@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
     s.swift_version    = '5.3'
 
     s.ios.deployment_target = "11.0"
-    s.ios.source_files      = 'mParticle-Rokt/*.{h,m}'
+    s.ios.source_files      = 'mParticle-Rokt/*.{swift}'
     s.ios.dependency 'mParticle-Apple-SDK', '~> 8.0'
     s.ios.dependency 'Rokt-Widget', '~> 4.8'
 end
