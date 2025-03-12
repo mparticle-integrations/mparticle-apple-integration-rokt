@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2502325C2D7A7BF3004794A2 /* Rokt-Widget in Frameworks */ = {isa = PBXBuildFile; productRef = 2502325B2D7A7BF3004794A2 /* Rokt-Widget */; };
 		536803952B7BAE11000A10BE /* mParticle-Apple-SDK in Frameworks */ = {isa = PBXBuildFile; productRef = 536803942B7BAE11000A10BE /* mParticle-Apple-SDK */; };
+		B8BED1502D81228700DC68BF /* Rokt_Widget.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8BED14F2D81228700DC68BF /* Rokt_Widget.xcframework */; };
 		DBB01A601DC1478A00A7B188 /* mParticle_Rokt.h in Headers */ = {isa = PBXBuildFile; fileRef = DBB01A5E1DC1478A00A7B188 /* mParticle_Rokt.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DBB01A681DC1480700A7B188 /* MPKitRokt.h in Headers */ = {isa = PBXBuildFile; fileRef = DBB01A661DC1480700A7B188 /* MPKitRokt.h */; };
 		DBB01A691DC1480700A7B188 /* MPKitRokt.m in Sources */ = {isa = PBXBuildFile; fileRef = DBB01A671DC1480700A7B188 /* MPKitRokt.m */; };
@@ -27,6 +27,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B8BED14F2D81228700DC68BF /* Rokt_Widget.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Rokt_Widget.xcframework; sourceTree = "<group>"; };
 		DBB01A5B1DC1478A00A7B188 /* mParticle_Rokt.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = mParticle_Rokt.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBB01A5E1DC1478A00A7B188 /* mParticle_Rokt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mParticle_Rokt.h; sourceTree = "<group>"; };
 		DBB01A5F1DC1478A00A7B188 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -42,8 +43,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2502325C2D7A7BF3004794A2 /* Rokt-Widget in Frameworks */,
 				536803952B7BAE11000A10BE /* mParticle-Apple-SDK in Frameworks */,
+				B8BED1502D81228700DC68BF /* Rokt_Widget.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,6 +62,7 @@
 		DBB01A511DC1478A00A7B188 = {
 			isa = PBXGroup;
 			children = (
+				B8BED14F2D81228700DC68BF /* Rokt_Widget.xcframework */,
 				DBB01A5D1DC1478A00A7B188 /* mParticle-Rokt */,
 				FF0BB63C217A84E800B0556C /* mParticle_RoktTests */,
 				DBB01A5C1DC1478A00A7B188 /* Products */,
@@ -135,7 +137,6 @@
 			name = "mParticle-Rokt";
 			packageProductDependencies = (
 				536803942B7BAE11000A10BE /* mParticle-Apple-SDK */,
-				2502325B2D7A7BF3004794A2 /* Rokt-Widget */,
 			);
 			productName = "mParticle-Rokt";
 			productReference = DBB01A5B1DC1478A00A7B188 /* mParticle_Rokt.framework */;
@@ -189,7 +190,6 @@
 			mainGroup = DBB01A511DC1478A00A7B188;
 			packageReferences = (
 				536803932B7BAE11000A10BE /* XCRemoteSwiftPackageReference "mparticle-apple-sdk" */,
-				2502325A2D7A7BF3004794A2 /* XCRemoteSwiftPackageReference "rokt-sdk-ios" */,
 			);
 			productRefGroup = DBB01A5C1DC1478A00A7B188 /* Products */;
 			projectDirPath = "";
@@ -500,14 +500,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		2502325A2D7A7BF3004794A2 /* XCRemoteSwiftPackageReference "rokt-sdk-ios" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ROKT/rokt-sdk-ios";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.8.1;
-			};
-		};
 		536803932B7BAE11000A10BE /* XCRemoteSwiftPackageReference "mparticle-apple-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mParticle/mparticle-apple-sdk";
@@ -519,11 +511,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		2502325B2D7A7BF3004794A2 /* Rokt-Widget */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2502325A2D7A7BF3004794A2 /* XCRemoteSwiftPackageReference "rokt-sdk-ios" */;
-			productName = "Rokt-Widget";
-		};
 		536803942B7BAE11000A10BE /* mParticle-Apple-SDK */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 536803932B7BAE11000A10BE /* XCRemoteSwiftPackageReference "mparticle-apple-sdk" */;

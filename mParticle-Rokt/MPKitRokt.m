@@ -41,7 +41,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 
     // Initialize Rokt SDK here
     [Rokt initWithRoktTagId:partnerId];
-    
+
     [self start];
 
     return [self execStatus:MPKitReturnCodeSuccess];
@@ -67,7 +67,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 
 - (MPKitExecStatus *)setUserIdentity:(NSString *)identityString identityType:(MPUserIdentity)identityType {
     MPKitExecStatus *execStatus = nil;
-    
+
     if (identityType == MPUserIdentityEmail) {
         // Set user email in Rokt SDK
         // [Rokt setUserEmail:identityString];
@@ -79,7 +79,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     } else {
         execStatus = [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeUnavailable];
     }
-    
+
     return execStatus;
 }
 
@@ -88,7 +88,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 - (MPKitExecStatus *)logEvent:(MPEvent *)event {
     // Track event in Rokt SDK
     // [Rokt trackEvent:event.name];
-    
+
     MPKitExecStatus *execStatus = [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeSuccess];
     return execStatus;
 }
@@ -180,28 +180,31 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 }
 
 /*
-    Implement this method if your SDK resets user attributes.
+    Whenever remove user attribute is called, this callback will update with the latest attributes in Rokt.
 */
 - (MPKitExecStatus *)onRemoveUserAttribute:(FilteredMParticleUser *)user {
-     /*  Your code goes here.
-         If the execution is not successful, please use a code other than MPKitReturnCodeSuccess for the execution status.
-         Please see MPKitExecStatus.h for all exec status codes
-      */
-
-     return [self execStatus:MPKitReturnCodeSuccess];
+    [Rokt setAttributes: [self processAttributes:user.userAttributes]];
+    return [self execStatus:MPKitReturnCodeSuccess];
 }
 
 /*
-    Implement this method if your SDK sets user attributes.
+    Whenever set user attribute is called, this callback will update the attributes in Rokt.
 */
 - (MPKitExecStatus *)onSetUserAttribute:(FilteredMParticleUser *)user {
-     /*  Your code goes here.
-         If the execution is not successful, please use a code other than MPKitReturnCodeSuccess for the execution status.
-         Please see MPKitExecStatus.h for all exec status codes
-      */
-
-     return [self execStatus:MPKitReturnCodeSuccess];
+    [Rokt setAttributes: [self processAttributes:user.userAttributes]];
+    return [self execStatus:MPKitReturnCodeSuccess];
 }
+
+- (MPKitExecStatus *)setUserAttribute:(NSString *)key values:(NSArray *)values {
+    [Rokt updateAttributeWithKey:[self prefixKey:key] value:values];
+    return [self execStatus:MPKitReturnCodeSuccess];
+}
+
+- (MPKitExecStatus *)setUserAttribute:(NSString *)key value:(id)value {
+    [Rokt updateAttributeWithKey:[self prefixKey:key] value:value];
+    return [self execStatus:MPKitReturnCodeSuccess];
+}
+
 
 /*
     Implement this method if your SDK supports setting value-less attributes
@@ -217,39 +220,27 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 
 #pragma mark Identity
 /*
-    Implement this method if your SDK should be notified any time the mParticle ID (MPID) changes. This will occur on initial install of the app, and potentially after a login or logout.
+    update attributes whenever identify is done
 */
 - (MPKitExecStatus *)onIdentifyComplete:(FilteredMParticleUser *)user request:(FilteredMPIdentityApiRequest *)request {
-     /*  Your code goes here.
-         If the execution is not successful, please use a code other than MPKitReturnCodeSuccess for the execution status.
-         Please see MPKitExecStatus.h for all exec status codes
-      */
-
-     return [self execStatus:MPKitReturnCodeSuccess];
+    [Rokt setAttributes: [self processAttributes:user.userAttributes]];
+    return [self execStatus:MPKitReturnCodeSuccess];
 }
 
 /*
-    Implement this method if your SDK should be notified when the user logs in
+    Update attributes when the user logs in
 */
 - (MPKitExecStatus *)onLoginComplete:(FilteredMParticleUser *)user request:(FilteredMPIdentityApiRequest *)request {
-     /*  Your code goes here.
-         If the execution is not successful, please use a code other than MPKitReturnCodeSuccess for the execution status.
-         Please see MPKitExecStatus.h for all exec status codes
-      */
-
-     return [self execStatus:MPKitReturnCodeSuccess];
+    [Rokt setAttributes: [self processAttributes:user.userAttributes]];
+    return [self execStatus:MPKitReturnCodeSuccess];
 }
 
 /*
-    Implement this method if your SDK should be notified when the user logs out
+    Update attributes of logged out identity when the user logs out
 */
 - (MPKitExecStatus *)onLogoutComplete:(FilteredMParticleUser *)user request:(FilteredMPIdentityApiRequest *)request {
-     /*  Your code goes here.
-         If the execution is not successful, please use a code other than MPKitReturnCodeSuccess for the execution status.
-         Please see MPKitExecStatus.h for all exec status codes
-      */
-
-     return [self execStatus:MPKitReturnCodeSuccess];
+    [Rokt setAttributes: [self processAttributes:user.userAttributes]];
+    return [self execStatus:MPKitReturnCodeSuccess];
 }
 
 /*
@@ -344,5 +335,22 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 
      return [self execStatus:MPKitReturnCodeSuccess];
  }
+
+#pragma mark Helper
+
+- (NSDictionary<NSString *, id> *)processAttributes:(NSDictionary<NSString *, id> *)attributes  {
+    NSMutableDictionary *mutableDict = [NSMutableDictionary dictionary];
+
+    [attributes enumerateKeysAndObjectsUsingBlock:^(NSString *key, id obj, BOOL *stop) {
+        NSString *prefixedKey = [self prefixKey:key];
+        [mutableDict setObject:obj forKey:prefixedKey];
+    }];
+
+    return mutableDict;
+}
+
+- (NSString *)prefixKey:(NSString *)key {
+    return [NSString stringWithFormat:@"mp_%@", key];
+}
 
 @end

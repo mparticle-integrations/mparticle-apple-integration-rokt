@@ -1,5 +1,5 @@
 {
-  "originHash" : "0ef9f5af76d29451074ba3334a8fa268b91ad7ee13c67ff22edadeb6690ac569",
+  "originHash" : "8bc689a1677969dc6dac8d272b9d75ae680d6ea09096249e4b6702e7d164454d",
   "pins" : [
     {
       "identity" : "mparticle-apple-sdk",
@@ -8,15 +8,6 @@
       "state" : {
         "revision" : "d6165052414519c53ccc16136ae407e5b8c6c67c",
         "version" : "8.27.5"
-      }
-    },
-    {
-      "identity" : "rokt-sdk-ios",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ROKT/rokt-sdk-ios",
-      "state" : {
-        "revision" : "878b61706abea1a4a2be47956288ad9fea22e3f8",
-        "version" : "4.8.1"
       }
     }
   ],
