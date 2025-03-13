@@ -3293,13 +3293,14 @@
               },
               {
                 "kind": "TypeNominal",
-                "name": "ProtocolComposition",
-                "printedName": "Any"
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
               }
             ],
             "declKind": "Func",
             "usr": "c:@M@Rokt_Widget@objc(cs)Rokt(cm)updateAttributeWithKey:value:",
-            "mangledName": "$s11Rokt_Widget0A0C15updateAttribute3key5valueySS_yptFZ",
+            "mangledName": "$s11Rokt_Widget0A0C15updateAttribute3key5valueySS_SStFZ",
             "moduleName": "Rokt_Widget",
             "static": true,
             "objc_name": "updateAttributeWithKey:value:",
@@ -3324,7 +3325,7 @@
               {
                 "kind": "TypeNominal",
                 "name": "Dictionary",
-                "printedName": "[Swift.String : Any]",
+                "printedName": "[Swift.String : Swift.String]",
                 "children": [
                   {
                     "kind": "TypeNominal",
@@ -3334,8 +3335,9 @@
                   },
                   {
                     "kind": "TypeNominal",
-                    "name": "ProtocolComposition",
-                    "printedName": "Any"
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
                   }
                 ],
                 "usr": "s:SD"
@@ -3343,7 +3345,7 @@
             ],
             "declKind": "Func",
             "usr": "c:@M@Rokt_Widget@objc(cs)Rokt(cm)setAttributes:",
-            "mangledName": "$s11Rokt_Widget0A0C13setAttributesyySDySSypGFZ",
+            "mangledName": "$s11Rokt_Widget0A0C13setAttributesyySDyS2SGFZ",
             "moduleName": "Rokt_Widget",
             "static": true,
             "declAttributes": [
@@ -13164,155 +13166,148 @@
     },
     {
       "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
-      "kind": "StringLiteral",
-      "offset": 583,
-      "length": 5,
-      "value": "\"mp_\""
-    },
-    {
-      "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
       "kind": "IntegerLiteral",
-      "offset": 618,
+      "offset": 576,
       "length": 4,
       "value": "9000"
     },
     {
       "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
       "kind": "IntegerLiteral",
-      "offset": 658,
+      "offset": 616,
       "length": 2,
       "value": "30"
     },
     {
       "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
       "kind": "IntegerLiteral",
-      "offset": 663,
+      "offset": 621,
       "length": 2,
       "value": "60"
     },
     {
       "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
       "kind": "IntegerLiteral",
-      "offset": 668,
+      "offset": 626,
       "length": 4,
       "value": "1000"
     },
     {
       "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
       "kind": "IntegerLiteral",
-      "offset": 732,
+      "offset": 690,
       "length": 2,
       "value": "30"
     },
     {
       "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
       "kind": "IntegerLiteral",
-      "offset": 772,
+      "offset": 730,
       "length": 4,
       "value": "1000"
     },
     {
       "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
       "kind": "IntegerLiteral",
-      "offset": 823,
+      "offset": 781,
       "length": 2,
       "value": "90"
     },
     {
       "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
       "kind": "IntegerLiteral",
-      "offset": 828,
+      "offset": 786,
       "length": 2,
       "value": "60"
     },
     {
       "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
       "kind": "BooleanLiteral",
-      "offset": 1100,
+      "offset": 1058,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
       "kind": "BooleanLiteral",
-      "offset": 1136,
+      "offset": 1094,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
       "kind": "BooleanLiteral",
-      "offset": 1174,
+      "offset": 1132,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
       "kind": "BooleanLiteral",
-      "offset": 1436,
+      "offset": 1394,
       "length": 4,
       "value": "true"
     },
     {
       "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
       "kind": "BooleanLiteral",
-      "offset": 1528,
+      "offset": 1486,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
       "kind": "BooleanLiteral",
-      "offset": 1627,
-      "length": 5,
-      "value": "false"
-    },
-    {
-      "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
-      "kind": "Dictionary",
-      "offset": 1710,
-      "length": 3,
-      "value": "[]"
-    },
-    {
-      "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
-      "kind": "BooleanLiteral",
-      "offset": 2573,
-      "length": 5,
-      "value": "false"
-    },
-    {
-      "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
-      "kind": "BooleanLiteral",
-      "offset": 2657,
+      "offset": 1585,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
       "kind": "Dictionary",
-      "offset": 3017,
+      "offset": 1668,
       "length": 3,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
       "kind": "BooleanLiteral",
-      "offset": 25487,
+      "offset": 2531,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
+      "kind": "BooleanLiteral",
+      "offset": 2615,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
+      "kind": "Dictionary",
+      "offset": 2975,
+      "length": 3,
+      "value": "[]"
+    },
+    {
+      "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
+      "kind": "BooleanLiteral",
+      "offset": 25445,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
       "kind": "StringLiteral",
-      "offset": 63571,
+      "offset": 63453,
       "length": 2,
       "value": "\"\""
     },
     {
       "filePath": "\/Users\/weizteoh\/Documents\/sdk-ios-source\/Rokt-Widget\/Classes\/Rokt.swift",
       "kind": "BooleanLiteral",
-      "offset": 63618,
+      "offset": 63500,
       "length": 5,
       "value": "false"
     },

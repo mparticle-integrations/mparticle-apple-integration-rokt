@@ -67,8 +67,8 @@ extension Rokt_Widget.RoktViewController : SafariServices.SFSafariViewController
   @objc public static func setEnvironment(environment: Rokt_Widget.RoktEnvironment)
   @objc public static func events(viewName: Swift.String, onEvent: ((Rokt_Widget.RoktEvent) -> Swift.Void)?)
   @objc public static func globalEvents(onEvent: @escaping ((Rokt_Widget.RoktEvent) -> Swift.Void))
-  @objc public static func updateAttribute(key: Swift.String, value: Any)
-  @objc public static func setAttributes(_ attributes: [Swift.String : Any])
+  @objc public static func updateAttribute(key: Swift.String, value: Swift.String)
+  @objc public static func setAttributes(_ attributes: [Swift.String : Swift.String])
   @objc deinit
 }
 @available(iOS 13.0, *)
