@@ -458,10 +458,14 @@ SWIFT_CLASS("_TtC11Rokt_Widget4Rokt")
 /// \param onEvent Function to execute when some events triggered, the first item is RoktEvent
 ///
 + (void)globalEventsOnEvent:(void (^ _Nonnull)(RoktEvent * _Nonnull))onEvent;
+/// Allows user to update an attribute that will be included in the next execute call.
+/// \param key key of element to be updated
+///
+/// \param value new value
+///
++ (void)updateAttributeWithKey:(NSString * _Nonnull)key value:(NSString * _Nonnull)value;
 /// Allows user to set attributes that will be included in the next execute call.
-+ (void)updateAttributeWithKey:(NSString * _Nonnull)key value:(id _Nonnull)value;
-/// Allows user to set attributes that will be included in the next execute call.
-+ (void)setAttributes:(NSDictionary<NSString *, id> * _Nonnull)attributes;
++ (void)setAttributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes;
 @end
 
 

@@ -183,7 +183,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     Whenever remove user attribute is called, this callback will update with the latest attributes in Rokt.
 */
 - (MPKitExecStatus *)onRemoveUserAttribute:(FilteredMParticleUser *)user {
-    [Rokt setAttributes: [self processAttributes:user.userAttributes]];
+    [Rokt setAttributes: [self processAttributesFromUser: user]];
     return [self execStatus:MPKitReturnCodeSuccess];
 }
 
@@ -191,17 +191,17 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     Whenever set user attribute is called, this callback will update the attributes in Rokt.
 */
 - (MPKitExecStatus *)onSetUserAttribute:(FilteredMParticleUser *)user {
-    [Rokt setAttributes: [self processAttributes:user.userAttributes]];
+    [Rokt setAttributes: [self processAttributesFromUser: user]];
     return [self execStatus:MPKitReturnCodeSuccess];
 }
 
 - (MPKitExecStatus *)setUserAttribute:(NSString *)key values:(NSArray *)values {
-    [Rokt updateAttributeWithKey:[self prefixKey:key] value:values];
+    [Rokt updateAttributeWithKey:[self prefixKey:key] value:[self mapToString:values]];
     return [self execStatus:MPKitReturnCodeSuccess];
 }
 
 - (MPKitExecStatus *)setUserAttribute:(NSString *)key value:(id)value {
-    [Rokt updateAttributeWithKey:[self prefixKey:key] value:value];
+    [Rokt updateAttributeWithKey:[self prefixKey:key] value:[self mapToString:value]];
     return [self execStatus:MPKitReturnCodeSuccess];
 }
 
@@ -223,7 +223,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     update attributes whenever identify is done
 */
 - (MPKitExecStatus *)onIdentifyComplete:(FilteredMParticleUser *)user request:(FilteredMPIdentityApiRequest *)request {
-    [Rokt setAttributes: [self processAttributes:user.userAttributes]];
+    [Rokt setAttributes: [self processAttributesFromUser: user]];
     return [self execStatus:MPKitReturnCodeSuccess];
 }
 
@@ -231,7 +231,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     Update attributes when the user logs in
 */
 - (MPKitExecStatus *)onLoginComplete:(FilteredMParticleUser *)user request:(FilteredMPIdentityApiRequest *)request {
-    [Rokt setAttributes: [self processAttributes:user.userAttributes]];
+    [Rokt setAttributes: [self processAttributesFromUser: user]];
     return [self execStatus:MPKitReturnCodeSuccess];
 }
 
@@ -239,7 +239,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     Update attributes of logged out identity when the user logs out
 */
 - (MPKitExecStatus *)onLogoutComplete:(FilteredMParticleUser *)user request:(FilteredMPIdentityApiRequest *)request {
-    [Rokt setAttributes: [self processAttributes:user.userAttributes]];
+    [Rokt setAttributes: [self processAttributesFromUser: user]];
     return [self execStatus:MPKitReturnCodeSuccess];
 }
 
@@ -338,12 +338,12 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 
 #pragma mark Helper
 
-- (NSDictionary<NSString *, id> *)processAttributes:(NSDictionary<NSString *, id> *)attributes  {
-    NSMutableDictionary *mutableDict = [NSMutableDictionary dictionary];
+- (NSDictionary<NSString *, NSString *> *)processAttributesFromUser:(FilteredMParticleUser *)user  {
+    NSMutableDictionary *mutableDict = [NSMutableDictionary dictionaryWithObject:[user.userId stringValue] forKey:@"mpid"];
 
-    [attributes enumerateKeysAndObjectsUsingBlock:^(NSString *key, id obj, BOOL *stop) {
+    [user.userAttributes enumerateKeysAndObjectsUsingBlock:^(NSString *key, id obj, BOOL *stop) {
         NSString *prefixedKey = [self prefixKey:key];
-        [mutableDict setObject:obj forKey:prefixedKey];
+        [mutableDict setObject:[self mapToString:obj] forKey:prefixedKey];
     }];
 
     return mutableDict;
@@ -351,6 +351,24 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 
 - (NSString *)prefixKey:(NSString *)key {
     return [NSString stringWithFormat:@"mp_%@", key];
+}
+
+- (NSString *)mapToString:(id)value {
+    if ([NSJSONSerialization isValidJSONObject:value]) {
+        NSError *error = nil;
+        NSData *data = [NSJSONSerialization dataWithJSONObject:value options:0 error:&error];
+
+        if (data && !error) {
+            NSString *jsonString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            if (jsonString) {
+                return jsonString;
+            }
+        } else {
+            NSLog(@"Rokt: Failed to serialize attribute to JSON: %@", error);
+        }
+    }
+    // Fallback to description if not a valid JSON object or serialization failed
+    return[value description];
 }
 
 @end
