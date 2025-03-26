@@ -61,29 +61,6 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 
     dispatch_once(&kitPredicate, ^{
         self->_started = YES;
-        
-        NSDictionary *attributes = @{
-                @"email" : @"j.smith@example.com",
-                @"firstname": @"Jenny",
-                @"lastname": @"Smith",
-                @"mobile": @"(555)867-5309",
-                @"postcode": @"90210",
-                @"country": @"US"
-            };
-            [Rokt executeWithViewName:@"RoktExperience"
-                           attributes:attributes
-                           placements:nil
-                               onLoad:^{
-                // Optional callback for when the Rokt placement loads
-            } onUnLoad:^{
-                // Optional callback for when the Rokt placement unloads
-            } onShouldShowLoadingIndicator:^{
-                // Optional callback to show a loading indicator
-            } onShouldHideLoadingIndicator:^{
-                // Optional callback to hide a loading indicator
-            } onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight) {
-                // Does not required for Full screen overlay
-            }];
 
         dispatch_async(dispatch_get_main_queue(), ^{
             NSDictionary *userInfo = @{mParticleKitInstanceKey:[[self class] kitCode]};
@@ -112,7 +89,14 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 /// \param onEmbeddedSizeChange Function to execute when size of embeddedView change, the first item is selected
 /// Placement and second item is widget height
 ///
-- (MPKitExecStatus *)executeWithViewName:(NSString * _Nullable)viewName attributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes placements:(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable)placements onLoad:(void (^ _Nullable)(void))onLoad onUnLoad:(void (^ _Nullable)(void))onUnLoad onShouldShowLoadingIndicator:(void (^ _Nullable)(void))onShouldShowLoadingIndicator onShouldHideLoadingIndicator:(void (^ _Nullable)(void))onShouldHideLoadingIndicator onEmbeddedSizeChange:(void (^ _Nullable)(NSString * _Nonnull, CGFloat))onEmbeddedSizeChange {
+- (MPKitExecStatus *)executeWithViewName:(NSString * _Nullable)viewName
+                              attributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes
+                              placements:(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable)placements
+                                  onLoad:(void (^ _Nullable)(void))onLoad
+                                onUnLoad:(void (^ _Nullable)(void))onUnLoad
+            onShouldShowLoadingIndicator:(void (^ _Nullable)(void))onShouldShowLoadingIndicator
+            onShouldHideLoadingIndicator:(void (^ _Nullable)(void))onShouldHideLoadingIndicator
+                    onEmbeddedSizeChange:(void (^ _Nullable)(NSString * _Nonnull, CGFloat))onEmbeddedSizeChange {
     FilteredMParticleUser *user = [[[MPKitAPI alloc] init] getCurrentUserWithKit:self];
     NSDictionary<NSString *, NSString *> *mpAttributes = [user.userAttributes transformValuesToString];
     NSMutableDictionary<NSString *, NSString *> *finalAtt = [[NSMutableDictionary alloc] init];
@@ -121,7 +105,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     
     [Rokt executeWithViewName:viewName
                    attributes:finalAtt
-                   placements:placements
+                   placements:[self confirmPlacements:placements]
                        onLoad:onLoad
                      onUnLoad:onUnLoad
  onShouldShowLoadingIndicator:onShouldShowLoadingIndicator
@@ -131,6 +115,20 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     
     return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeSuccess];
 
+}
+
+-(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmPlacements:(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable)placements {
+    NSMutableDictionary <NSString *, RoktEmbeddedView *> *safePlacements = [NSMutableDictionary dictionary];
+    
+    for (NSString* key in placements) {
+        id value = [placements objectForKey:key];
+        
+        if ([value isKindOfClass:RoktEmbeddedView.class]) {
+            [safePlacements setObject:value forKey:key];
+        }
+    }
+    
+    return safePlacements;
 }
 
 -(NSDictionary<NSString *, NSString *> *) filteredUserAttributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes kitConfiguration:(MPKitConfiguration *)kitConfiguration {
