@@ -43,7 +43,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     _configuration = configuration;
 
     // Initialize Rokt SDK here
-    [Rokt initWithRoktTagId:partnerId onInitComplete:^(BOOL InitComplete) {
+    [Rokt initWithRoktTagId:@"2754655826098840951" onInitComplete:^(BOOL InitComplete) {
         NSDictionary *userInfo = @{mParticleKitInstanceKey:[[self class] kitCode]};
 
         [[NSNotificationCenter defaultCenter] postNotificationName:@"mParticle.Rokt.Initialized"
@@ -96,12 +96,12 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
                                 onUnLoad:(void (^ _Nullable)(void))onUnLoad
             onShouldShowLoadingIndicator:(void (^ _Nullable)(void))onShouldShowLoadingIndicator
             onShouldHideLoadingIndicator:(void (^ _Nullable)(void))onShouldHideLoadingIndicator
-                    onEmbeddedSizeChange:(void (^ _Nullable)(NSString * _Nonnull, CGFloat))onEmbeddedSizeChange {
-    FilteredMParticleUser *user = [[[MPKitAPI alloc] init] getCurrentUserWithKit:self];
-    NSDictionary<NSString *, NSString *> *mpAttributes = [user.userAttributes transformValuesToString];
+                    onEmbeddedSizeChange:(void (^ _Nullable)(NSString * _Nonnull, CGFloat))onEmbeddedSizeChange
+                            filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser {
+    NSDictionary<NSString *, NSString *> *mpAttributes = [filteredUser.userAttributes transformValuesToString];
     NSMutableDictionary<NSString *, NSString *> *finalAtt = [[NSMutableDictionary alloc] init];
+    [finalAtt addEntriesFromDictionary:@{@"mpid": filteredUser.userId.stringValue}];
     [finalAtt addEntriesFromDictionary:mpAttributes];
-    [finalAtt addEntriesFromDictionary:[self filteredUserAttributes:attributes kitConfiguration:user.kitConfiguration]];
     
     [Rokt executeWithViewName:viewName
                    attributes:finalAtt
@@ -114,7 +114,6 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     ];
     
     return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeSuccess];
-
 }
 
 -(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmPlacements:(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable)placements {
@@ -131,7 +130,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     return safePlacements;
 }
 
--(NSDictionary<NSString *, NSString *> *) filteredUserAttributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes kitConfiguration:(MPKitConfiguration *)kitConfiguration {
+- (NSDictionary<NSString *, NSString *> *) filteredUserAttributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes kitConfiguration:(MPKitConfiguration *)kitConfiguration {
     NSDictionary<NSString *, NSString *> *unfilteredUserAttributes = attributes;
     NSMutableDictionary *userAttributes = [NSMutableDictionary dictionary];
     
