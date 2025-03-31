@@ -43,7 +43,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     _configuration = configuration;
 
     // Initialize Rokt SDK here
-    [Rokt initWithRoktTagId:@"2754655826098840951" onInitComplete:^(BOOL InitComplete) {
+    [Rokt initWithRoktTagId:partnerId onInitComplete:^(BOOL InitComplete) {
         NSDictionary *userInfo = @{mParticleKitInstanceKey:[[self class] kitCode]};
 
         [[NSNotificationCenter defaultCenter] postNotificationName:@"mParticle.Rokt.Initialized"
@@ -100,7 +100,9 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
                             filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser {
     NSDictionary<NSString *, NSString *> *mpAttributes = [filteredUser.userAttributes transformValuesToString];
     NSMutableDictionary<NSString *, NSString *> *finalAtt = [[NSMutableDictionary alloc] init];
-    [finalAtt addEntriesFromDictionary:@{@"mpid": filteredUser.userId.stringValue}];
+    if (filteredUser.userId.stringValue) {
+        [finalAtt addEntriesFromDictionary:@{@"mpid": filteredUser.userId.stringValue}];
+    }
     [finalAtt addEntriesFromDictionary:mpAttributes];
     
     [Rokt executeWithViewName:viewName
@@ -116,7 +118,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeSuccess];
 }
 
--(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmPlacements:(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable)placements {
+- (NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmPlacements:(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable)placements {
     NSMutableDictionary <NSString *, RoktEmbeddedView *> *safePlacements = [NSMutableDictionary dictionary];
     
     for (NSString* key in placements) {
