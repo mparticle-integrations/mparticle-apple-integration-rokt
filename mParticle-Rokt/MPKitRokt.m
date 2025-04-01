@@ -44,8 +44,8 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 
     // Initialize Rokt SDK here
     [Rokt initWithRoktTagId:partnerId onInitComplete:^(BOOL InitComplete) {
-        NSDictionary *userInfo = @{mParticleKitInstanceKey:[[self class] kitCode]};
-
+        NSDictionary *userInfo = @{mParticleKitInstanceKey:[[self class] kitCode],
+                                   @"RoktInitialized": @(InitComplete)};
         [[NSNotificationCenter defaultCenter] postNotificationName:@"mParticle.Rokt.Initialized"
                                                             object:nil
                                                           userInfo:userInfo];
@@ -130,27 +130,6 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     }
     
     return safePlacements;
-}
-
-- (NSDictionary<NSString *, NSString *> *) filteredUserAttributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes kitConfiguration:(MPKitConfiguration *)kitConfiguration {
-    NSDictionary<NSString *, NSString *> *unfilteredUserAttributes = attributes;
-    NSMutableDictionary *userAttributes = [NSMutableDictionary dictionary];
-    
-    for (NSString* key in unfilteredUserAttributes) {
-        id value = [unfilteredUserAttributes objectForKey:key];
-        NSString *hashKey = [MPIHasher hashString:key];
-        BOOL shouldFilter = NO;
-        
-        if (kitConfiguration) {
-            shouldFilter = kitConfiguration.userAttributeFilters[hashKey] && [kitConfiguration.userAttributeFilters[hashKey] isEqualToNumber:@0];
-        }
-        
-        if (!shouldFilter) {
-            [userAttributes setObject:value forKey:key];
-        }
-    }
-    
-    return userAttributes;
 }
 
 #pragma mark - User attributes and identities

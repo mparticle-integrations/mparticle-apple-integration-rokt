@@ -87,28 +87,6 @@
     XCTAssertEqual(result.count, 0);
 }
 
-- (void)testFilteredUserAttributes {
-    NSDictionary *attributes = @{
-        @"email": @"test@example.com",
-        @"name": @"Test User"
-    };
-    
-    NSDictionary *kitConfigDictionary = @{
-        
-    };
-    
-    MPKitConfiguration *kitConfig = [[MPKitConfiguration alloc] initWithDictionary: kitConfigDictionary];
-    kitConfig.userAttributeFilters = @{
-        [MPIHasher hashString:@"email"]: @0  // Filter out email
-    };
-    
-    NSDictionary *filtered = [self.kitInstance filteredUserAttributes:attributes kitConfiguration:kitConfig];
-    
-    XCTAssertEqual(filtered.count, 1);
-    XCTAssertNil(filtered[@"email"]);
-    XCTAssertEqualObjects(filtered[@"name"], @"Test User");
-}
-
 - (void)testSetUserIdentity_Email {
     MPKitExecStatus *status = [self.kitInstance setUserIdentity:@"test@example.com" identityType:MPUserIdentityEmail];
     
