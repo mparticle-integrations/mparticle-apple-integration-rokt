@@ -44,15 +44,15 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 
     // Initialize Rokt SDK here
     [Rokt initWithRoktTagId:partnerId onInitComplete:^(BOOL InitComplete) {
-        NSDictionary *userInfo = @{mParticleKitInstanceKey:[[self class] kitCode],
-                                   @"RoktInitialized": @(InitComplete)};
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"mParticle.Rokt.Initialized"
-                                                            object:nil
-                                                          userInfo:userInfo];
+        if (InitComplete) {
+            [self start];
+            NSDictionary *userInfo = @{mParticleKitInstanceKey:[[self class] kitCode]};
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"mParticle.Rokt.Initialized"
+                                                                object:nil
+                                                              userInfo:userInfo];
+        }
     }];
     
-    [self start];
-
     return [self execStatus:MPKitReturnCodeSuccess];
 }
 
