@@ -1,6 +1,8 @@
 #import "MPKitRokt.h"
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
 
+NSString * const kMPRemoteConfigKitHashesKey = @"hs";
+NSString * const kMPRemoteConfigUserAttributeFilter = @"ua";
 NSString * const MPKitRoktErrorDomain = @"com.mparticle.kits.rokt";
 NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 
@@ -33,6 +35,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 #pragma mark Kit instance and lifecycle
 - (MPKitExecStatus *)didFinishLaunchingWithConfiguration:(NSDictionary *)configuration {
     NSString *partnerId = configuration[@"accountId"];
+
     if (!partnerId) {
         return [self execStatus:MPKitReturnCodeRequirementsNotMet];
     }
@@ -40,10 +43,16 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     _configuration = configuration;
 
     // Initialize Rokt SDK here
-    [Rokt initWithRoktTagId:partnerId];
+    [Rokt initWithRoktTagId:partnerId onInitComplete:^(BOOL InitComplete) {
+        if (InitComplete) {
+            [self start];
+            NSDictionary *userInfo = @{mParticleKitInstanceKey:[[self class] kitCode]};
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"mParticle.Rokt.Initialized"
+                                                                object:nil
+                                                              userInfo:userInfo];
+        }
+    }];
     
-    [self start];
-
     return [self execStatus:MPKitReturnCodeSuccess];
 }
 
@@ -61,6 +70,66 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
                                                               userInfo:userInfo];
         });
     });
+}
+
+/// \param viewName The name that should be displayed in the widget
+///
+/// \param attributes A string dictionary containing the parameters that should be displayed in the widget
+///
+/// \param placements A dictionary of RoktEmbeddedViews with their names
+///
+/// \param onLoad Function to execute right after the widget is successfully loaded and displayed
+///
+/// \param onUnLoad Function to execute right after widget is unloaded, there is no widget or there is an exception
+///
+/// \param onShouldShowLoadingIndicator Function to execute when the loading indicator should be shown
+///
+/// \param onShouldHideLoadingIndicator Function to execute when the loading indicator should be hidden
+///
+/// \param onEmbeddedSizeChange Function to execute when size of embeddedView change, the first item is selected
+/// Placement and second item is widget height
+///
+- (MPKitExecStatus *)executeWithViewName:(NSString * _Nullable)viewName
+                              attributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes
+                              placements:(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable)placements
+                                  onLoad:(void (^ _Nullable)(void))onLoad
+                                onUnLoad:(void (^ _Nullable)(void))onUnLoad
+            onShouldShowLoadingIndicator:(void (^ _Nullable)(void))onShouldShowLoadingIndicator
+            onShouldHideLoadingIndicator:(void (^ _Nullable)(void))onShouldHideLoadingIndicator
+                    onEmbeddedSizeChange:(void (^ _Nullable)(NSString * _Nonnull, CGFloat))onEmbeddedSizeChange
+                            filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser {
+    NSDictionary<NSString *, NSString *> *mpAttributes = [filteredUser.userAttributes transformValuesToString];
+    NSMutableDictionary<NSString *, NSString *> *finalAtt = [[NSMutableDictionary alloc] init];
+    if (filteredUser.userId.stringValue) {
+        [finalAtt addEntriesFromDictionary:@{@"mpid": filteredUser.userId.stringValue}];
+    }
+    [finalAtt addEntriesFromDictionary:mpAttributes];
+    
+    [Rokt executeWithViewName:viewName
+                   attributes:finalAtt
+                   placements:[self confirmPlacements:placements]
+                       onLoad:onLoad
+                     onUnLoad:onUnLoad
+ onShouldShowLoadingIndicator:onShouldShowLoadingIndicator
+ onShouldHideLoadingIndicator:onShouldHideLoadingIndicator
+         onEmbeddedSizeChange:onEmbeddedSizeChange
+    ];
+    
+    return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeSuccess];
+}
+
+- (NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmPlacements:(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable)placements {
+    NSMutableDictionary <NSString *, RoktEmbeddedView *> *safePlacements = [NSMutableDictionary dictionary];
+    
+    for (NSString* key in placements) {
+        id value = [placements objectForKey:key];
+        
+        if ([value isKindOfClass:RoktEmbeddedView.class]) {
+            [safePlacements setObject:value forKey:key];
+        }
+    }
+    
+    return safePlacements;
 }
 
 #pragma mark - User attributes and identities
