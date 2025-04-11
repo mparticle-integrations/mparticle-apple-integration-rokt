@@ -11,6 +11,7 @@
 		536803952B7BAE11000A10BE /* mParticle-Apple-SDK in Frameworks */ = {isa = PBXBuildFile; productRef = 536803942B7BAE11000A10BE /* mParticle-Apple-SDK */; };
 		7E15B2092D9AE82000C1FF3E /* mParticle-Apple-SDK in Frameworks */ = {isa = PBXBuildFile; productRef = 7E15B2082D9AE82000C1FF3E /* mParticle-Apple-SDK */; };
 		7E15B20B2D9AE82600C1FF3E /* Rokt-Widget in Frameworks */ = {isa = PBXBuildFile; productRef = 7E15B20A2D9AE82600C1FF3E /* Rokt-Widget */; };
+		7EE7F13E2DA95BEE006C5440 /* OCMock in Frameworks */ = {isa = PBXBuildFile; productRef = 7EE7F13D2DA95BEE006C5440 /* OCMock */; };
 		DBB01A601DC1478A00A7B188 /* mParticle_Rokt.h in Headers */ = {isa = PBXBuildFile; fileRef = DBB01A5E1DC1478A00A7B188 /* mParticle_Rokt.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DBB01A681DC1480700A7B188 /* MPKitRokt.h in Headers */ = {isa = PBXBuildFile; fileRef = DBB01A661DC1480700A7B188 /* MPKitRokt.h */; };
 		DBB01A691DC1480700A7B188 /* MPKitRokt.m in Sources */ = {isa = PBXBuildFile; fileRef = DBB01A671DC1480700A7B188 /* MPKitRokt.m */; };
@@ -55,6 +56,7 @@
 			files = (
 				7E15B2092D9AE82000C1FF3E /* mParticle-Apple-SDK in Frameworks */,
 				FF0BB640217A84E800B0556C /* mParticle_Rokt.framework in Frameworks */,
+				7EE7F13E2DA95BEE006C5440 /* OCMock in Frameworks */,
 				7E15B20B2D9AE82600C1FF3E /* Rokt-Widget in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -194,6 +196,7 @@
 			packageReferences = (
 				536803932B7BAE11000A10BE /* XCRemoteSwiftPackageReference "mparticle-apple-sdk" */,
 				2502325A2D7A7BF3004794A2 /* XCRemoteSwiftPackageReference "rokt-sdk-ios" */,
+				7EE7F13C2DA95BEE006C5440 /* XCRemoteSwiftPackageReference "ocmock" */,
 			);
 			productRefGroup = DBB01A5C1DC1478A00A7B188 /* Products */;
 			projectDirPath = "";
@@ -520,6 +523,14 @@
 				minimumVersion = 8.4.0;
 			};
 		};
+		7EE7F13C2DA95BEE006C5440 /* XCRemoteSwiftPackageReference "ocmock" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/erikdoe/ocmock.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -542,6 +553,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2502325A2D7A7BF3004794A2 /* XCRemoteSwiftPackageReference "rokt-sdk-ios" */;
 			productName = "Rokt-Widget";
+		};
+		7EE7F13D2DA95BEE006C5440 /* OCMock */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7EE7F13C2DA95BEE006C5440 /* XCRemoteSwiftPackageReference "ocmock" */;
+			productName = OCMock;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
