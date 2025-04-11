@@ -104,6 +104,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     if (filteredUser.userId.stringValue != nil) {
         [finalAtt addEntriesFromDictionary:@{@"mpid": filteredUser.userId.stringValue}];
     }
+    // The core SDK does not set sandbox on the user, but we must pass it to Rokt if provided
     NSString *sandboxKey = @"sandbox";
     if (attributes[sandboxKey] != nil) {
         [finalAtt addEntriesFromDictionary:@{sandboxKey: attributes[sandboxKey]}];
