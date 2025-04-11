@@ -100,10 +100,14 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
                             filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser {
     NSDictionary<NSString *, NSString *> *mpAttributes = [filteredUser.userAttributes transformValuesToString];
     NSMutableDictionary<NSString *, NSString *> *finalAtt = [[NSMutableDictionary alloc] init];
-    if (filteredUser.userId.stringValue) {
+    [finalAtt addEntriesFromDictionary:mpAttributes];
+    if (filteredUser.userId.stringValue != nil) {
         [finalAtt addEntriesFromDictionary:@{@"mpid": filteredUser.userId.stringValue}];
     }
-    [finalAtt addEntriesFromDictionary:mpAttributes];
+    NSString *sandboxKey = @"sandbox";
+    if (attributes[sandboxKey] != nil) {
+        [finalAtt addEntriesFromDictionary:@{sandboxKey: attributes[sandboxKey]}];
+    }
     
     [Rokt executeWithViewName:viewName
                    attributes:finalAtt
