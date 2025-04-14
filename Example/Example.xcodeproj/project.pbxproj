@@ -10,27 +10,8 @@
 		B883A4092DAC925400F41C4D /* mParticle-Rokt in Frameworks */ = {isa = PBXBuildFile; productRef = B883A4082DAC925400F41C4D /* mParticle-Rokt */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		B883A3EA2DAC923300F41C4D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B883A3CB2DAC923100F41C4D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = B883A3D22DAC923100F41C4D;
-			remoteInfo = Example;
-		};
-		B883A3F42DAC923300F41C4D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B883A3CB2DAC923100F41C4D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = B883A3D22DAC923100F41C4D;
-			remoteInfo = Example;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
 		B883A3D32DAC923100F41C4D /* Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		B883A3E92DAC923300F41C4D /* ExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		B883A3F32DAC923300F41C4D /* ExampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -52,16 +33,6 @@
 			path = Example;
 			sourceTree = "<group>";
 		};
-		B883A3EC2DAC923300F41C4D /* ExampleTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ExampleTests;
-			sourceTree = "<group>";
-		};
-		B883A3F62DAC923300F41C4D /* ExampleUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ExampleUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,20 +44,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B883A3E62DAC923300F41C4D /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B883A3F02DAC923300F41C4D /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -94,8 +51,6 @@
 			isa = PBXGroup;
 			children = (
 				B883A3D52DAC923100F41C4D /* Example */,
-				B883A3EC2DAC923300F41C4D /* ExampleTests */,
-				B883A3F62DAC923300F41C4D /* ExampleUITests */,
 				B883A3D42DAC923100F41C4D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -104,8 +59,6 @@
 			isa = PBXGroup;
 			children = (
 				B883A3D32DAC923100F41C4D /* Example.app */,
-				B883A3E92DAC923300F41C4D /* ExampleTests.xctest */,
-				B883A3F32DAC923300F41C4D /* ExampleUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -136,52 +89,6 @@
 			productReference = B883A3D32DAC923100F41C4D /* Example.app */;
 			productType = "com.apple.product-type.application";
 		};
-		B883A3E82DAC923300F41C4D /* ExampleTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = B883A4012DAC923300F41C4D /* Build configuration list for PBXNativeTarget "ExampleTests" */;
-			buildPhases = (
-				B883A3E52DAC923300F41C4D /* Sources */,
-				B883A3E62DAC923300F41C4D /* Frameworks */,
-				B883A3E72DAC923300F41C4D /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				B883A3EB2DAC923300F41C4D /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				B883A3EC2DAC923300F41C4D /* ExampleTests */,
-			);
-			name = ExampleTests;
-			packageProductDependencies = (
-			);
-			productName = ExampleTests;
-			productReference = B883A3E92DAC923300F41C4D /* ExampleTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		B883A3F22DAC923300F41C4D /* ExampleUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = B883A4042DAC923300F41C4D /* Build configuration list for PBXNativeTarget "ExampleUITests" */;
-			buildPhases = (
-				B883A3EF2DAC923300F41C4D /* Sources */,
-				B883A3F02DAC923300F41C4D /* Frameworks */,
-				B883A3F12DAC923300F41C4D /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				B883A3F52DAC923300F41C4D /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				B883A3F62DAC923300F41C4D /* ExampleUITests */,
-			);
-			name = ExampleUITests;
-			packageProductDependencies = (
-			);
-			productName = ExampleUITests;
-			productReference = B883A3F32DAC923300F41C4D /* ExampleUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -194,14 +101,6 @@
 				TargetAttributes = {
 					B883A3D22DAC923100F41C4D = {
 						CreatedOnToolsVersion = 16.3;
-					};
-					B883A3E82DAC923300F41C4D = {
-						CreatedOnToolsVersion = 16.3;
-						TestTargetID = B883A3D22DAC923100F41C4D;
-					};
-					B883A3F22DAC923300F41C4D = {
-						CreatedOnToolsVersion = 16.3;
-						TestTargetID = B883A3D22DAC923100F41C4D;
 					};
 				};
 			};
@@ -223,28 +122,12 @@
 			projectRoot = "";
 			targets = (
 				B883A3D22DAC923100F41C4D /* Example */,
-				B883A3E82DAC923300F41C4D /* ExampleTests */,
-				B883A3F22DAC923300F41C4D /* ExampleUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		B883A3D12DAC923100F41C4D /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B883A3E72DAC923300F41C4D /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B883A3F12DAC923300F41C4D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -261,34 +144,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B883A3E52DAC923300F41C4D /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B883A3EF2DAC923300F41C4D /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		B883A3EB2DAC923300F41C4D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = B883A3D22DAC923100F41C4D /* Example */;
-			targetProxy = B883A3EA2DAC923300F41C4D /* PBXContainerItemProxy */;
-		};
-		B883A3F52DAC923300F41C4D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = B883A3D22DAC923100F41C4D /* Example */;
-			targetProxy = B883A3F42DAC923300F41C4D /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		B883A3FD2DAC923300F41C4D /* Debug */ = {
@@ -468,78 +324,6 @@
 			};
 			name = Release;
 		};
-		B883A4022DAC923300F41C4D /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = EX8W57PJ9C;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rokt.ExampleTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Example.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Example";
-			};
-			name = Debug;
-		};
-		B883A4032DAC923300F41C4D /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = EX8W57PJ9C;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rokt.ExampleTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Example.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Example";
-			};
-			name = Release;
-		};
-		B883A4052DAC923300F41C4D /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = EX8W57PJ9C;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rokt.ExampleUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Example;
-			};
-			name = Debug;
-		};
-		B883A4062DAC923300F41C4D /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = EX8W57PJ9C;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rokt.ExampleUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Example;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -557,24 +341,6 @@
 			buildConfigurations = (
 				B883A3FD2DAC923300F41C4D /* Debug */,
 				B883A3FE2DAC923300F41C4D /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		B883A4012DAC923300F41C4D /* Build configuration list for PBXNativeTarget "ExampleTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				B883A4022DAC923300F41C4D /* Debug */,
-				B883A4032DAC923300F41C4D /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		B883A4042DAC923300F41C4D /* Build configuration list for PBXNativeTarget "ExampleUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				B883A4052DAC923300F41C4D /* Debug */,
-				B883A4062DAC923300F41C4D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
