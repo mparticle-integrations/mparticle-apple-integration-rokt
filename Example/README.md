@@ -25,17 +25,14 @@ This example app demonstrates how to integrate and use the mParticle Rokt kit in
 The example app consists of two main screens:
 
 1. **Home Screen (`HomeViewController`)**: 
-   - Displays a simple UI with a button to launch the Rokt experience
-   - Contains basic styling and layout setup
-
-2. **Sample Screen (`SampleViewController`)**:
-   - Creates a Rokt embedded view and adds it to the view hierarchy
-   - Initializes the Rokt integration with user attributes
-   - Demonstrates how to use callbacks for various Rokt widget events (loading, unloading, size changes)
+    - Displays a simple UI with a button to launch the Rokt experience
+    - Creates a Rokt embedded view and adds it to the view hierarchy
+    - Initializes the Rokt integration with user attributes
+    - Demonstrates how to use callbacks for various Rokt widget events (loading, unloading, size changes)
 
 ### Code Example
 
-Here's the key integration code from `SampleViewController.swift`:
+Here's the key integration code from `HomeViewController.swift`:
 
 ```swift
 MParticle
