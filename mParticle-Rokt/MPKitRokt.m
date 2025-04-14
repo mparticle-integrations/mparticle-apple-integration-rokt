@@ -100,10 +100,15 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
                             filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser {
     NSDictionary<NSString *, NSString *> *mpAttributes = [filteredUser.userAttributes transformValuesToString];
     NSMutableDictionary<NSString *, NSString *> *finalAtt = [[NSMutableDictionary alloc] init];
-    if (filteredUser.userId.stringValue) {
+    [finalAtt addEntriesFromDictionary:mpAttributes];
+    if (filteredUser.userId.stringValue != nil) {
         [finalAtt addEntriesFromDictionary:@{@"mpid": filteredUser.userId.stringValue}];
     }
-    [finalAtt addEntriesFromDictionary:mpAttributes];
+    // The core SDK does not set sandbox on the user, but we must pass it to Rokt if provided
+    NSString *sandboxKey = @"sandbox";
+    if (attributes[sandboxKey] != nil) {
+        [finalAtt addEntriesFromDictionary:@{sandboxKey: attributes[sandboxKey]}];
+    }
     
     [Rokt executeWithViewName:viewName
                    attributes:finalAtt

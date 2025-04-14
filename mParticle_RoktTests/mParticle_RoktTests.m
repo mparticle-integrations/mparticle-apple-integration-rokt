@@ -1,4 +1,5 @@
 #import <XCTest/XCTest.h>
+#import <OCMock/OCMock.h>
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
 #import "MPKitRokt.h"
 
@@ -118,12 +119,30 @@
 }
 
 - (void)testExecuteWithViewName {
+    id mockRoktSDK = OCMClassMock([Rokt class]);
+
     RoktEmbeddedView *view = [[RoktEmbeddedView alloc] init];
+    NSString *viewName = @"TestView";
     NSDictionary *placements = @{@"placement1": view};
-    NSDictionary *attributes = @{@"attr1": @"value1"};
+    NSDictionary *attributes = @{@"attr1": @"value1", @"sandbox": @"true"};
     FilteredMParticleUser *user = [[FilteredMParticleUser alloc] init];
     
-    MPKitExecStatus *status = [self.kitInstance executeWithViewName:@"TestView"
+    // Expected attributes in final call
+    NSDictionary *expectedAttributes = @{
+        @"sandbox": @"true"
+    };
+
+    // Expect Rokt execute call with correct parameters
+    OCMExpect([mockRoktSDK executeWithViewName:@"TestView"
+                                   attributes:expectedAttributes
+                                   placements:placements
+                                       onLoad:nil
+                                     onUnLoad:nil
+                 onShouldShowLoadingIndicator:nil
+                 onShouldHideLoadingIndicator:nil
+                         onEmbeddedSizeChange:nil]);
+    
+    MPKitExecStatus *status = [self.kitInstance executeWithViewName:viewName
                                                        attributes:attributes
                                                        placements:placements
                                                            onLoad:nil
@@ -132,9 +151,11 @@
                                      onShouldHideLoadingIndicator:nil
                                              onEmbeddedSizeChange:nil
                                                      filteredUser:user];
-    
+
+    // Verify
     XCTAssertNotNil(status);
     XCTAssertEqual(status.returnCode, MPKitReturnCodeSuccess);
+    OCMVerifyAll(mockRoktSDK);
 }
 
 @end 
