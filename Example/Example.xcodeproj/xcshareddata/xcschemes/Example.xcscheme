@@ -74,18 +74,6 @@
             ReferencedContainer = "container:Example.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <EnvironmentVariables>
-         <EnvironmentVariable
-            key = "MPARTICLE_KEY"
-            value = "us2-ea563c42b9151b4c96543cc89834258e"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-         <EnvironmentVariable
-            key = "MPARTICLE_SECRET"
-            value = "754VnSU5kU80JOGPQIHlu_ymNL5NA0GkEb1DIdz1Oa8dDfsPP2M9jsZOw3SMpRc6"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
