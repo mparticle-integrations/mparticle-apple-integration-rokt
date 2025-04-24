@@ -76,3 +76,7 @@ node_modules
 .ruby-version
 /**/.ruby-version
 vendor/
+
+# SPM
+*.swiftpm/
+Package.resolved
