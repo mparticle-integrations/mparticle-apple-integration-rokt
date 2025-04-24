@@ -8,11 +8,7 @@
 - (MPKitExecStatus *)executeWithViewName:(NSString * _Nullable)viewName
                               attributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes
                               placements:(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable)placements
-                                  onLoad:(void (^ _Nullable)(void))onLoad
-                                onUnLoad:(void (^ _Nullable)(void))onUnLoad
-            onShouldShowLoadingIndicator:(void (^ _Nullable)(void))onShouldShowLoadingIndicator
-            onShouldHideLoadingIndicator:(void (^ _Nullable)(void))onShouldHideLoadingIndicator
-                    onEmbeddedSizeChange:(void (^ _Nullable)(NSString * _Nonnull, CGFloat))onEmbeddedSizeChange
+                               callbacks:(MPRoktEventCallback * _Nullable)callbacks
                             filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser;
 
 - (NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmPlacements:(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable)placements;
@@ -143,14 +139,10 @@
                          onEmbeddedSizeChange:nil]);
     
     MPKitExecStatus *status = [self.kitInstance executeWithViewName:viewName
-                                                       attributes:attributes
-                                                       placements:placements
-                                                           onLoad:nil
-                                                         onUnLoad:nil
-                                     onShouldShowLoadingIndicator:nil
-                                     onShouldHideLoadingIndicator:nil
-                                             onEmbeddedSizeChange:nil
-                                                     filteredUser:user];
+                                                         attributes:attributes
+                                                         placements:placements
+                                                          callbacks:nil
+                                                       filteredUser:user];
 
     // Verify
     XCTAssertNotNil(status);

@@ -78,25 +78,14 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 ///
 /// \param placements A dictionary of RoktEmbeddedViews with their names
 ///
-/// \param onLoad Function to execute right after the widget is successfully loaded and displayed
+/// \param callbacks Object that contains all possible callbacks for selectPlacements
 ///
-/// \param onUnLoad Function to execute right after widget is unloaded, there is no widget or there is an exception
-///
-/// \param onShouldShowLoadingIndicator Function to execute when the loading indicator should be shown
-///
-/// \param onShouldHideLoadingIndicator Function to execute when the loading indicator should be hidden
-///
-/// \param onEmbeddedSizeChange Function to execute when size of embeddedView change, the first item is selected
-/// Placement and second item is widget height
+/// \param filteredUser The current user when this placement was requested. Filtered for the kit as per settings in the mParticle UI
 ///
 - (MPKitExecStatus *)executeWithViewName:(NSString * _Nullable)viewName
                               attributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes
                               placements:(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable)placements
-                                  onLoad:(void (^ _Nullable)(void))onLoad
-                                onUnLoad:(void (^ _Nullable)(void))onUnLoad
-            onShouldShowLoadingIndicator:(void (^ _Nullable)(void))onShouldShowLoadingIndicator
-            onShouldHideLoadingIndicator:(void (^ _Nullable)(void))onShouldHideLoadingIndicator
-                    onEmbeddedSizeChange:(void (^ _Nullable)(NSString * _Nonnull, CGFloat))onEmbeddedSizeChange
+                               callbacks:(MPRoktEventCallback * _Nullable)callbacks
                             filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser {
     NSDictionary<NSString *, NSString *> *mpAttributes = [filteredUser.userAttributes transformValuesToString];
     NSMutableDictionary<NSString *, NSString *> *finalAtt = [[NSMutableDictionary alloc] init];
@@ -113,11 +102,11 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     [Rokt executeWithViewName:viewName
                    attributes:finalAtt
                    placements:[self confirmPlacements:placements]
-                       onLoad:onLoad
-                     onUnLoad:onUnLoad
- onShouldShowLoadingIndicator:onShouldShowLoadingIndicator
- onShouldHideLoadingIndicator:onShouldHideLoadingIndicator
-         onEmbeddedSizeChange:onEmbeddedSizeChange
+                       onLoad:callbacks.onLoad
+                     onUnLoad:callbacks.onUnLoad
+ onShouldShowLoadingIndicator:callbacks.onShouldShowLoadingIndicator
+ onShouldHideLoadingIndicator:callbacks.onShouldHideLoadingIndicator
+         onEmbeddedSizeChange:callbacks.onEmbeddedSizeChange
     ];
     
     return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeSuccess];
