@@ -14,6 +14,8 @@
 - (NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmPlacements:(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable)placements;
 
 - (NSDictionary<NSString *, NSString *> *) filteredUserAttributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes kitConfiguration:(MPKitConfiguration *)kitConfiguration;
+
+- (void)addIdentityAttributes:(NSMutableDictionary<NSString *, NSString *> * _Nullable)attributes filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser;
     
 @end
 
@@ -148,6 +150,23 @@
     XCTAssertNotNil(status);
     XCTAssertEqual(status.returnCode, MPKitReturnCodeSuccess);
     OCMVerifyAll(mockRoktSDK);
+}
+
+- (void)testAddIdentityAttributes {
+    NSMutableDictionary<NSString *, NSString *> *passedAttributes = [[NSMutableDictionary alloc] init];
+    NSDictionary<NSNumber *, NSString *> *testIdentities = @{@(MPIdentityEmail): @"testEmail@gmail.com",
+                                                             @(MPIdentityOther): @"testUserName",
+                                                             @(MPIdentityMobileNumber): @"1(234)-567-8910"};
+    FilteredMParticleUser *filteredUser = [[FilteredMParticleUser alloc] init];
+    id mockfilteredUser = OCMPartialMock(filteredUser);
+    [[[mockfilteredUser stub] andReturn:testIdentities] userIdentities];
+    
+    MPKitRokt *kit = [[MPKitRokt alloc] init];
+    [kit addIdentityAttributes:passedAttributes filteredUser:filteredUser];
+    
+    XCTAssertEqualObjects(passedAttributes[@"email"], @"testEmail@gmail.com");
+    XCTAssertEqualObjects(passedAttributes[@"other"], @"testUserName");
+    XCTAssertEqualObjects(passedAttributes[@"mobile_number"], @"1(234)-567-8910");
 }
 
 @end 
