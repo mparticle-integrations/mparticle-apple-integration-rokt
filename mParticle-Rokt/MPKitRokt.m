@@ -90,9 +90,15 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     NSDictionary<NSString *, NSString *> *mpAttributes = [filteredUser.userAttributes transformValuesToString];
     NSMutableDictionary<NSString *, NSString *> *finalAtt = [[NSMutableDictionary alloc] init];
     [finalAtt addEntriesFromDictionary:mpAttributes];
+    
+    // Add MPID to the attributes being passed to the Rokt SDK
     if (filteredUser.userId.stringValue != nil) {
         [finalAtt addEntriesFromDictionary:@{@"mpid": filteredUser.userId.stringValue}];
     }
+    
+    // Add all known user identities to the attributes being passed to the Rokt SDK
+    [self addIdentityAttributes:finalAtt filteredUser:filteredUser];
+    
     // The core SDK does not set sandbox on the user, but we must pass it to Rokt if provided
     NSString *sandboxKey = @"sandbox";
     if (attributes[sandboxKey] != nil) {
@@ -124,6 +130,102 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     }
     
     return safePlacements;
+}
+
+- (void)addIdentityAttributes:(NSMutableDictionary<NSString *, NSString *> * _Nullable)attributes filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser {
+    NSMutableDictionary<NSString *, NSString *> *identityAttributes = [[NSMutableDictionary alloc] init];
+    for (NSNumber *identityNumberKey in filteredUser.userIdentities) {
+        NSString *identityStringKey = [MPKitRokt stringForIdentityType:identityNumberKey.unsignedIntegerValue];
+        [identityAttributes setObject:filteredUser.userIdentities[identityNumberKey] forKey:identityStringKey];
+    }
+    
+    if (attributes != nil) {
+        [attributes addEntriesFromDictionary:identityAttributes];
+    } else {
+        attributes = identityAttributes;
+    }
+}
+
++ (NSString *)stringForIdentityType:(MPIdentity)identityType {
+    switch (identityType) {
+        case MPIdentityCustomerId:
+            return @"customerid";
+            
+        case MPIdentityEmail:
+            return @"email";
+            
+        case MPIdentityFacebook:
+            return @"facebook";
+            
+        case MPIdentityFacebookCustomAudienceId:
+            return @"facebookcustomaudienceid";
+            
+        case MPIdentityGoogle:
+            return @"google";
+            
+        case MPIdentityMicrosoft:
+            return @"microsoft";
+            
+        case MPIdentityOther:
+            return @"other";
+            
+        case MPIdentityTwitter:
+            return @"twitter";
+            
+        case MPIdentityYahoo:
+            return @"yahoo";
+            
+        case MPIdentityOther2:
+            return @"other2";
+            
+        case MPIdentityOther3:
+            return @"other3";
+            
+        case MPIdentityOther4:
+            return @"other4";
+            
+        case MPIdentityOther5:
+            return @"other5";
+            
+        case MPIdentityOther6:
+            return @"other6";
+            
+        case MPIdentityOther7:
+            return @"other7";
+            
+        case MPIdentityOther8:
+            return @"other8";
+            
+        case MPIdentityOther9:
+            return @"other9";
+            
+        case MPIdentityOther10:
+            return @"other10";
+            
+        case MPIdentityMobileNumber:
+            return @"mobile_number";
+            
+        case MPIdentityPhoneNumber2:
+            return @"phone_number_2";
+            
+        case MPIdentityPhoneNumber3:
+            return @"phone_number_3";
+            
+        case MPIdentityIOSAdvertiserId:
+            return @"ios_idfa";
+            
+        case MPIdentityIOSVendorId:
+            return @"ios_idfv";
+            
+        case MPIdentityPushToken:
+            return @"push_token";
+            
+        case MPIdentityDeviceApplicationStamp:
+            return @"device_application_stamp";
+            
+        default:
+            return nil;
+    }
 }
 
 #pragma mark - User attributes and identities
