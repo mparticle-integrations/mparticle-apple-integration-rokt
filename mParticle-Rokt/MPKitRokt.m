@@ -41,9 +41,13 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     }
 
     _configuration = configuration;
+    
+    NSString *sdkVersion = [MParticle sharedInstance].version;
+    // https://go.mparticle.com/work/SQDSDKS-7379
+    NSString *kitVersion = @"8.0.1";
 
     // Initialize Rokt SDK here
-    [Rokt initWithRoktTagId:partnerId onInitComplete:^(BOOL InitComplete) {
+    [Rokt initWithRoktTagId:partnerId mParticleSdkVersion:sdkVersion mParticleKitVersion:kitVersion onInitComplete:^(BOOL InitComplete) {
         if (InitComplete) {
             [self start];
             NSDictionary *userInfo = @{mParticleKitInstanceKey:[[self class] kitCode]};
@@ -245,16 +249,6 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
         execStatus = [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeUnavailable];
     }
     
-    return execStatus;
-}
-
-#pragma mark - Event tracking
-
-- (MPKitExecStatus *)logEvent:(MPEvent *)event {
-    // Track event in Rokt SDK
-    // [Rokt trackEvent:event.name];
-    
-    MPKitExecStatus *execStatus = [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeSuccess];
     return execStatus;
 }
 
