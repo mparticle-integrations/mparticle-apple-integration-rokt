@@ -89,6 +89,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 - (MPKitExecStatus *)executeWithViewName:(NSString * _Nullable)viewName
                               attributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes
                               placements:(NSDictionary<NSString *, MPRoktEmbeddedView *> * _Nullable)placements
+                                  config:(MPRoktConfig * _Nullable)mpRoktConfig
                                callbacks:(MPRoktEventCallback * _Nullable)callbacks
                             filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser {
     NSDictionary<NSString *, NSString *> *mpAttributes = [filteredUser.userAttributes transformValuesToString];
@@ -109,9 +110,13 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
         [finalAtt addEntriesFromDictionary:@{sandboxKey: attributes[sandboxKey]}];
     }
     
+    //Convert MPRoktConfig to RoktConfig
+    RoktConfig *roktConfig = [MPKitRokt convertMPRoktConfig:mpRoktConfig];
+    
     [Rokt executeWithViewName:viewName
                    attributes:finalAtt
                    placements:[self confirmPlacements:placements]
+                       config:roktConfig
                        onLoad:callbacks.onLoad
                      onUnLoad:callbacks.onUnLoad
  onShouldShowLoadingIndicator:callbacks.onShouldShowLoadingIndicator
@@ -153,6 +158,25 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     } else {
         attributes = identityAttributes;
     }
+}
+
++ (RoktConfig *)convertMPRoktConfig:(MPRoktConfig *)mpRoktConfig {
+    if (mpRoktConfig != nil) {
+        Builder *builder = [[Builder alloc] init];
+
+        if (mpRoktConfig.cacheDuration != nil) {
+            CacheConfig *cacheConfig = [[CacheConfig alloc] initWithCacheDuration:mpRoktConfig.cacheDuration.doubleValue cacheAttributes:mpRoktConfig.cacheAttributes];
+            builder = [builder cacheConfig:cacheConfig];
+        }
+        
+        builder = [builder colorMode:(ColorMode)mpRoktConfig.colorMode];
+        
+        RoktConfig *config = [builder build];
+        
+        return config;
+    }
+    
+    return nil;
 }
 
 + (NSString *)stringForIdentityType:(MPIdentity)identityType {
