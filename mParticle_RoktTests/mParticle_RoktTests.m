@@ -7,7 +7,7 @@
 
 - (MPKitExecStatus *)executeWithViewName:(NSString * _Nullable)viewName
                               attributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes
-                              placements:(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable)placements
+                              placements:(NSDictionary<NSString *, MPRoktEmbeddedView *> * _Nullable)placements
                                callbacks:(MPRoktEventCallback * _Nullable)callbacks
                             filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser;
 
