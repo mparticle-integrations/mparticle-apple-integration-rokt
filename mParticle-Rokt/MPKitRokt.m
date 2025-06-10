@@ -88,7 +88,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 ///
 - (MPKitExecStatus *)executeWithViewName:(NSString * _Nullable)viewName
                               attributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes
-                              placements:(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable)placements
+                              placements:(NSDictionary<NSString *, MPRoktEmbeddedView *> * _Nullable)placements
                                callbacks:(MPRoktEventCallback * _Nullable)callbacks
                             filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser {
     NSDictionary<NSString *, NSString *> *mpAttributes = [filteredUser.userAttributes transformValuesToString];
@@ -122,14 +122,19 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeSuccess];
 }
 
-- (NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmPlacements:(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable)placements {
+- (NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmPlacements:(NSDictionary<NSString *, MPRoktEmbeddedView *> * _Nullable)placements {
     NSMutableDictionary <NSString *, RoktEmbeddedView *> *safePlacements = [NSMutableDictionary dictionary];
     
     for (NSString* key in placements) {
-        id value = [placements objectForKey:key];
+        MPRoktEmbeddedView *mpView = [placements objectForKey:key];
         
-        if ([value isKindOfClass:RoktEmbeddedView.class]) {
-            [safePlacements setObject:value forKey:key];
+        if ([mpView isKindOfClass:MPRoktEmbeddedView.class]) {
+            // Create a new RoktEmbeddedView instance
+            RoktEmbeddedView *roktView = [[RoktEmbeddedView alloc] initWithFrame:mpView.bounds];
+            // Add the RoktEmbeddedView as a child view of MPRoktEmbeddedView
+            [mpView addSubview:roktView];
+            // Add the RoktEmbeddedView to our safe placements dictionary
+            [safePlacements setObject:roktView forKey:key];
         }
     }
     
