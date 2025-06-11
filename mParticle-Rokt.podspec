@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name             = "mParticle-Rokt"
-    s.version          = "8.0.1"
+    s.version          = "8.0.2"
     s.summary          = "Rokt integration for mParticle"
 
     s.description      = <<-DESC
@@ -14,8 +14,8 @@ Pod::Spec.new do |s|
     s.social_media_url = "https://twitter.com/mparticle"
     s.swift_version    = '5.3'
 
-    s.ios.deployment_target = "11.0"
+    s.ios.deployment_target = "12.0"
     s.ios.source_files      = 'mParticle-Rokt/*.{h,m}'
     s.ios.dependency 'mParticle-Apple-SDK', '~> 8.0'
-    s.ios.dependency 'Rokt-Widget', '~> 4.8'
+    s.ios.dependency 'Rokt-Widget', '~> 4.10'
 end
