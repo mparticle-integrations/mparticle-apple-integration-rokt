@@ -286,6 +286,7 @@
     mpConfig.cacheDuration = @(100);
     mpConfig.cacheAttributes = @{@"test": @"tested"};
     
+    // RoktConfig does not expose any of it's properties so we are only able to confirm that it was successfully initialized
     RoktConfig *roktConfig = [MPKitRokt convertMPRoktConfig:mpConfig];
     
     XCTAssert(roktConfig);
