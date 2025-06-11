@@ -261,6 +261,17 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     }
 }
 
+- (MPKitExecStatus *)reportConversion:(NSString *)placementId catalogItemId:(NSString *)catalogItemId success:(NSNumber *)success {
+    if (placementId != nil && catalogItemId != nil && success != nil) {
+        if (@available(iOS 15.0, *)) {
+            [Rokt purchaseFinalizedWithPlacementId:placementId catalogItemId:catalogItemId success:success.boolValue];
+            return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeSuccess];
+        }
+        return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeUnavailable];
+    }
+    return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeFail];
+}
+
 #pragma mark - User attributes and identities
 
 - (MPKitExecStatus *)setUserIdentity:(NSString *)identityString identityType:(MPUserIdentity)identityType {
