@@ -16,6 +16,8 @@
 - (NSDictionary<NSString *, NSString *> *) filteredUserAttributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes kitConfiguration:(MPKitConfiguration *)kitConfiguration;
 
 - (void)addIdentityAttributes:(NSMutableDictionary<NSString *, NSString *> * _Nullable)attributes filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser;
+
++ (RoktConfig *)convertMPRoktConfig:(MPRoktConfig *)mpRoktConfig;
     
 @end
 
@@ -276,6 +278,18 @@
     XCTAssertEqualObjects(passedAttributes[@"ios_idfv"], @"testVendorID");
     XCTAssertEqualObjects(passedAttributes[@"push_token"], @"testPushToken");
     XCTAssertEqualObjects(passedAttributes[@"device_application_stamp"], @"Test DAS");
+}
+
+- (void)testConvertMPRoktConfig {
+    MPRoktConfig *mpConfig = [[MPRoktConfig alloc] init];
+    mpConfig.colorMode = MPColorModeDark;
+    mpConfig.cacheDuration = @(100);
+    mpConfig.cacheAttributes = @{@"test": @"tested"};
+    
+    // RoktConfig does not expose any of it's properties so we are only able to confirm that it was successfully initialized
+    RoktConfig *roktConfig = [MPKitRokt convertMPRoktConfig:mpConfig];
+    
+    XCTAssert(roktConfig);
 }
 
 @end 
