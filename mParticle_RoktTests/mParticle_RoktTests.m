@@ -306,15 +306,16 @@
         // Set up test parameters
         NSString *placementId = @"testonversion";
         NSString *catalogItemId = @"testcatalogItemId";
+        BOOL success = YES;
         
         // Expect Rokt reportConversion call with correct parameters
         OCMExpect([mockRoktSDK purchaseFinalizedWithPlacementId:placementId
                                                   catalogItemId:catalogItemId
-                                                        success:YES]);
+                                                        success:success]);
         
         MPKitExecStatus *status = [self.kitInstance purchaseFinalized:placementId
                                                         catalogItemId:catalogItemId
-                                                              success:@(YES)];
+                                                              success:@(success)];
         
         // Verify
         XCTAssertNotNil(status);
