@@ -44,7 +44,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     
     NSString *sdkVersion = [MParticle sharedInstance].version;
     // https://go.mparticle.com/work/SQDSDKS-7379
-    NSString *kitVersion = @"8.0.2";
+    NSString *kitVersion = @"8.0.3";
 
     // Initialize Rokt SDK here
     [Rokt initWithRoktTagId:partnerId mParticleSdkVersion:sdkVersion mParticleKitVersion:kitVersion onInitComplete:^(BOOL InitComplete) {
@@ -263,6 +263,17 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
         default:
             return nil;
     }
+}
+
+- (MPKitExecStatus *)purchaseFinalized:(NSString *)placementId catalogItemId:(NSString *)catalogItemId success:(NSNumber *)success {
+    if (placementId != nil && catalogItemId != nil && success != nil) {
+        if (@available(iOS 15.0, *)) {
+            [Rokt purchaseFinalizedWithPlacementId:placementId catalogItemId:catalogItemId success:success.boolValue];
+            return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeSuccess];
+        }
+        return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeUnavailable];
+    }
+    return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeFail];
 }
 
 #pragma mark - User attributes and identities
