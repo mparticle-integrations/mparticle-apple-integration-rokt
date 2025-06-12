@@ -12,9 +12,9 @@
                                callbacks:(MPRoktEventCallback * _Nullable)callbacks
                             filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser;
 
-- (MPKitExecStatus *)reportConversion:(NSString *)placementId
-                        catalogItemId:(NSString *)catalogItemId
-                              success:(NSNumber *)success;
+- (MPKitExecStatus *)purchaseFinalized:(NSString *)placementId
+                         catalogItemId:(NSString *)catalogItemId
+                               success:(NSNumber *)success;
 
 - (NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmPlacements:(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable)placements;
 
@@ -299,7 +299,7 @@
     XCTAssert(roktConfig);
 }
 
-- (void)testreportConversion {
+- (void)testPurchaseFinalized {
     if (@available(iOS 15.0, *)) {
         id mockRoktSDK = OCMClassMock([Rokt class]);
         
@@ -312,9 +312,9 @@
                                                   catalogItemId:catalogItemId
                                                         success:YES]);
         
-        MPKitExecStatus *status = [self.kitInstance reportConversion:placementId
-                                                       catalogItemId:catalogItemId
-                                                             success:@(YES)];
+        MPKitExecStatus *status = [self.kitInstance purchaseFinalized:placementId
+                                                        catalogItemId:catalogItemId
+                                                              success:@(YES)];
         
         // Verify
         XCTAssertNotNil(status);

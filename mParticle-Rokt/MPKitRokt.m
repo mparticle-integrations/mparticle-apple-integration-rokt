@@ -261,7 +261,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     }
 }
 
-- (MPKitExecStatus *)reportConversion:(NSString *)placementId catalogItemId:(NSString *)catalogItemId success:(NSNumber *)success {
+- (MPKitExecStatus *)purchaseFinalized:(NSString *)placementId catalogItemId:(NSString *)catalogItemId success:(NSNumber *)success {
     if (placementId != nil && catalogItemId != nil && success != nil) {
         if (@available(iOS 15.0, *)) {
             [Rokt purchaseFinalizedWithPlacementId:placementId catalogItemId:catalogItemId success:success.boolValue];
