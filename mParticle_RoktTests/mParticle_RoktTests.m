@@ -8,6 +8,7 @@
 - (MPKitExecStatus *)executeWithViewName:(NSString * _Nullable)viewName
                               attributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes
                               placements:(NSDictionary<NSString *, MPRoktEmbeddedView *> * _Nullable)placements
+                                  config:(MPRoktConfig * _Nullable)mpRoktConfig
                                callbacks:(MPRoktEventCallback * _Nullable)callbacks
                             filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser;
 
@@ -71,13 +72,13 @@
 }
 
 - (void)testConfirmPlacements_ValidPlacements {
-    RoktEmbeddedView *view = [[RoktEmbeddedView alloc] init];
+    MPRoktEmbeddedView *view = [[MPRoktEmbeddedView alloc] init];
     NSDictionary *placements = @{@"placement1": view};
     
     NSDictionary *result = [self.kitInstance confirmPlacements:placements];
     
     XCTAssertEqual(result.count, 1);
-    XCTAssertEqualObjects(result[@"placement1"], view);
+    XCTAssertTrue([result[@"placement1"] isKindOfClass:RoktEmbeddedView.class]);
 }
 
 - (void)testConfirmPlacements_InvalidPlacements {
@@ -121,7 +122,7 @@
 - (void)testExecuteWithViewName {
     id mockRoktSDK = OCMClassMock([Rokt class]);
 
-    RoktEmbeddedView *view = [[RoktEmbeddedView alloc] init];
+    MPRoktEmbeddedView *view = [[MPRoktEmbeddedView alloc] init];
     NSString *viewName = @"TestView";
     NSDictionary *placements = @{@"placement1": view};
     NSDictionary *attributes = @{@"attr1": @"value1", @"sandbox": @"true"};
@@ -133,9 +134,10 @@
     };
 
     // Expect Rokt execute call with correct parameters
-    OCMExpect([mockRoktSDK executeWithViewName:@"TestView"
+    OCMExpect([mockRoktSDK executeWithViewName:viewName
                                    attributes:expectedAttributes
-                                   placements:placements
+                                   placements:[OCMArg any]
+                                      config: nil
                                        onLoad:nil
                                      onUnLoad:nil
                  onShouldShowLoadingIndicator:nil
@@ -145,6 +147,7 @@
     MPKitExecStatus *status = [self.kitInstance executeWithViewName:viewName
                                                          attributes:attributes
                                                          placements:placements
+                                                            config:nil
                                                           callbacks:nil
                                                        filteredUser:user];
 
