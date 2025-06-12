@@ -18,6 +18,6 @@ jobs:
       - name: Run Tests
         run: >
           set -o pipefail &&
-          xcodebuild -skipPackagePluginValidation -project mParticle-Rokt.xcodeproj -scheme mParticle_RoktTests -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=latest' -enableCodeCoverage YES -derivedDataPath DerivedData clean build test
+          xcodebuild test -project mParticle-Rokt.xcodeproj -scheme mParticle_RoktTests -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest'
           | xcbeautify --renderer github-actions
         shell: bash
