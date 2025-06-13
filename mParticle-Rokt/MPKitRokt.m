@@ -76,10 +76,6 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     });
 }
 
-- (MPKitExecStatus *)logEvent:(MPEvent *)event {
-    return [self execStatus:MPKitReturnCodeSuccess];
-}
-
 /// \param viewName The name that should be displayed in the widget
 ///
 /// \param attributes A string dictionary containing the parameters that should be displayed in the widget
