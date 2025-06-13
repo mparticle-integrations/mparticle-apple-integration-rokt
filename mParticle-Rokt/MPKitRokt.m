@@ -44,7 +44,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     
     NSString *sdkVersion = [MParticle sharedInstance].version;
     // https://go.mparticle.com/work/SQDSDKS-7379
-    NSString *kitVersion = @"8.0.3";
+    NSString *kitVersion = @"8.1.0";
 
     // Initialize Rokt SDK here
     [Rokt initWithRoktTagId:partnerId mParticleSdkVersion:sdkVersion mParticleKitVersion:kitVersion onInitComplete:^(BOOL InitComplete) {

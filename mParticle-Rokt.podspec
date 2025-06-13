@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name             = "mParticle-Rokt"
-    s.version          = "8.0.3"
+    s.version          = "8.1.0"
     s.summary          = "Rokt integration for mParticle"
 
     s.description      = <<-DESC
