@@ -123,7 +123,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
  onShouldHideLoadingIndicator:callbacks.onShouldHideLoadingIndicator
          onEmbeddedSizeChange:callbacks.onEmbeddedSizeChange
     ];
-    
+
     return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeSuccess];
 }
 

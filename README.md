@@ -24,6 +24,15 @@ This repository contains the Rokt integration for the [mParticle Apple SDK](http
 
 3. Reference mParticle's integration docs below to enable the integration.
 
+### Example App
+
+This repository includes an Example app that demonstrates how to use the Rokt integration with mParticle. The example shows how to:
+- Initialize the mParticle SDK with the Rokt kit
+- Display a Rokt embedded widget within your app
+- Pass user attributes to personalize the Rokt experience
+
+Check out the [Example](./Example) directory for more details.
+
 ### Documentation
 
 [Rokt integration](https://docs.mparticle.com/integrations/rokt/event/)
