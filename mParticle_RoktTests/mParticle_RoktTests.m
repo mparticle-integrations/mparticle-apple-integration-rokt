@@ -8,9 +8,14 @@
 - (MPKitExecStatus *)executeWithViewName:(NSString * _Nullable)viewName
                               attributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes
                               placements:(NSDictionary<NSString *, MPRoktEmbeddedView *> * _Nullable)placements
+                                  config:(MPRoktConfig * _Nullable)mpRoktConfig
                                callbacks:(MPRoktEventCallback * _Nullable)callbacks
                             filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser;
 - (MPKitExecStatus *)setWrapperSdk:(MPWrapperSdk)wrapperSdk version:(nonnull NSString *)wrapperSdkVersion;
+
+- (MPKitExecStatus *)purchaseFinalized:(NSString *)placementId
+                         catalogItemId:(NSString *)catalogItemId
+                               success:(NSNumber *)success;
 
 - (NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmPlacements:(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable)placements;
 
@@ -72,13 +77,13 @@
 }
 
 - (void)testConfirmPlacements_ValidPlacements {
-    RoktEmbeddedView *view = [[RoktEmbeddedView alloc] init];
+    MPRoktEmbeddedView *view = [[MPRoktEmbeddedView alloc] init];
     NSDictionary *placements = @{@"placement1": view};
     
     NSDictionary *result = [self.kitInstance confirmPlacements:placements];
     
     XCTAssertEqual(result.count, 1);
-    XCTAssertEqualObjects(result[@"placement1"], view);
+    XCTAssertTrue([result[@"placement1"] isKindOfClass:[RoktEmbeddedView class]]);
 }
 
 - (void)testConfirmPlacements_InvalidPlacements {
@@ -110,10 +115,10 @@
     XCTAssertEqual(status.returnCode, MPKitReturnCodeUnavailable);
 }
 
-- (void)testLogEvent {
+- (void)testLogBaseEvent {
     MPEvent *event = [[MPEvent alloc] initWithName:@"Test Event" type:MPEventTypeOther];
     
-    MPKitExecStatus *status = [self.kitInstance logEvent:event];
+    MPKitExecStatus *status = [self.kitInstance logBaseEvent:event];
     
     XCTAssertNotNil(status);
     XCTAssertEqual(status.returnCode, MPKitReturnCodeSuccess);
@@ -135,17 +140,19 @@
 
     // Expect Rokt execute call with correct parameters
     OCMExpect([mockRoktSDK executeWithViewName:@"TestView"
-                                   attributes:expectedAttributes
-                                   placements:placements
-                                       onLoad:nil
-                                     onUnLoad:nil
-                 onShouldShowLoadingIndicator:nil
-                 onShouldHideLoadingIndicator:nil
-                         onEmbeddedSizeChange:nil]);
+                                    attributes:expectedAttributes
+                                    placements:OCMOCK_ANY
+                                        config:nil
+                                        onLoad:nil
+                                      onUnLoad:nil
+                  onShouldShowLoadingIndicator:nil
+                  onShouldHideLoadingIndicator:nil
+                          onEmbeddedSizeChange:nil]);
     
     MPKitExecStatus *status = [self.kitInstance executeWithViewName:viewName
                                                          attributes:attributes
                                                          placements:placements
+                                                             config:nil
                                                           callbacks:nil
                                                        filteredUser:user];
 
@@ -318,4 +325,29 @@
     [self runSetWrapperSdkTestWithProvidedMPWrapperType:MPWrapperSdkFlutter expectedRoktFrameworkType:RoktFrameworkTypeFlutter];
 }
 
-@end
+- (void)testPurchaseFinalized {
+    if (@available(iOS 15.0, *)) {
+        id mockRoktSDK = OCMClassMock([Rokt class]);
+        
+        // Set up test parameters
+        NSString *placementId = @"testonversion";
+        NSString *catalogItemId = @"testcatalogItemId";
+        BOOL success = YES;
+        
+        // Expect Rokt reportConversion call with correct parameters
+        OCMExpect([mockRoktSDK purchaseFinalizedWithPlacementId:placementId
+                                                  catalogItemId:catalogItemId
+                                                        success:success]);
+        
+        MPKitExecStatus *status = [self.kitInstance purchaseFinalized:placementId
+                                                        catalogItemId:catalogItemId
+                                                              success:@(success)];
+        
+        // Verify
+        XCTAssertNotNil(status);
+        XCTAssertEqual(status.returnCode, MPKitReturnCodeSuccess);
+        OCMVerifyAll(mockRoktSDK);
+    }
+}
+
+@end 
