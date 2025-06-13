@@ -127,6 +127,30 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeSuccess];
 }
 
+/// \param wrapperSdk The type of wrapper SDK
+///
+/// \param wrapperSdkVersion A string representing the wrapper SDK version
+///
+- (nonnull MPKitExecStatus *)setWrapperSdk:(MPWrapperSdk)wrapperSdk version:(nonnull NSString *)wrapperSdkVersion {
+    RoktFrameworkType roktFrameworkType = [self mapMPWrapperSdkToRoktFrameworkType:wrapperSdk];
+    [Rokt setFrameworkTypeWithFrameworkType:roktFrameworkType];
+
+    return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeSuccess];
+}
+
+- (RoktFrameworkType)mapMPWrapperSdkToRoktFrameworkType:(MPWrapperSdk)wrapperSdk {
+    switch (wrapperSdk) {
+        case MPWrapperSdkCordova:
+            return RoktFrameworkTypeCordova;
+        case MPWrapperSdkReactNative:
+            return RoktFrameworkTypeReactNative;
+        case MPWrapperSdkFlutter:
+            return RoktFrameworkTypeFlutter;
+        default:
+            return RoktFrameworkTypeIOS;
+    }
+}
+
 - (NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmPlacements:(NSDictionary<NSString *, MPRoktEmbeddedView *> * _Nullable)placements {
     NSMutableDictionary <NSString *, RoktEmbeddedView *> *safePlacements = [NSMutableDictionary dictionary];
     

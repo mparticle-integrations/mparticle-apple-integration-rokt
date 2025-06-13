@@ -11,6 +11,7 @@
                                   config:(MPRoktConfig * _Nullable)mpRoktConfig
                                callbacks:(MPRoktEventCallback * _Nullable)callbacks
                             filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser;
+- (MPKitExecStatus *)setWrapperSdk:(MPWrapperSdk)wrapperSdk version:(nonnull NSString *)wrapperSdkVersion;
 
 - (MPKitExecStatus *)purchaseFinalized:(NSString *)placementId
                          catalogItemId:(NSString *)catalogItemId
@@ -297,6 +298,31 @@
     RoktConfig *roktConfig = [MPKitRokt convertMPRoktConfig:mpConfig];
     
     XCTAssert(roktConfig);
+}
+
+- (void)runSetWrapperSdkTestWithProvidedMPWrapperType:(MPWrapperSdk)providedMPWrapperType expectedRoktFrameworkType:(RoktFrameworkType)expectedRoktFrameworkType {
+    id mockRoktSDK = OCMClassMock([Rokt class]);
+
+    // Expect Rokt execute call with correct parameters
+    OCMExpect([mockRoktSDK setFrameworkTypeWithFrameworkType:expectedRoktFrameworkType]);
+
+    MPKitExecStatus *status = [self.kitInstance setWrapperSdk:providedMPWrapperType
+                                                         version:@""];
+
+    // Verify
+    XCTAssertNotNil(status);
+    XCTAssertEqual(status.returnCode, MPKitReturnCodeSuccess);
+    OCMVerifyAll(mockRoktSDK);
+    [mockRoktSDK stopMocking];
+}
+
+- (void)testSetWrapperSdk {
+    [self runSetWrapperSdkTestWithProvidedMPWrapperType:MPWrapperSdkNone expectedRoktFrameworkType:RoktFrameworkTypeIOS];
+    [self runSetWrapperSdkTestWithProvidedMPWrapperType:MPWrapperSdkUnity expectedRoktFrameworkType:RoktFrameworkTypeIOS];
+    [self runSetWrapperSdkTestWithProvidedMPWrapperType:MPWrapperSdkReactNative expectedRoktFrameworkType:RoktFrameworkTypeReactNative];
+    [self runSetWrapperSdkTestWithProvidedMPWrapperType:MPWrapperSdkCordova expectedRoktFrameworkType:RoktFrameworkTypeCordova];
+    [self runSetWrapperSdkTestWithProvidedMPWrapperType:MPWrapperSdkXamarin expectedRoktFrameworkType:RoktFrameworkTypeIOS];
+    [self runSetWrapperSdkTestWithProvidedMPWrapperType:MPWrapperSdkFlutter expectedRoktFrameworkType:RoktFrameworkTypeFlutter];
 }
 
 - (void)testPurchaseFinalized {
