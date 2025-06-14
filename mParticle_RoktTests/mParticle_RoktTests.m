@@ -127,7 +127,7 @@
 - (void)testExecuteWithViewName {
     id mockRoktSDK = OCMClassMock([Rokt class]);
 
-    RoktEmbeddedView *view = [[RoktEmbeddedView alloc] init];
+    MPRoktEmbeddedView *view = [[MPRoktEmbeddedView alloc] init];
     NSString *viewName = @"TestView";
     NSDictionary *placements = @{@"placement1": view};
     NSDictionary *attributes = @{@"attr1": @"value1", @"sandbox": @"true"};
@@ -139,7 +139,7 @@
     };
 
     // Expect Rokt execute call with correct parameters
-    OCMExpect([mockRoktSDK executeWithViewName:@"TestView"
+    OCMExpect([mockRoktSDK executeWithViewName:viewName
                                     attributes:expectedAttributes
                                     placements:OCMOCK_ANY
                                         config:nil
