@@ -5,9 +5,9 @@
 
 @interface MPKitRokt ()
 
-- (MPKitExecStatus *)executeWithViewName:(NSString * _Nullable)viewName
+- (MPKitExecStatus *)executeWithIdentifier:(NSString * _Nullable)identifier
                               attributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes
-                              placements:(NSDictionary<NSString *, MPRoktEmbeddedView *> * _Nullable)placements
+                           embeddedViews:(NSDictionary<NSString *, MPRoktEmbeddedView *> * _Nullable)embeddedViews
                                   config:(MPRoktConfig * _Nullable)mpRoktConfig
                                callbacks:(MPRoktEventCallback * _Nullable)callbacks
                             filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser;
@@ -17,7 +17,7 @@
                          catalogItemId:(NSString *)catalogItemId
                                success:(NSNumber *)success;
 
-- (NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmPlacements:(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable)placements;
+- (NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmEmbeddedViews:(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable)embeddedViews;
 
 - (NSDictionary<NSString *, NSString *> *) filteredUserAttributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes kitConfiguration:(MPKitConfiguration *)kitConfiguration;
 
@@ -76,20 +76,20 @@
     XCTAssertEqual(status.returnCode, MPKitReturnCodeRequirementsNotMet);
 }
 
-- (void)testConfirmPlacements_ValidPlacements {
+- (void)testConfirmEmbeddedViews_ValidEmbeddedViews {
     MPRoktEmbeddedView *view = [[MPRoktEmbeddedView alloc] init];
-    NSDictionary *placements = @{@"placement1": view};
+    NSDictionary *embeddedViews = @{@"placement1": view};
     
-    NSDictionary *result = [self.kitInstance confirmPlacements:placements];
+    NSDictionary *result = [self.kitInstance confirmEmbeddedViews:embeddedViews];
     
     XCTAssertEqual(result.count, 1);
     XCTAssertTrue([result[@"placement1"] isKindOfClass:[RoktEmbeddedView class]]);
 }
 
-- (void)testConfirmPlacements_InvalidPlacements {
-    NSDictionary *placements = @{@"placement1": @"invalid"};
+- (void)testConfirmEmbeddedViews_InvalidEmbeddedViews {
+    NSDictionary *embeddedViews = @{@"placement1": @"invalid"};
     
-    NSDictionary *result = [self.kitInstance confirmPlacements:placements];
+    NSDictionary *result = [self.kitInstance confirmEmbeddedViews:embeddedViews];
     
     XCTAssertEqual(result.count, 0);
 }
@@ -124,12 +124,12 @@
     XCTAssertEqual(status.returnCode, MPKitReturnCodeSuccess);
 }
 
-- (void)testExecuteWithViewName {
+- (void)testExecuteWithIdentifier {
     id mockRoktSDK = OCMClassMock([Rokt class]);
 
     MPRoktEmbeddedView *view = [[MPRoktEmbeddedView alloc] init];
-    NSString *viewName = @"TestView";
-    NSDictionary *placements = @{@"placement1": view};
+    NSString *identifier = @"TestView";
+    NSDictionary *embeddedViews = @{@"placement1": view};
     NSDictionary *attributes = @{@"attr1": @"value1", @"sandbox": @"true"};
     FilteredMParticleUser *user = [[FilteredMParticleUser alloc] init];
     
@@ -139,7 +139,7 @@
     };
 
     // Expect Rokt execute call with correct parameters
-    OCMExpect([mockRoktSDK executeWithViewName:viewName
+    OCMExpect([mockRoktSDK executeWithViewName:identifier
                                     attributes:expectedAttributes
                                     placements:OCMOCK_ANY
                                         config:nil
@@ -149,9 +149,9 @@
                   onShouldHideLoadingIndicator:nil
                           onEmbeddedSizeChange:nil]);
     
-    MPKitExecStatus *status = [self.kitInstance executeWithViewName:viewName
+    MPKitExecStatus *status = [self.kitInstance executeWithIdentifier:identifier
                                                          attributes:attributes
-                                                         placements:placements
+                                                      embeddedViews:embeddedViews
                                                              config:nil
                                                           callbacks:nil
                                                        filteredUser:user];

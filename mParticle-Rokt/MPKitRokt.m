@@ -76,19 +76,19 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     });
 }
 
-/// \param viewName The name that should be displayed in the widget
+/// \param identifier The name that should be displayed in the widget
 ///
 /// \param attributes A string dictionary containing the parameters that should be displayed in the widget
 ///
-/// \param placements A dictionary of RoktEmbeddedViews with their names
+/// \param embeddedViews A dictionary of RoktEmbeddedViews with their names
 ///
 /// \param callbacks Object that contains all possible callbacks for selectPlacements
 ///
 /// \param filteredUser The current user when this placement was requested. Filtered for the kit as per settings in the mParticle UI
 ///
-- (MPKitExecStatus *)executeWithViewName:(NSString * _Nullable)viewName
+- (MPKitExecStatus *)executeWithIdentifier:(NSString * _Nullable)identifier
                               attributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes
-                              placements:(NSDictionary<NSString *, MPRoktEmbeddedView *> * _Nullable)placements
+                           embeddedViews:(NSDictionary<NSString *, MPRoktEmbeddedView *> * _Nullable)embeddedViews
                                   config:(MPRoktConfig * _Nullable)mpRoktConfig
                                callbacks:(MPRoktEventCallback * _Nullable)callbacks
                             filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser {
@@ -113,9 +113,9 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     //Convert MPRoktConfig to RoktConfig
     RoktConfig *roktConfig = [MPKitRokt convertMPRoktConfig:mpRoktConfig];
     
-    [Rokt executeWithViewName:viewName
+    [Rokt executeWithViewName:identifier
                    attributes:finalAtt
-                   placements:[self confirmPlacements:placements]
+                   placements:[self confirmEmbeddedViews:embeddedViews]
                        config:roktConfig
                        onLoad:callbacks.onLoad
                      onUnLoad:callbacks.onUnLoad
@@ -151,11 +151,11 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     }
 }
 
-- (NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmPlacements:(NSDictionary<NSString *, MPRoktEmbeddedView *> * _Nullable)placements {
+- (NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmEmbeddedViews:(NSDictionary<NSString *, MPRoktEmbeddedView *> * _Nullable)embeddedViews {
     NSMutableDictionary <NSString *, RoktEmbeddedView *> *safePlacements = [NSMutableDictionary dictionary];
     
-    for (NSString* key in placements) {
-        MPRoktEmbeddedView *mpView = [placements objectForKey:key];
+    for (NSString* key in embeddedViews) {
+        MPRoktEmbeddedView *mpView = [embeddedViews objectForKey:key];
         
         if ([mpView isKindOfClass:MPRoktEmbeddedView.class]) {
             // Create a new RoktEmbeddedView instance
