@@ -1,5 +1,6 @@
 #import "MPKitRokt.h"
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
+#import "MPRoktEventMapper.h"
 
 NSString * const kMPRemoteConfigKitHashesKey = @"hs";
 NSString * const kMPRemoteConfigUserAttributeFilter = @"ua";
@@ -294,6 +295,26 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
         return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeUnavailable];
     }
     return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeFail];
+}
+
+- (MPKitExecStatus *)eventsWithIdentifier:(NSString *)identifier onEvent:(void (^)(MPRoktEvent * _Nonnull))onEvent {
+    [Rokt eventsWithViewName:identifier onEvent:^(RoktEvent * _Nonnull event) {
+        MPRoktEvent *mpEvent = [MPRoktEventMapper mapEvent:event];
+        if (mpEvent) {
+            onEvent(mpEvent);
+        }
+    }];
+    return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeSuccess];
+}
+
+- (MPKitExecStatus *)globalEventsOnEvent:(void (^)(MPRoktEvent * _Nonnull))onEvent {
+    [Rokt globalEventsOnEvent:^(RoktEvent * _Nonnull event) {
+        MPRoktEvent *mpEvent = [MPRoktEventMapper mapEvent:event];
+        if (mpEvent) {
+            onEvent(mpEvent);
+        }
+    }];
+    return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeSuccess];
 }
 
 #pragma mark - User attributes and identities

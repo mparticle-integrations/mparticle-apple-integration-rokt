@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -12,6 +12,8 @@
 		7E15B2092D9AE82000C1FF3E /* mParticle-Apple-SDK in Frameworks */ = {isa = PBXBuildFile; productRef = 7E15B2082D9AE82000C1FF3E /* mParticle-Apple-SDK */; };
 		7E15B20B2D9AE82600C1FF3E /* Rokt-Widget in Frameworks */ = {isa = PBXBuildFile; productRef = 7E15B20A2D9AE82600C1FF3E /* Rokt-Widget */; };
 		7EE7F13E2DA95BEE006C5440 /* OCMock in Frameworks */ = {isa = PBXBuildFile; productRef = 7EE7F13D2DA95BEE006C5440 /* OCMock */; };
+		B3D778532E02845700D887A4 /* MPRoktEventMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3D778512E02845700D887A4 /* MPRoktEventMapper.swift */; };
+		B3D778582E028ACD00D887A4 /* MPRoktEventMapper.h in Headers */ = {isa = PBXBuildFile; fileRef = B3D778572E028ACD00D887A4 /* MPRoktEventMapper.h */; };
 		DBB01A601DC1478A00A7B188 /* mParticle_Rokt.h in Headers */ = {isa = PBXBuildFile; fileRef = DBB01A5E1DC1478A00A7B188 /* mParticle_Rokt.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DBB01A681DC1480700A7B188 /* MPKitRokt.h in Headers */ = {isa = PBXBuildFile; fileRef = DBB01A661DC1480700A7B188 /* MPKitRokt.h */; };
 		DBB01A691DC1480700A7B188 /* MPKitRokt.m in Sources */ = {isa = PBXBuildFile; fileRef = DBB01A671DC1480700A7B188 /* MPKitRokt.m */; };
@@ -30,6 +32,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B3D778512E02845700D887A4 /* MPRoktEventMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPRoktEventMapper.swift; sourceTree = "<group>"; };
+		B3D778572E028ACD00D887A4 /* MPRoktEventMapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MPRoktEventMapper.h; sourceTree = "<group>"; };
 		DBB01A5B1DC1478A00A7B188 /* mParticle_Rokt.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = mParticle_Rokt.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBB01A5E1DC1478A00A7B188 /* mParticle_Rokt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mParticle_Rokt.h; sourceTree = "<group>"; };
 		DBB01A5F1DC1478A00A7B188 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -86,6 +90,8 @@
 		DBB01A5D1DC1478A00A7B188 /* mParticle-Rokt */ = {
 			isa = PBXGroup;
 			children = (
+				B3D778572E028ACD00D887A4 /* MPRoktEventMapper.h */,
+				B3D778512E02845700D887A4 /* MPRoktEventMapper.swift */,
 				DBB01A661DC1480700A7B188 /* MPKitRokt.h */,
 				DBB01A671DC1480700A7B188 /* MPKitRokt.m */,
 				DBB01A5E1DC1478A00A7B188 /* mParticle_Rokt.h */,
@@ -117,6 +123,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B3D778582E028ACD00D887A4 /* MPRoktEventMapper.h in Headers */,
 				DBB01A601DC1478A00A7B188 /* mParticle_Rokt.h in Headers */,
 				DBB01A681DC1480700A7B188 /* MPKitRokt.h in Headers */,
 			);
@@ -176,10 +183,12 @@
 				TargetAttributes = {
 					DBB01A5A1DC1478A00A7B188 = {
 						CreatedOnToolsVersion = 8.0;
+						LastSwiftMigration = 1640;
 						ProvisioningStyle = Automatic;
 					};
 					FF0BB63A217A84E800B0556C = {
 						CreatedOnToolsVersion = 10.0;
+						LastSwiftMigration = 1640;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -230,6 +239,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B3D778522E02845700D887A4 /* MPRoktEventMapper.swift in Sources */,
 				DBB01A691DC1480700A7B188 /* MPKitRokt.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -238,6 +248,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B3D778532E02845700D887A4 /* MPRoktEventMapper.swift in Sources */,
 				FF0BB63E217A84E800B0556C /* mParticle_RoktTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -352,6 +363,7 @@
 		DBB01A641DC1478A00A7B188 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -371,12 +383,15 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mparticle.mParticle-Rokt";
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
 		DBB01A651DC1478A00A7B188 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -396,6 +411,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mparticle.mParticle-Rokt";
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
@@ -404,6 +420,7 @@
 			buildSettings = {
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
@@ -433,6 +450,8 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mparticle.mParticle-RoktTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -442,6 +461,7 @@
 			buildSettings = {
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
@@ -470,6 +490,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mparticle.mParticle-RoktTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
