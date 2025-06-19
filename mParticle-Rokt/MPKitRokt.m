@@ -1,6 +1,6 @@
 #import "MPKitRokt.h"
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
-#import "MPRoktEventMapper.h"
+#import <mParticle_Rokt/mParticle_Rokt-Swift.h>
 
 NSString * const kMPRemoteConfigKitHashesKey = @"hs";
 NSString * const kMPRemoteConfigUserAttributeFilter = @"ua";
@@ -154,10 +154,10 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 
 - (NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmEmbeddedViews:(NSDictionary<NSString *, MPRoktEmbeddedView *> * _Nullable)embeddedViews {
     NSMutableDictionary <NSString *, RoktEmbeddedView *> *safePlacements = [NSMutableDictionary dictionary];
-    
+
     for (NSString* key in embeddedViews) {
         MPRoktEmbeddedView *mpView = [embeddedViews objectForKey:key];
-        
+
         if ([mpView isKindOfClass:MPRoktEmbeddedView.class]) {
             // Create a new RoktEmbeddedView instance
             RoktEmbeddedView *roktView = [[RoktEmbeddedView alloc] initWithFrame:mpView.bounds];
@@ -167,7 +167,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
             [safePlacements setObject:roktView forKey:key];
         }
     }
-    
+
     return safePlacements;
 }
 
@@ -297,7 +297,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeFail];
 }
 
-- (MPKitExecStatus *)eventsWithIdentifier:(NSString *)identifier onEvent:(void (^)(MPRoktEvent * _Nonnull))onEvent {
+- (MPKitExecStatus *)events:(NSString *)identifier onEvent:(void (^)(MPRoktEvent * _Nonnull))onEvent {
     [Rokt eventsWithViewName:identifier onEvent:^(RoktEvent * _Nonnull event) {
         MPRoktEvent *mpEvent = [MPRoktEventMapper mapEvent:event];
         if (mpEvent) {
@@ -307,7 +307,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeSuccess];
 }
 
-- (MPKitExecStatus *)globalEventsOnEvent:(void (^)(MPRoktEvent * _Nonnull))onEvent {
+- (MPKitExecStatus *)globalEvents:(void (^)(MPRoktEvent * _Nonnull))onEvent {
     [Rokt globalEventsOnEvent:^(RoktEvent * _Nonnull event) {
         MPRoktEvent *mpEvent = [MPRoktEventMapper mapEvent:event];
         if (mpEvent) {

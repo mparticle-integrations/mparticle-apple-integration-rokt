@@ -3,11 +3,15 @@ import mParticle_Apple_SDK
 import Rokt_Widget
 
 /// Utility class for mapping Rokt events to mParticle events
-@objc(MPRoktEventMapper) public class MPRoktEventMapper: NSObject {
+@objc(MPRoktEventMapper)
+@objcMembers
+public class MPRoktEventMapper: NSObject {
+
     /// Maps a RoktEvent to the corresponding MPRoktEvent
     /// - Parameter event: The RoktEvent to map
     /// - Returns: The mapped MPRoktEvent, or nil if mapping fails
-    @objc public static func mapEvent(_ event: RoktEvent) -> MPRoktEvent? {
+    @objc(mapEvent:)
+    public static func mapEvent(_ event: RoktEvent) -> MPRoktEvent? {
         switch event {
         case let initComplete as RoktEvent.InitComplete:
             return MPRoktEvent.MPRoktInitComplete(success: initComplete.success)
@@ -67,4 +71,4 @@ import Rokt_Widget
             return nil
         }
     }
-} 
+}
