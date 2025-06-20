@@ -1,7 +1,9 @@
 #import <XCTest/XCTest.h>
 #import <OCMock/OCMock.h>
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
+#import <mParticle_Rokt/mParticle_Rokt.h>
 #import "MPKitRokt.h"
+#import <mParticle_Rokt/mParticle_Rokt-Swift.h>
 
 @interface MPKitRokt ()
 
@@ -17,14 +19,14 @@
                          catalogItemId:(NSString *)catalogItemId
                                success:(NSNumber *)success;
 
-- (NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmEmbeddedViews:(NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable)embeddedViews;
+- (NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmEmbeddedViews:(NSDictionary<NSString *, MPRoktEmbeddedView *> * _Nullable)embeddedViews;
 
 - (NSDictionary<NSString *, NSString *> *) filteredUserAttributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes kitConfiguration:(MPKitConfiguration *)kitConfiguration;
 
 - (void)addIdentityAttributes:(NSMutableDictionary<NSString *, NSString *> * _Nullable)attributes filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser;
 
 + (RoktConfig *)convertMPRoktConfig:(MPRoktConfig *)mpRoktConfig;
-    
+
 @end
 
 @interface mParticle_RoktTests : XCTestCase
@@ -350,4 +352,111 @@
     }
 }
 
-@end 
+- (void)testEvents_Success {
+    id mockRoktSDK = OCMClassMock([Rokt class]);
+
+    NSString *identifier = @"TestViewName";
+    __block BOOL callbackCalled = NO;
+    __block MPRoktEvent *receivedEvent = nil;
+
+    // Mock the Rokt SDK call and simulate triggering the callback with a mock event
+    OCMStub([mockRoktSDK eventsWithViewName:identifier onEvent:[OCMArg any]]).andDo(^(NSInvocation *invocation) {
+        // Get the callback block from the invocation
+        void (^onEventCallback)(RoktEvent *) = nil;
+        [invocation getArgument:&onEventCallback atIndex:3]; // Index 3 is the second parameter (onEvent)
+
+        // Create a dummy ShowLoadingIndicator for testing
+        id mockRoktEvent = [[ShowLoadingIndicator alloc] init];
+
+        // Simulate the callback being called
+        if (onEventCallback) {
+            onEventCallback(mockRoktEvent);
+        }
+    });
+
+    // Execute the method under test
+    MPKitExecStatus *status = [self.kitInstance events:identifier onEvent:^(MPRoktEvent * _Nonnull event) {
+        callbackCalled = YES;
+        receivedEvent = event;
+    }];
+
+    // Verify the Rokt SDK method was called
+    OCMVerify([mockRoktSDK eventsWithViewName:identifier onEvent:[OCMArg any]]);
+
+    // Verify the return status
+    XCTAssertNotNil(status);
+    XCTAssertEqual(status.returnCode, MPKitReturnCodeSuccess);
+    XCTAssertEqualObjects(status.integrationId, @181);
+
+    // Verify the callback was called with the mapped event
+    XCTAssertTrue(callbackCalled);
+    XCTAssertNotNil(receivedEvent);
+    XCTAssertEqual([receivedEvent class], [MPRoktShowLoadingIndicator class]);
+
+    [mockRoktSDK stopMocking];
+}
+
+- (void)testEvents_MappingReturnsNil {
+    id mockRoktSDK = OCMClassMock([Rokt class]);
+
+    NSString *identifier = @"TestViewName";
+    __block BOOL callbackCalled = NO;
+
+    // Mock the Rokt SDK call and simulate triggering the callback with a mock event
+    OCMStub([mockRoktSDK eventsWithViewName:identifier onEvent:[OCMArg any]]).andDo(^(NSInvocation *invocation) {
+        // Get the callback block from the invocation
+        void (^onEventCallback)(RoktEvent *) = nil;
+        [invocation getArgument:&onEventCallback atIndex:3];
+
+        // Create a mock RoktEvent for testing
+        id mockRoktEvent = OCMClassMock([RoktEvent class]);
+
+        // Simulate the callback being called
+        if (onEventCallback) {
+            onEventCallback(mockRoktEvent);
+        }
+    });
+
+    // Execute the method under test
+    MPKitExecStatus *status = [self.kitInstance events:identifier onEvent:^(MPRoktEvent * _Nonnull event) {
+        callbackCalled = YES;
+    }];
+
+    // Verify the Rokt SDK method was called
+    OCMVerify([mockRoktSDK eventsWithViewName:identifier onEvent:[OCMArg any]]);
+
+    // Verify the return status
+    XCTAssertNotNil(status);
+    XCTAssertEqual(status.returnCode, MPKitReturnCodeSuccess);
+
+    // Verify the callback was NOT called since mapping returned nil
+    XCTAssertFalse(callbackCalled);
+
+    [mockRoktSDK stopMocking];
+}
+
+- (void)testEvents_NilIdentifier {
+    id mockRoktSDK = OCMClassMock([Rokt class]);
+
+    NSString *identifier = @"";
+    __block BOOL callbackCalled = NO;
+
+    // The Rokt SDK should still be called even with nil identifier
+    OCMExpect([mockRoktSDK eventsWithViewName:@"" onEvent:[OCMArg any]]);
+
+    // Execute the method under test
+    MPKitExecStatus *status = [self.kitInstance events:identifier onEvent:^(MPRoktEvent * _Nonnull event) {
+        callbackCalled = YES;
+    }];
+
+    // Verify the Rokt SDK method was called
+    OCMVerify([mockRoktSDK eventsWithViewName:@"" onEvent:[OCMArg any]]);
+
+    // Verify the return status
+    XCTAssertNotNil(status);
+    XCTAssertEqual(status.returnCode, MPKitReturnCodeSuccess);
+
+    [mockRoktSDK stopMocking];
+}
+
+@end
