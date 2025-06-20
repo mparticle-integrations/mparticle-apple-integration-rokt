@@ -307,16 +307,6 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeSuccess];
 }
 
-- (MPKitExecStatus *)globalEvents:(void (^)(MPRoktEvent * _Nonnull))onEvent {
-    [Rokt globalEventsOnEvent:^(RoktEvent * _Nonnull event) {
-        MPRoktEvent *mpEvent = [MPRoktEventMapper mapEvent:event];
-        if (mpEvent) {
-            onEvent(mpEvent);
-        }
-    }];
-    return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeSuccess];
-}
-
 #pragma mark - User attributes and identities
 
 - (MPKitExecStatus *)setUserIdentity:(NSString *)identityString identityType:(MPUserIdentity)identityType {
