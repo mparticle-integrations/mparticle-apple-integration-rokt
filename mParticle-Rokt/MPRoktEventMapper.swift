@@ -48,8 +48,7 @@ public class MPRoktEventMapper: NSObject {
             
         case let firstPositiveEngagement as RoktEvent.FirstPositiveEngagement:
             return MPRoktEvent.MPRoktFirstPositiveEngagement(
-                placementId: firstPositiveEngagement.placementId,
-                onFulfillmentAttributesUpdate: firstPositiveEngagement.setFulfillmentAttributes
+                placementId: firstPositiveEngagement.placementId
             )
             
         case let cartItemInstantPurchase as RoktEvent.CartItemInstantPurchase:
