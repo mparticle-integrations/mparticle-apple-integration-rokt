@@ -8,9 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		2502325C2D7A7BF3004794A2 /* Rokt-Widget in Frameworks */ = {isa = PBXBuildFile; productRef = 2502325B2D7A7BF3004794A2 /* Rokt-Widget */; };
-		536803952B7BAE11000A10BE /* mParticle-Apple-SDK in Frameworks */ = {isa = PBXBuildFile; productRef = 536803942B7BAE11000A10BE /* mParticle-Apple-SDK */; };
-		7E15B2092D9AE82000C1FF3E /* mParticle-Apple-SDK in Frameworks */ = {isa = PBXBuildFile; productRef = 7E15B2082D9AE82000C1FF3E /* mParticle-Apple-SDK */; };
 		7E15B20B2D9AE82600C1FF3E /* Rokt-Widget in Frameworks */ = {isa = PBXBuildFile; productRef = 7E15B20A2D9AE82600C1FF3E /* Rokt-Widget */; };
+		7EDDAAB02E05A88E00D089CF /* mParticle-Apple-SDK in Frameworks */ = {isa = PBXBuildFile; productRef = 7EDDAAAF2E05A88E00D089CF /* mParticle-Apple-SDK */; };
+		7EDDAAB22E05A89B00D089CF /* mParticle-Apple-SDK in Frameworks */ = {isa = PBXBuildFile; productRef = 7EDDAAB12E05A89B00D089CF /* mParticle-Apple-SDK */; };
+		7EE7F13E2DA95BEE006C5440 /* OCMock in Frameworks */ = {isa = PBXBuildFile; productRef = 7EE7F13D2DA95BEE006C5440 /* OCMock */; };
+		B34CE55A2E04356F00712DE1 /* MPRoktEventMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3D778512E02845700D887A4 /* MPRoktEventMapper.swift */; };
+		B3D778532E02845700D887A4 /* MPRoktEventMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3D778512E02845700D887A4 /* MPRoktEventMapper.swift */; };
 		DBB01A601DC1478A00A7B188 /* mParticle_Rokt.h in Headers */ = {isa = PBXBuildFile; fileRef = DBB01A5E1DC1478A00A7B188 /* mParticle_Rokt.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DBB01A681DC1480700A7B188 /* MPKitRokt.h in Headers */ = {isa = PBXBuildFile; fileRef = DBB01A661DC1480700A7B188 /* MPKitRokt.h */; };
 		DBB01A691DC1480700A7B188 /* MPKitRokt.m in Sources */ = {isa = PBXBuildFile; fileRef = DBB01A671DC1480700A7B188 /* MPKitRokt.m */; };
@@ -29,6 +32,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B3D778512E02845700D887A4 /* MPRoktEventMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPRoktEventMapper.swift; sourceTree = "<group>"; };
 		DBB01A5B1DC1478A00A7B188 /* mParticle_Rokt.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = mParticle_Rokt.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBB01A5E1DC1478A00A7B188 /* mParticle_Rokt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mParticle_Rokt.h; sourceTree = "<group>"; };
 		DBB01A5F1DC1478A00A7B188 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -44,8 +48,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7EDDAAB02E05A88E00D089CF /* mParticle-Apple-SDK in Frameworks */,
 				2502325C2D7A7BF3004794A2 /* Rokt-Widget in Frameworks */,
-				536803952B7BAE11000A10BE /* mParticle-Apple-SDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -53,8 +57,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7E15B2092D9AE82000C1FF3E /* mParticle-Apple-SDK in Frameworks */,
 				FF0BB640217A84E800B0556C /* mParticle_Rokt.framework in Frameworks */,
+				7EE7F13E2DA95BEE006C5440 /* OCMock in Frameworks */,
+				7EDDAAB22E05A89B00D089CF /* mParticle-Apple-SDK in Frameworks */,
 				7E15B20B2D9AE82600C1FF3E /* Rokt-Widget in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -84,6 +89,7 @@
 		DBB01A5D1DC1478A00A7B188 /* mParticle-Rokt */ = {
 			isa = PBXGroup;
 			children = (
+				B3D778512E02845700D887A4 /* MPRoktEventMapper.swift */,
 				DBB01A661DC1480700A7B188 /* MPKitRokt.h */,
 				DBB01A671DC1480700A7B188 /* MPKitRokt.m */,
 				DBB01A5E1DC1478A00A7B188 /* mParticle_Rokt.h */,
@@ -138,8 +144,8 @@
 			);
 			name = "mParticle-Rokt";
 			packageProductDependencies = (
-				536803942B7BAE11000A10BE /* mParticle-Apple-SDK */,
 				2502325B2D7A7BF3004794A2 /* Rokt-Widget */,
+				7EDDAAAF2E05A88E00D089CF /* mParticle-Apple-SDK */,
 			);
 			productName = "mParticle-Rokt";
 			productReference = DBB01A5B1DC1478A00A7B188 /* mParticle_Rokt.framework */;
@@ -174,10 +180,12 @@
 				TargetAttributes = {
 					DBB01A5A1DC1478A00A7B188 = {
 						CreatedOnToolsVersion = 8.0;
+						LastSwiftMigration = 1640;
 						ProvisioningStyle = Automatic;
 					};
 					FF0BB63A217A84E800B0556C = {
 						CreatedOnToolsVersion = 10.0;
+						LastSwiftMigration = 1640;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -192,8 +200,9 @@
 			);
 			mainGroup = DBB01A511DC1478A00A7B188;
 			packageReferences = (
-				536803932B7BAE11000A10BE /* XCRemoteSwiftPackageReference "mparticle-apple-sdk" */,
 				2502325A2D7A7BF3004794A2 /* XCRemoteSwiftPackageReference "rokt-sdk-ios" */,
+				7EE7F13C2DA95BEE006C5440 /* XCRemoteSwiftPackageReference "ocmock" */,
+				7EDDAAAE2E05A88E00D089CF /* XCRemoteSwiftPackageReference "mparticle-apple-sdk" */,
 			);
 			productRefGroup = DBB01A5C1DC1478A00A7B188 /* Products */;
 			projectDirPath = "";
@@ -227,6 +236,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B34CE55A2E04356F00712DE1 /* MPRoktEventMapper.swift in Sources */,
 				DBB01A691DC1480700A7B188 /* MPKitRokt.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -235,6 +245,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B3D778532E02845700D887A4 /* MPRoktEventMapper.swift in Sources */,
 				FF0BB63E217A84E800B0556C /* mParticle_RoktTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -275,6 +286,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -326,6 +338,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -349,6 +362,7 @@
 		DBB01A641DC1478A00A7B188 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -368,12 +382,15 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mparticle.mParticle-Rokt";
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
 		DBB01A651DC1478A00A7B188 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -393,6 +410,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mparticle.mParticle-Rokt";
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
@@ -401,6 +419,7 @@
 			buildSettings = {
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
@@ -430,6 +449,8 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mparticle.mParticle-RoktTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -439,6 +460,7 @@
 			buildSettings = {
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
@@ -467,6 +489,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mparticle.mParticle-RoktTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -512,12 +535,20 @@
 				minimumVersion = 4.8.1;
 			};
 		};
-		536803932B7BAE11000A10BE /* XCRemoteSwiftPackageReference "mparticle-apple-sdk" */ = {
+		7EDDAAAE2E05A88E00D089CF /* XCRemoteSwiftPackageReference "mparticle-apple-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/mParticle/mparticle-apple-sdk";
+			repositoryURL = "https://github.com/mParticle/mparticle-apple-sdk.git";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 8.4.0;
+			};
+		};
+		7EE7F13C2DA95BEE006C5440 /* XCRemoteSwiftPackageReference "ocmock" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/erikdoe/ocmock.git";
+			requirement = {
+				branch = master;
+				kind = branch;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -528,20 +559,25 @@
 			package = 2502325A2D7A7BF3004794A2 /* XCRemoteSwiftPackageReference "rokt-sdk-ios" */;
 			productName = "Rokt-Widget";
 		};
-		536803942B7BAE11000A10BE /* mParticle-Apple-SDK */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 536803932B7BAE11000A10BE /* XCRemoteSwiftPackageReference "mparticle-apple-sdk" */;
-			productName = "mParticle-Apple-SDK";
-		};
-		7E15B2082D9AE82000C1FF3E /* mParticle-Apple-SDK */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 536803932B7BAE11000A10BE /* XCRemoteSwiftPackageReference "mparticle-apple-sdk" */;
-			productName = "mParticle-Apple-SDK";
-		};
 		7E15B20A2D9AE82600C1FF3E /* Rokt-Widget */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 2502325A2D7A7BF3004794A2 /* XCRemoteSwiftPackageReference "rokt-sdk-ios" */;
 			productName = "Rokt-Widget";
+		};
+		7EDDAAAF2E05A88E00D089CF /* mParticle-Apple-SDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7EDDAAAE2E05A88E00D089CF /* XCRemoteSwiftPackageReference "mparticle-apple-sdk" */;
+			productName = "mParticle-Apple-SDK";
+		};
+		7EDDAAB12E05A89B00D089CF /* mParticle-Apple-SDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7EDDAAAE2E05A88E00D089CF /* XCRemoteSwiftPackageReference "mparticle-apple-sdk" */;
+			productName = "mParticle-Apple-SDK";
+		};
+		7EE7F13D2DA95BEE006C5440 /* OCMock */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7EE7F13C2DA95BEE006C5440 /* XCRemoteSwiftPackageReference "ocmock" */;
+			productName = OCMock;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

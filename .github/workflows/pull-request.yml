@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  pull_request:
+
+jobs:
+  pr-branch-check-name:
+    name: "Check PR for semantic branch name"
+    uses: mParticle/mparticle-workflows/.github/workflows/pr-branch-check-name.yml@stable
+  pr-title-check:
+    name: "Check PR for semantic title"
+    uses: mParticle/mparticle-workflows/.github/workflows/pr-title-check.yml@stable
+  pr-branch-target-gitflow:
+    name: "Check PR for semantic target branch"
+    uses: mParticle/mparticle-workflows/.github/workflows/pr-branch-target-gitflow.yml@stable
+
+  test:
+    name: Test
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Xcode 16
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: 16.3.0
+      - name: Run Tests
+        run: >
+          set -o pipefail &&
+          xcodebuild test -project mParticle-Rokt.xcodeproj -scheme mParticle_RoktTests -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest'
+          | xcbeautify --renderer github-actions
+        shell: bash
