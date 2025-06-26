@@ -30,7 +30,7 @@ public struct MPRoktLayout: View {
         onShouldShowLoadingIndicator: (() -> Void)? = nil,
         onShouldHideLoadingIndicator: (() -> Void)? = nil
     ) {
-        MPKitRokt.prepareAttributes(attributes, filteredUser: nil, performMapping: true)
+        MPKitRokt.prepareAttributes(attributes, filteredUser: Optional<FilteredMParticleUser>.none, performMapping: true)
 
         self.roktLayout = RoktLayout.init(
             sdkTriggered: sdkTriggered,

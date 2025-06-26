@@ -21,9 +21,7 @@
 
 - (NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmEmbeddedViews:(NSDictionary<NSString *, MPRoktEmbeddedView *> * _Nullable)embeddedViews;
 
-- (NSDictionary<NSString *, NSString *> *) filteredUserAttributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes kitConfiguration:(MPKitConfiguration *)kitConfiguration;
-
-- (void)addIdentityAttributes:(NSMutableDictionary<NSString *, NSString *> * _Nullable)attributes filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser;
++ (void)addIdentityAttributes:(NSMutableDictionary<NSString *, NSString *> * _Nullable)attributes filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser;
 
 + (RoktConfig *)convertMPRoktConfig:(MPRoktConfig *)mpRoktConfig;
 
@@ -196,8 +194,7 @@
     id mockfilteredUser = OCMPartialMock(filteredUser);
     [[[mockfilteredUser stub] andReturn:testIdentities] userIdentities];
     
-    MPKitRokt *kit = [[MPKitRokt alloc] init];
-    [kit addIdentityAttributes:passedAttributes filteredUser:filteredUser];
+    [MPKitRokt addIdentityAttributes:passedAttributes filteredUser:filteredUser];
     
     XCTAssertEqualObjects(passedAttributes[@"customerid"], @"testCustomerID");
     XCTAssertEqualObjects(passedAttributes[@"email"], @"testEmail@gmail.com");
@@ -259,8 +256,7 @@
     id mockfilteredUser = OCMPartialMock(filteredUser);
     [[[mockfilteredUser stub] andReturn:testIdentities] userIdentities];
     
-    MPKitRokt *kit = [[MPKitRokt alloc] init];
-    [kit addIdentityAttributes:passedAttributes filteredUser:filteredUser];
+    [MPKitRokt addIdentityAttributes:passedAttributes filteredUser:filteredUser];
     
     XCTAssertEqualObjects(passedAttributes[@"foo"], @"bar");
     XCTAssertEqualObjects(passedAttributes[@"customerid"], @"testCustomerID");
