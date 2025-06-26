@@ -16,4 +16,6 @@
 @property (nonatomic, strong, nullable) NSDictionary *launchOptions;
 @property (nonatomic, unsafe_unretained, readonly) BOOL started;
 
++ (NSDictionary<NSString *, NSString *> * _Nonnull)prepareAttributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes filteredUser:(FilteredMParticleUser * _Nullable)filteredUser performMapping:(BOOL)performMapping;
+
 @end

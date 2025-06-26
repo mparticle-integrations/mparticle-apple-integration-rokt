@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		2502325C2D7A7BF3004794A2 /* Rokt-Widget in Frameworks */ = {isa = PBXBuildFile; productRef = 2502325B2D7A7BF3004794A2 /* Rokt-Widget */; };
+		7E084C852E0C4B3A0098059B /* MPRoktLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E084C842E0C4B340098059B /* MPRoktLayout.swift */; };
+		7E084C862E0C4B3A0098059B /* MPRoktLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E084C842E0C4B340098059B /* MPRoktLayout.swift */; };
 		7E15B20B2D9AE82600C1FF3E /* Rokt-Widget in Frameworks */ = {isa = PBXBuildFile; productRef = 7E15B20A2D9AE82600C1FF3E /* Rokt-Widget */; };
 		7EDDAAB02E05A88E00D089CF /* mParticle-Apple-SDK in Frameworks */ = {isa = PBXBuildFile; productRef = 7EDDAAAF2E05A88E00D089CF /* mParticle-Apple-SDK */; };
 		7EDDAAB22E05A89B00D089CF /* mParticle-Apple-SDK in Frameworks */ = {isa = PBXBuildFile; productRef = 7EDDAAB12E05A89B00D089CF /* mParticle-Apple-SDK */; };
@@ -32,6 +34,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7E084C842E0C4B340098059B /* MPRoktLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPRoktLayout.swift; sourceTree = "<group>"; };
 		B3D778512E02845700D887A4 /* MPRoktEventMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPRoktEventMapper.swift; sourceTree = "<group>"; };
 		DBB01A5B1DC1478A00A7B188 /* mParticle_Rokt.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = mParticle_Rokt.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBB01A5E1DC1478A00A7B188 /* mParticle_Rokt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mParticle_Rokt.h; sourceTree = "<group>"; };
@@ -89,6 +92,7 @@
 		DBB01A5D1DC1478A00A7B188 /* mParticle-Rokt */ = {
 			isa = PBXGroup;
 			children = (
+				7E084C842E0C4B340098059B /* MPRoktLayout.swift */,
 				B3D778512E02845700D887A4 /* MPRoktEventMapper.swift */,
 				DBB01A661DC1480700A7B188 /* MPKitRokt.h */,
 				DBB01A671DC1480700A7B188 /* MPKitRokt.m */,
@@ -237,6 +241,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B34CE55A2E04356F00712DE1 /* MPRoktEventMapper.swift in Sources */,
+				7E084C862E0C4B3A0098059B /* MPRoktLayout.swift in Sources */,
 				DBB01A691DC1480700A7B188 /* MPKitRokt.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -246,6 +251,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B3D778532E02845700D887A4 /* MPRoktEventMapper.swift in Sources */,
+				7E084C852E0C4B3A0098059B /* MPRoktLayout.swift in Sources */,
 				FF0BB63E217A84E800B0556C /* mParticle_RoktTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
