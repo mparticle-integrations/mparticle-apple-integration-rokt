@@ -25,39 +25,15 @@ public struct MPRoktLayout: View {
         locationName: String = "",
         attributes: [String: String],
         config: RoktConfig? = nil,
-        onLoad: (() -> Void)? = nil,
-        onUnLoad: (() -> Void)? = nil,
-        onShouldShowLoadingIndicator: (() -> Void)? = nil,
-        onShouldHideLoadingIndicator: (() -> Void)? = nil
-    ) {
-        MPKitRokt.prepareAttributes(attributes, filteredUser: Optional<FilteredMParticleUser>.none, performMapping: true)
-
-        self.roktLayout = RoktLayout.init(
-            sdkTriggered: sdkTriggered,
-            viewName: viewName,
-            locationName: locationName,
-            attributes: attributes,
-            config: config,
-            onLoad: onLoad,
-            onUnLoad: onUnLoad,
-            onShouldShowLoadingIndicator: onShouldShowLoadingIndicator,
-            onShouldHideLoadingIndicator: onShouldHideLoadingIndicator
-        )
-    }
-
-    public init(
-        sdkTriggered: Binding<Bool>,
-        viewName: String? = nil,
-        locationName: String = "",
-        attributes: [String: String],
-        config: RoktConfig? = nil,
         onEvent: ((RoktEvent) -> Void)? = nil
     ) {
+        let preparedAttributes = MPKitRokt.prepareAttributes(attributes, filteredUser: Optional<FilteredMParticleUser>.none, performMapping: true)
+
         self.roktLayout = RoktLayout.init(
             sdkTriggered: sdkTriggered,
             viewName: viewName,
             locationName: locationName,
-            attributes: attributes,
+            attributes: preparedAttributes,
             config: config,
             onEvent: onEvent
         )

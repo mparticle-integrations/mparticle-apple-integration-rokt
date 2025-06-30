@@ -130,7 +130,45 @@
     MPRoktEmbeddedView *view = [[MPRoktEmbeddedView alloc] init];
     NSString *identifier = @"TestView";
     NSDictionary *embeddedViews = @{@"placement1": view};
-    NSDictionary *attributes = @{@"attr1": @"value1", @"sandbox": @"true"};
+    NSDictionary *attributes = @{@"attr1": @"value1", @"sandbox": @"false"};
+    FilteredMParticleUser *user = [[FilteredMParticleUser alloc] init];
+    
+    // Expected attributes in final call
+    NSDictionary *expectedAttributes = @{
+        @"sandbox": @"false"
+    };
+
+    // Expect Rokt execute call with correct parameters
+    OCMExpect([mockRoktSDK executeWithViewName:identifier
+                                    attributes:expectedAttributes
+                                    placements:OCMOCK_ANY
+                                        config:nil
+                                        onLoad:nil
+                                      onUnLoad:nil
+                  onShouldShowLoadingIndicator:nil
+                  onShouldHideLoadingIndicator:nil
+                          onEmbeddedSizeChange:nil]);
+    
+    MPKitExecStatus *status = [self.kitInstance executeWithIdentifier:identifier
+                                                         attributes:attributes
+                                                      embeddedViews:embeddedViews
+                                                             config:nil
+                                                          callbacks:nil
+                                                       filteredUser:user];
+
+    // Verify
+    XCTAssertNotNil(status);
+    XCTAssertEqual(status.returnCode, MPKitReturnCodeSuccess);
+    OCMVerifyAll(mockRoktSDK);
+}
+
+- (void)testExecuteSandboxDetection {
+    id mockRoktSDK = OCMClassMock([Rokt class]);
+
+    MPRoktEmbeddedView *view = [[MPRoktEmbeddedView alloc] init];
+    NSString *identifier = @"TestView";
+    NSDictionary *embeddedViews = @{@"placement1": view};
+    NSDictionary *attributes = @{@"attr1": @"value1"};
     FilteredMParticleUser *user = [[FilteredMParticleUser alloc] init];
     
     // Expected attributes in final call
