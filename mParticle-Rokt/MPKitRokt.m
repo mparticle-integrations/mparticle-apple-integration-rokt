@@ -6,6 +6,8 @@ NSString * const kMPRemoteConfigKitHashesKey = @"hs";
 NSString * const kMPRemoteConfigUserAttributeFilter = @"ua";
 NSString * const MPKitRoktErrorDomain = @"com.mparticle.kits.rokt";
 NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
+NSString * const kMPPlacementAttributesMapping = @"placementAttributesMapping";
+static __weak MPKitRokt *roktKit = nil;
 
 @interface MPKitRokt () <MPKitProtocol>
 
@@ -42,6 +44,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     }
 
     _configuration = configuration;
+    roktKit = self;
     
     NSString *sdkVersion = [MParticle sharedInstance].version;
     // https://go.mparticle.com/work/SQDSDKS-7379
@@ -93,23 +96,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
                                   config:(MPRoktConfig * _Nullable)mpRoktConfig
                                callbacks:(MPRoktEventCallback * _Nullable)callbacks
                             filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser {
-    NSDictionary<NSString *, NSString *> *mpAttributes = [filteredUser.userAttributes transformValuesToString];
-    NSMutableDictionary<NSString *, NSString *> *finalAtt = [[NSMutableDictionary alloc] init];
-    [finalAtt addEntriesFromDictionary:mpAttributes];
-    
-    // Add MPID to the attributes being passed to the Rokt SDK
-    if (filteredUser.userId.stringValue != nil) {
-        [finalAtt addEntriesFromDictionary:@{@"mpid": filteredUser.userId.stringValue}];
-    }
-    
-    // Add all known user identities to the attributes being passed to the Rokt SDK
-    [self addIdentityAttributes:finalAtt filteredUser:filteredUser];
-    
-    // The core SDK does not set sandbox on the user, but we must pass it to Rokt if provided
-    NSString *sandboxKey = @"sandbox";
-    if (attributes[sandboxKey] != nil) {
-        [finalAtt addEntriesFromDictionary:@{sandboxKey: attributes[sandboxKey]}];
-    }
+    NSDictionary<NSString *, NSString *> *finalAtt = [MPKitRokt prepareAttributes:attributes filteredUser:filteredUser performMapping:NO];
     
     //Convert MPRoktConfig to RoktConfig
     RoktConfig *roktConfig = [MPKitRokt convertMPRoktConfig:mpRoktConfig];
@@ -171,7 +158,128 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
     return safePlacements;
 }
 
-- (void)addIdentityAttributes:(NSMutableDictionary<NSString *, NSString *> * _Nullable)attributes filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser {
++ (NSDictionary<NSString *, NSString *> *)confirmSandboxAttribute:(NSDictionary<NSString *, NSString *> * _Nullable)attributes {
+    NSMutableDictionary<NSString *, NSString *> *finalAttributes = attributes.mutableCopy;
+    NSString *sandboxKey = @"sandbox";
+    
+    // Determine the value of the sandbox attribute based off the current environment
+    NSString *sandboxValue = ([[MParticle sharedInstance] environment] == MPEnvironmentDevelopment) ? @"true" : @"false";
+    
+    if (finalAttributes != nil) {
+        // Only set sandbox if it`s not set by the client
+        if (![finalAttributes.allKeys containsObject:sandboxKey]) {
+            finalAttributes[sandboxKey] = sandboxValue;
+        }
+    } else {
+        finalAttributes = [[NSMutableDictionary alloc] initWithDictionary:@{sandboxKey: sandboxValue}];
+    }
+    
+    return finalAttributes;
+}
+
++ (NSDictionary<NSString *, NSString *> * _Nonnull)prepareAttributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes filteredUser:(FilteredMParticleUser * _Nullable)filteredUser performMapping:(BOOL)performMapping {
+    if (filteredUser == nil && roktKit != nil) {
+        filteredUser = [[[MPKitAPI alloc] init] getCurrentUserWithKit:roktKit];
+    }
+    NSDictionary<NSString *, NSString *> *mpAttributes = [filteredUser.userAttributes transformValuesToString];
+    if (performMapping) {
+        mpAttributes = [self mapAttributes:attributes filteredUser:filteredUser];
+    }
+    
+    NSMutableDictionary<NSString *, NSString *> *finalAtt = [[NSMutableDictionary alloc] init];
+    [finalAtt addEntriesFromDictionary:mpAttributes];
+    
+    // Add MPID to the attributes being passed to the Rokt SDK
+    if (filteredUser.userId.stringValue != nil) {
+        [finalAtt addEntriesFromDictionary:@{@"mpid": filteredUser.userId.stringValue}];
+    }
+    
+    // Add all known user identities to the attributes being passed to the Rokt SDK
+    [self addIdentityAttributes:finalAtt filteredUser:filteredUser];
+    
+    // The core SDK does not set sandbox on the user, but we must pass it to Rokt if provided
+    NSString *sandboxKey = @"sandbox";
+    if (attributes[sandboxKey] != nil) {
+        [finalAtt addEntriesFromDictionary:@{sandboxKey: attributes[sandboxKey]}];
+    }
+    
+    return [self confirmSandboxAttribute:finalAtt];
+}
+
++ (NSDictionary<NSString *, NSString *> *)mapAttributes:(NSDictionary<NSString *, NSString *> * _Nullable)attributes filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser {
+    NSArray<NSDictionary<NSString *, NSString *> *> *attributeMap = nil;
+    
+    // Get the kit configuration
+    NSArray<NSDictionary *> *kitConfigs = [MParticle sharedInstance].kitContainer_PRIVATE.originalConfig.copy;
+    NSDictionary *roktKitConfig;
+    for (NSDictionary *kitConfig in kitConfigs) {
+        if (kitConfig[@"id"] != nil && [kitConfig[@"id"] integerValue] == 181) {
+            roktKitConfig = kitConfig;
+        }
+    }
+    
+    // Return nil if no Rokt Kit configuration found
+    if (!roktKitConfig) {
+        return attributes;
+    }
+    
+    // Get the placement attributes map
+    NSString *strAttributeMap;
+    NSData *dataAttributeMap;
+    // Rokt Kit is available though there may not be an attribute map
+    attributeMap = @[];
+    if (roktKitConfig[kMPPlacementAttributesMapping] != [NSNull null]) {
+        strAttributeMap = [roktKitConfig[kMPPlacementAttributesMapping] stringByRemovingPercentEncoding];
+        dataAttributeMap = [strAttributeMap dataUsingEncoding:NSUTF8StringEncoding];
+    }
+    
+    if (dataAttributeMap != nil) {
+        // Convert it to an array of dictionaries
+        NSError *error = nil;
+        
+        @try {
+            attributeMap = [NSJSONSerialization JSONObjectWithData:dataAttributeMap options:kNilOptions error:&error];
+        } @catch (NSException *exception) {
+        }
+        
+        if (attributeMap && !error) {
+            NSLog(@"%@", attributeMap);
+        } else {
+            NSLog(@"%@", error);
+        }
+    }
+    
+    if (attributeMap) {
+        NSMutableDictionary *mappedAttributes = attributes.mutableCopy;
+        for (NSDictionary<NSString *, NSString *> *map in attributeMap) {
+            NSString *mapFrom = map[@"map"];
+            NSString *mapTo = map[@"value"];
+            if (mappedAttributes[mapFrom]) {
+                NSString * value = mappedAttributes[mapFrom];
+                [mappedAttributes removeObjectForKey:mapFrom];
+                mappedAttributes[mapTo] = value;
+            }
+        }
+        for (NSString *key in mappedAttributes) {
+            if (![key isEqual:@"sandbox"]) {
+                [[MParticle sharedInstance].identity.currentUser setUserAttribute:key value:mappedAttributes[key]];
+            }
+        }
+        
+        // Add userAttributes to the attributes sent to Rokt
+        for (NSString *uaKey in filteredUser.userAttributes) {
+            if (![mappedAttributes.allKeys containsObject:uaKey]) {
+                mappedAttributes[uaKey] = filteredUser.userAttributes[uaKey];
+            }
+        }
+        
+        return [mappedAttributes transformValuesToString];
+    } else {
+        return attributes;
+    }
+}
+
++ (void)addIdentityAttributes:(NSMutableDictionary<NSString *, NSString *> * _Nullable)attributes filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser {
     NSMutableDictionary<NSString *, NSString *> *identityAttributes = [[NSMutableDictionary alloc] init];
     for (NSNumber *identityNumberKey in filteredUser.userIdentities) {
         NSString *identityStringKey = [MPKitRokt stringForIdentityType:identityNumberKey.unsignedIntegerValue];
