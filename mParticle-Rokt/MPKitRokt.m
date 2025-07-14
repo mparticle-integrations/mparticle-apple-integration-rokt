@@ -415,6 +415,11 @@ static __weak MPKitRokt *roktKit = nil;
     return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeSuccess];
 }
 
+- (MPKitExecStatus *)close {
+    [Rokt close];
+    return [[MPKitExecStatus alloc] initWithSDKCode:[[self class] kitCode] returnCode:MPKitReturnCodeSuccess];
+}
+
 #pragma mark - User attributes and identities
 
 - (MPKitExecStatus *)setUserIdentity:(NSString *)identityString identityType:(MPUserIdentity)identityType {
