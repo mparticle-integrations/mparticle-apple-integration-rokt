@@ -3,6 +3,16 @@ name: CI
 on:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: write
+  id-token: write
+
 jobs:
   pr-branch-check-name:
     name: "Check PR for semantic branch name"
@@ -30,3 +40,14 @@ jobs:
           xcodebuild test -project mParticle-Rokt.xcodeproj -scheme mParticle_RoktTests -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest'
           | xcbeautify --renderer github-actions
         shell: bash
+
+  pr-notify:
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.draft == false
+    needs:
+      - test
+    name: Notify GChat
+    uses: ROKT/rokt-workflows/.github/workflows/oss_pr_opened_notification.yml@main
+    secrets:
+      gchat_webhook: ${{ secrets.GCHAT_PRS_WEBHOOK }}
