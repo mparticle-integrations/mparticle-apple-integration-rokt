@@ -197,6 +197,9 @@ static __weak MPKitRokt *roktKit = nil;
     // Add all known user identities to the attributes being passed to the Rokt SDK
     [self addIdentityAttributes:finalAtt filteredUser:filteredUser];
     
+    // Handle hashed email use case
+    [self handleHashedEmail:finalAtt];
+    
     // The core SDK does not set sandbox on the user, but we must pass it to Rokt if provided
     NSString *sandboxKey = @"sandbox";
     if (attributes[sandboxKey] != nil) {
@@ -290,6 +293,27 @@ static __weak MPKitRokt *roktKit = nil;
         [attributes addEntriesFromDictionary:identityAttributes];
     } else {
         attributes = identityAttributes;
+    }
+}
+
++ (void)handleHashedEmail:(NSMutableDictionary<NSString *, NSString *> * _Nullable)attributes {
+    NSString *emailKey = [MPKitRokt stringForIdentityType:MPIdentityEmail];
+    NSString *otherKey = [MPKitRokt stringForIdentityType:MPIdentityOther];
+    NSString *hashedEmailValue = attributes[@"emailsha256"];
+    
+    // Remove email and other is hashed vlaue already set
+    if (hashedEmailValue != nil) {
+        [attributes removeObjectForKey:emailKey];
+        [attributes removeObjectForKey:otherKey];
+    }
+    
+    NSString *otherValue = attributes[otherKey];
+    
+    // Remove email and replace key on other if it's set
+    if (otherValue != nil) {
+        [attributes removeObjectForKey:emailKey];
+        attributes[@"emailsha256"] = otherValue;
+        [attributes removeObjectForKey:otherKey];
     }
 }
 

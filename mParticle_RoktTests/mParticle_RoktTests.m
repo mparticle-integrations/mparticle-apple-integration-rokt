@@ -23,6 +23,8 @@
 
 + (void)addIdentityAttributes:(NSMutableDictionary<NSString *, NSString *> * _Nullable)attributes filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser;
 
++ (void)handleHashedEmail:(NSMutableDictionary<NSString *, NSString *> * _Nullable)attributes;
+
 + (RoktConfig *)convertMPRoktConfig:(MPRoktConfig *)mpRoktConfig;
 
 @end
@@ -491,6 +493,33 @@
     XCTAssertEqual(status.returnCode, MPKitReturnCodeSuccess);
 
     [mockRoktSDK stopMocking];
+}
+
+- (void)testHandleHashedEmailOtherOverride {
+    NSMutableDictionary<NSString *, NSString *> *passedAttributes = [[NSMutableDictionary alloc] init];
+    [passedAttributes setObject:@"foo@gmail.com" forKey:@"email"];
+    [passedAttributes setObject:@"test@gmail.com" forKey:@"other"];
+    
+    [MPKitRokt handleHashedEmail:passedAttributes];
+    
+    XCTAssertNil(passedAttributes[@"email"]);
+    XCTAssertNil(passedAttributes[@"other"]);
+    XCTAssertEqualObjects(passedAttributes[@"emailsha256"], @"test@gmail.com");
+    XCTAssertTrue(passedAttributes.allKeys.count == 1);
+}
+
+- (void)testHandleHashedEmailHashedOverride {
+    NSMutableDictionary<NSString *, NSString *> *passedAttributes = [[NSMutableDictionary alloc] init];
+    [passedAttributes setObject:@"foo@gmail.com" forKey:@"email"];
+    [passedAttributes setObject:@"test@gmail.com" forKey:@"other"];
+    [passedAttributes setObject:@"test2@gmail.com" forKey:@"emailsha256"];
+    
+    [MPKitRokt handleHashedEmail:passedAttributes];
+    
+    XCTAssertNil(passedAttributes[@"email"]);
+    XCTAssertNil(passedAttributes[@"other"]);
+    XCTAssertEqualObjects(passedAttributes[@"emailsha256"], @"test2@gmail.com");
+    XCTAssertTrue(passedAttributes.allKeys.count == 1);
 }
 
 @end
