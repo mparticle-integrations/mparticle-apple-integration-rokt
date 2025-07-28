@@ -181,7 +181,7 @@ static __weak MPKitRokt *roktKit = nil;
     if (filteredUser == nil && roktKit != nil) {
         filteredUser = [[[MPKitAPI alloc] init] getCurrentUserWithKit:roktKit];
     }
-    NSDictionary<NSString *, NSString *> *mpAttributes = [filteredUser.userAttributes transformValuesToString];
+    NSDictionary<NSString *, NSString *> *mpAttributes = [self transformValuesToString:filteredUser.userAttributes];
     if (performMapping) {
         mpAttributes = [self mapAttributes:attributes filteredUser:filteredUser];
     }
@@ -207,6 +207,42 @@ static __weak MPKitRokt *roktKit = nil;
     }
     
     return [self confirmSandboxAttribute:finalAtt];
+}
+
++ (NSDictionary<NSString *, NSString *> *)transformValuesToString:(NSDictionary<NSString *, id> * _Nullable)originalDictionary {
+    __block NSMutableDictionary<NSString *, NSString *> *transformedDictionary = [[NSMutableDictionary alloc] initWithCapacity:originalDictionary.count];
+    Class NSStringClass = [NSString class];
+    Class NSNumberClass = [NSNumber class];
+    
+    [originalDictionary enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        if ([obj isKindOfClass:NSStringClass]) {
+            transformedDictionary[key] = obj;
+        } else if ([obj isKindOfClass:NSNumberClass]) {
+            NSNumber *numberAttribute = (NSNumber *)obj;
+            
+            if (numberAttribute == (void *)kCFBooleanFalse || numberAttribute == (void *)kCFBooleanTrue) {
+                transformedDictionary[key] = [numberAttribute boolValue] ? @"true" : @"false";
+            } else {
+                transformedDictionary[key] = [numberAttribute stringValue];
+            }
+        } else if ([obj isKindOfClass:[NSDate class]]) {
+            transformedDictionary[key] = [MPDateFormatter stringFromDateRFC3339:obj];
+        } else if ([obj isKindOfClass:[NSData class]] && [(NSData *)obj length] > 0) {
+            transformedDictionary[key] = [[NSString alloc] initWithData:obj encoding:NSUTF8StringEncoding];
+        } else if ([obj isKindOfClass:[NSDictionary class]]) {
+            transformedDictionary[key] = [obj description];
+        } else if ([obj isKindOfClass:[NSMutableDictionary class]]) {
+            transformedDictionary[key] = [obj description];
+        } else if ([obj isKindOfClass:[NSArray class]]) {
+            transformedDictionary[key] = [obj description];
+        } else if ([obj isKindOfClass:[NSMutableArray class]]) {
+            transformedDictionary[key] = [obj description];
+        } else if ([obj isKindOfClass:[NSNull class]]) {
+            transformedDictionary[key] = @"null";
+        }
+    }];
+    
+    return transformedDictionary;
 }
 
 + (NSDictionary<NSString *, NSString *> *)mapAttributes:(NSDictionary<NSString *, NSString *> * _Nullable)attributes filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser {
@@ -276,7 +312,7 @@ static __weak MPKitRokt *roktKit = nil;
             }
         }
         
-        return [mappedAttributes transformValuesToString];
+        return [self transformValuesToString:mappedAttributes];
     } else {
         return attributes;
     }
