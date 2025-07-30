@@ -334,22 +334,11 @@ static __weak MPKitRokt *roktKit = nil;
 
 + (void)handleHashedEmail:(NSMutableDictionary<NSString *, NSString *> * _Nullable)attributes {
     NSString *emailKey = [MPKitRokt stringForIdentityType:MPIdentityEmail];
-    NSString *otherKey = [MPKitRokt stringForIdentityType:MPIdentityOther];
     NSString *hashedEmailValue = attributes[@"emailsha256"];
     
-    // Remove email and other is hashed vlaue already set
+    // Remove email if hashed value set
     if (hashedEmailValue != nil) {
         [attributes removeObjectForKey:emailKey];
-        [attributes removeObjectForKey:otherKey];
-    }
-    
-    NSString *otherValue = attributes[otherKey];
-    
-    // Remove email and replace key on other if it's set
-    if (otherValue != nil) {
-        [attributes removeObjectForKey:emailKey];
-        attributes[@"emailsha256"] = otherValue;
-        [attributes removeObjectForKey:otherKey];
     }
 }
 
@@ -393,7 +382,8 @@ static __weak MPKitRokt *roktKit = nil;
             return @"microsoft";
             
         case MPIdentityOther:
-            return @"other";
+            // As of 7/30/2025, "MPIdentityOther" is used by Rokt customers to identify based off hashed email
+            return @"emailsha256";
             
         case MPIdentityTwitter:
             return @"twitter";

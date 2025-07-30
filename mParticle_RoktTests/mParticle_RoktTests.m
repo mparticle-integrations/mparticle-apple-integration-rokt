@@ -244,7 +244,8 @@
     XCTAssertEqualObjects(passedAttributes[@"facebookcustomaudienceid"], @"testCustomAudienceID");
     XCTAssertEqualObjects(passedAttributes[@"google"], @"testGoogle");
     XCTAssertEqualObjects(passedAttributes[@"microsoft"], @"testMicrosoft");
-    XCTAssertEqualObjects(passedAttributes[@"other"], @"testOther");
+    XCTAssertNil(passedAttributes[@"other"]);
+    XCTAssertEqualObjects(passedAttributes[@"emailsha256"], @"testOther");
     XCTAssertEqualObjects(passedAttributes[@"twitter"], @"testTwitter");
     XCTAssertEqualObjects(passedAttributes[@"yahoo"], @"testYahoo");
     XCTAssertEqualObjects(passedAttributes[@"other2"], @"testOther2");
@@ -307,7 +308,8 @@
     XCTAssertEqualObjects(passedAttributes[@"facebookcustomaudienceid"], @"testCustomAudienceID");
     XCTAssertEqualObjects(passedAttributes[@"google"], @"testGoogle");
     XCTAssertEqualObjects(passedAttributes[@"microsoft"], @"testMicrosoft");
-    XCTAssertEqualObjects(passedAttributes[@"other"], @"testOther");
+    XCTAssertNil(passedAttributes[@"other"]);
+    XCTAssertEqualObjects(passedAttributes[@"emailsha256"], @"testOther");
     XCTAssertEqualObjects(passedAttributes[@"twitter"], @"testTwitter");
     XCTAssertEqualObjects(passedAttributes[@"yahoo"], @"testYahoo");
     XCTAssertEqualObjects(passedAttributes[@"other2"], @"testOther2");
@@ -504,24 +506,24 @@
     
     [MPKitRokt handleHashedEmail:passedAttributes];
     
-    XCTAssertNil(passedAttributes[@"email"]);
-    XCTAssertNil(passedAttributes[@"other"]);
-    XCTAssertEqualObjects(passedAttributes[@"emailsha256"], @"test@gmail.com");
-    XCTAssertTrue(passedAttributes.allKeys.count == 1);
+    XCTAssertEqualObjects(passedAttributes[@"email"], @"foo@gmail.com");
+    XCTAssertEqualObjects(passedAttributes[@"other"], @"test@gmail.com");
+    XCTAssertNil(passedAttributes[@"emailsha256"]);
+    XCTAssertTrue(passedAttributes.allKeys.count == 2);
 }
 
 - (void)testHandleHashedEmailHashedOverride {
     NSMutableDictionary<NSString *, NSString *> *passedAttributes = [[NSMutableDictionary alloc] init];
     [passedAttributes setObject:@"foo@gmail.com" forKey:@"email"];
-    [passedAttributes setObject:@"test@gmail.com" forKey:@"other"];
+    [passedAttributes setObject:@"foo-value" forKey:@"other"];
     [passedAttributes setObject:@"test2@gmail.com" forKey:@"emailsha256"];
     
     [MPKitRokt handleHashedEmail:passedAttributes];
     
     XCTAssertNil(passedAttributes[@"email"]);
-    XCTAssertNil(passedAttributes[@"other"]);
+    XCTAssertEqualObjects(passedAttributes[@"other"], @"foo-value");
     XCTAssertEqualObjects(passedAttributes[@"emailsha256"], @"test2@gmail.com");
-    XCTAssertTrue(passedAttributes.allKeys.count == 1);
+    XCTAssertTrue(passedAttributes.allKeys.count == 2);
 }
 
 - (void)testTransformValuesToString {
