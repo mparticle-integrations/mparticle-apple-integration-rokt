@@ -515,13 +515,13 @@
 - (void)testHandleHashedEmailHashedOverride {
     NSMutableDictionary<NSString *, NSString *> *passedAttributes = [[NSMutableDictionary alloc] init];
     [passedAttributes setObject:@"foo@gmail.com" forKey:@"email"];
-    [passedAttributes setObject:@"test@gmail.com" forKey:@"other"];
+    [passedAttributes setObject:@"foo-value" forKey:@"other"];
     [passedAttributes setObject:@"test2@gmail.com" forKey:@"emailsha256"];
     
     [MPKitRokt handleHashedEmail:passedAttributes];
     
     XCTAssertNil(passedAttributes[@"email"]);
-    XCTAssertEqualObjects(passedAttributes[@"other"], @"test@gmail.com");
+    XCTAssertEqualObjects(passedAttributes[@"other"], @"foo-value");
     XCTAssertEqualObjects(passedAttributes[@"emailsha256"], @"test2@gmail.com");
     XCTAssertTrue(passedAttributes.allKeys.count == 2);
 }
