@@ -382,6 +382,7 @@ static __weak MPKitRokt *roktKit = nil;
             return @"microsoft";
             
         case MPIdentityOther:
+            // As of 7/30/2025, "MPIdentityOther" is used by Rokt customers to identify based off hashed email
             return @"emailsha256";
             
         case MPIdentityTwitter:
