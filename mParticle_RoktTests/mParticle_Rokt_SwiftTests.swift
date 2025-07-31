@@ -10,6 +10,7 @@ import Testing
 import SwiftUI
 @testable import mParticle_Rokt
 import Rokt_Widget
+import mParticle_Rokt_Swift
 
 struct mParticle_Rokt_SwiftTests {
 

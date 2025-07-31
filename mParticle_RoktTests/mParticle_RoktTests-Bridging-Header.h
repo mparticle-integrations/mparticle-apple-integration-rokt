@@ -5,4 +5,3 @@
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
 #import <mParticle_Rokt/mParticle_Rokt.h>
 #import "MPKitRokt.h"
-#import <mParticle_Rokt/mParticle_Rokt-Swift.h>
