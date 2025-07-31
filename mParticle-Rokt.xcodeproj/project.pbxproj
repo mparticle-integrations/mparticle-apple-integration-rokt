@@ -90,7 +90,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		7E9623532E3BB202005905F4 /* Swift */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Swift; sourceTree = "<group>"; };
 		7E96235A2E3BB272005905F4 /* mParticle-Rokt-Swift */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "mParticle-Rokt-Swift"; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -153,7 +152,6 @@
 		DBB01A5D1DC1478A00A7B188 /* mParticle-Rokt */ = {
 			isa = PBXGroup;
 			children = (
-				7E9623532E3BB202005905F4 /* Swift */,
 				DBB01A661DC1480700A7B188 /* MPKitRokt.h */,
 				DBB01A671DC1480700A7B188 /* MPKitRokt.m */,
 				DBB01A5E1DC1478A00A7B188 /* mParticle_Rokt.h */,
@@ -241,9 +239,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				7E9623532E3BB202005905F4 /* Swift */,
 			);
 			name = "mParticle-Rokt";
 			packageProductDependencies = (

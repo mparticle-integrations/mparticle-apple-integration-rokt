@@ -1,6 +1,5 @@
 #import "MPKitRokt.h"
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
-#import <mParticle_Apple_SDK/mParticle_Apple_SDK-Swift.h>
 
 NSString * const kMPRemoteConfigKitHashesKey = @"hs";
 NSString * const kMPRemoteConfigUserAttributeFilter = @"ua";

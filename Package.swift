@@ -9,7 +9,7 @@ let package = Package(
     products: [
         .library(
             name: "mParticle-Rokt",
-            targets: ["mParticle-Rokt"]),
+            targets: ["mParticle-Rokt-Swift"]),
     ],
     dependencies: [
       .package(name: "mParticle-Apple-SDK",
@@ -28,6 +28,15 @@ let package = Package(
             ],
             path: "mParticle-Rokt",
             publicHeadersPath: "."
+        ),
+        .target(
+            name: "mParticle-Rokt-Swift",
+            dependencies: [
+                "mParticle-Rokt",
+                .product(name: "mParticle-Apple-SDK", package: "mParticle-Apple-SDK"),
+                .product(name: "Rokt-Widget", package: "Rokt-Widget"),
+            ],
+            path: "mParticle-Rokt-Swift"
         ),
     ]
 ) 
