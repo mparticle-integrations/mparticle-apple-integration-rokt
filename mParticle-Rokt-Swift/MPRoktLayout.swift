@@ -18,7 +18,7 @@ import mParticle_Rokt
 
 @available(iOS 15, *)
 public struct MPRoktLayout: View {
-    private var roktLayout: RoktLayout
+    public var roktLayout: RoktLayout
 
     public init(
         sdkTriggered: Binding<Bool>,
