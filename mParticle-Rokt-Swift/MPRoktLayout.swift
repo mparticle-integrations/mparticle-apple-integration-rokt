@@ -19,6 +19,7 @@ import mParticle_Rokt
 @available(iOS 15, *)
 public class MPRoktLayout {
     public var roktLayout: RoktLayout? = nil
+    let mparticle = MParticle.sharedInstance()
 
     public init(
         sdkTriggered: Binding<Bool>,
@@ -41,16 +42,18 @@ public class MPRoktLayout {
             )
         }
     }
-}
-
-func confirmUser(
-    attributes: [String: String]?,
-    completion: @escaping () -> Void
-) {
-    let email = attributes?["email"]
-    let hashedEmail = attributes?["emailsha256"]
     
-    if let user = MParticle.sharedInstance().identity.currentUser {
+    func confirmUser(
+        attributes: [String: String]?,
+        completion: @escaping () -> Void
+    ) {
+        guard let user = mparticle.identity.currentUser else {
+            completion()
+            return
+        }
+        let email = attributes?["email"]
+        let hashedEmail = attributes?["emailsha256"]
+        
         let userEmailIdentity = user.identities[NSNumber(value: MPIdentity.email.rawValue)]
         let userHashedEmailIdentity = user.identities[NSNumber(value: MPIdentity.other.rawValue)]
         
@@ -59,29 +62,39 @@ func confirmUser(
         
         if emailMismatch || hashedEmailMismatch {
             // If there is an existing email or hashed email but it doesn't match what was passed in, warn the customer
-            if let email = email, let userEmail = userEmailIdentity {
-                print("The existing email on the user (\(userEmail)) does not match the email passed in to `selectPlacements:` (\(email)). Please remember to sync the email identity to mParticle as soon as you receive it. We will now identify the user before continuing to `selectPlacements:`")
-            } else if let hashedEmail = hashedEmail, let userHashedEmail = userHashedEmailIdentity {
-                print("The existing hashed email on the user (\(userHashedEmail)) does not match the email passed in to `selectPlacements:` (\(hashedEmail)). Please remember to sync the email identity to mParticle as soon as you receive it. We will now identify the user before continuing to `selectPlacements:`")
+            if emailMismatch {
+                print("The existing email on the user (\(userEmailIdentity ?? "nil")) does not match the email passed in to `selectPlacements:` (\(email ?? "nil")). Please remember to sync the email identity to mParticle as soon as you receive it. We will now identify the user before creating the layout")
+            }
+            if hashedEmailMismatch {
+                print("The existing hashed email on the user (\(userHashedEmailIdentity ?? "nil")) does not match the email passed in to `selectPlacements:` (\(hashedEmail ?? "nil")). Please remember to sync the email identity to mParticle as soon as you receive it. We will now identify the user before creating the layout")
             }
             
-            let identityRequest = MPIdentityApiRequest(user: user)
-            identityRequest.setIdentity(email, identityType: .email)
-            identityRequest.setIdentity(hashedEmail, identityType: .other)
-            
-            MParticle.sharedInstance().identity.identify(identityRequest) {apiResult, error in
-                if let error = error {
-                    print("Failed to sync email from selectPlacement to user: \(error)")
-                    completion()
-                } else {
-                    if let identities = apiResult?.user.identities {
-                        print("Updated user identity based off selectPlacement's attributes: \(identities)")
-                    }
-                    completion()
-                }
-            }
+            syncIdentities(user: user, email: email, hashedEmail: hashedEmail, completion: completion)
         } else {
             completion()
+        }
+    }
+    
+    func syncIdentities(
+        user: MParticleUser,
+        email: String?,
+        hashedEmail: String?,
+        completion: @escaping () -> Void
+    ) {
+        let identityRequest = MPIdentityApiRequest(user: user)
+        identityRequest.setIdentity(email, identityType: .email)
+        identityRequest.setIdentity(hashedEmail, identityType: .other)
+        
+        mparticle.identity.identify(identityRequest) {apiResult, error in
+            if let error = error {
+                print("Failed to sync email from selectPlacement to user: \(error)")
+                completion()
+            } else {
+                if let identities = apiResult?.user.identities {
+                    print("Updated user identity based off selectPlacement's attributes: \(identities)")
+                }
+                completion()
+            }
         }
     }
 }
