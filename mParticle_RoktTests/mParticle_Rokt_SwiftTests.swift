@@ -31,7 +31,7 @@ struct mParticle_Rokt_SwiftTests {
         )
         
         // Then
-        #expect(layout.body != nil, "Layout body should not be nil")
+        #expect(layout.roktLayout != nil, "Layout.roktLayout should not be nil")
     }
     
     @MainActor @available(iOS 15, *)
@@ -58,7 +58,7 @@ struct mParticle_Rokt_SwiftTests {
         )
         
         // Then
-        #expect(layout.body != nil, "Layout body should not be nil")
+        #expect(layout.roktLayout != nil, "Layout.roktLayout should not be nil")
     }
     
     @MainActor @available(iOS 15, *)
@@ -76,7 +76,7 @@ struct mParticle_Rokt_SwiftTests {
         )
         
         // Then
-        #expect(layout.body != nil, "Layout should handle empty attributes")
+        #expect(layout.roktLayout != nil, "Layout should handle empty attributes")
     }
     
     @MainActor @available(iOS 15, *)
@@ -94,7 +94,7 @@ struct mParticle_Rokt_SwiftTests {
         )
         
         // Then
-        #expect(layout.body != nil, "Layout should handle sandbox attribute")
+        #expect(layout.roktLayout != nil, "Layout should handle sandbox attribute")
     }
     
     // MARK: - Attribute Preparation Tests
@@ -183,25 +183,7 @@ struct mParticle_Rokt_SwiftTests {
         )
         
         // Then
-        #expect(layout is any View, "MPRoktLayout should conform to SwiftUI View protocol")
-    }
-    
-    @MainActor @available(iOS 15, *)
-    @Test func testMPRoktLayoutBodyProperty() {
-        // Given
-        let sdkTriggered = Binding.constant(false)
-        let attributes: [String: String] = ["test": "value"]
-        
-        // When
-        let layout = MPRoktLayout(
-            sdkTriggered: sdkTriggered,
-            locationName: "test",
-            attributes: attributes
-        )
-        
-        // Then
-        let body = layout.body
-        #expect(body != nil, "Layout body should be accessible")
+        #expect(layout.roktLayout is any View, "MPRoktLayout should conform to SwiftUI View protocol")
     }
     
     // MARK: - Parameter Validation Tests
@@ -212,16 +194,16 @@ struct mParticle_Rokt_SwiftTests {
         let sdkTriggered = Binding.constant(false)
         let longLocationName = String(repeating: "a", count: 1000)
         let attributes: [String: String] = ["test": "value"]
-        
+
         // When
         let layout = MPRoktLayout(
             sdkTriggered: sdkTriggered,
             locationName: longLocationName,
             attributes: attributes
         )
-        
+
         // Then
-        #expect(layout.body != nil, "Layout should handle long location names")
+        #expect(layout.roktLayout != nil, "Layout should handle long location names")
     }
     
     @MainActor @available(iOS 15, *)
@@ -242,7 +224,7 @@ struct mParticle_Rokt_SwiftTests {
         )
         
         // Then
-        #expect(layout.body != nil, "Layout should handle special characters and unicode")
+        #expect(layout.roktLayout != nil, "Layout should handle special characters and unicode")
     }
     
     // MARK: - State Management Tests
@@ -261,13 +243,13 @@ struct mParticle_Rokt_SwiftTests {
         )
         
         // Then
-        #expect(layout.body != nil, "Layout should be created with initial state")
+        #expect(layout.roktLayout != nil, "Layout should be created with initial state")
         
         // When state changes
         sdkTriggered.wrappedValue = true
         
         // Then
-        #expect(layout.body != nil, "Layout should handle state changes")
+        #expect(layout.roktLayout != nil, "Layout should handle state changes")
     }
     
     // MARK: - Integration Tests
@@ -291,7 +273,7 @@ struct mParticle_Rokt_SwiftTests {
         )
         
         // Then
-        #expect(layout.body != nil, "Layout should properly integrate attribute processing")
+        #expect(layout.roktLayout == nil, "Layout should attempt to identify user attributes and fail")
     }
     
     @MainActor @available(iOS 15, *)
@@ -325,6 +307,6 @@ struct mParticle_Rokt_SwiftTests {
         )
         
         // Then
-        #expect(layout.body != nil, "Layout should handle complex configurations")
+        #expect(layout.roktLayout != nil, "Layout should handle complex configurations")
     }
 }
