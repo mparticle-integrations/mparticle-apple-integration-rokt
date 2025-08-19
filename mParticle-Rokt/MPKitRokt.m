@@ -6,6 +6,7 @@ NSString * const kMPRemoteConfigUserAttributeFilter = @"ua";
 NSString * const MPKitRoktErrorDomain = @"com.mparticle.kits.rokt";
 NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 NSString * const kMPPlacementAttributesMapping = @"placementAttributesMapping";
+NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType";
 static __weak MPKitRokt *roktKit = nil;
 
 @interface MPKitRokt () <MPKitProtocol>
@@ -361,6 +362,12 @@ static __weak MPKitRokt *roktKit = nil;
 }
 
 + (NSString *)stringForIdentityType:(MPIdentity)identityType {
+    NSNumber *hashedEmailIdentity = [MPKitRokt getRoktHashedEmailUserIdentityType];
+    
+    if (hashedEmailIdentity.unsignedIntValue == identityType) {
+        return @"emailsha256";
+    }
+
     switch (identityType) {
         case MPIdentityCustomerId:
             return @"customerid";
@@ -381,8 +388,7 @@ static __weak MPKitRokt *roktKit = nil;
             return @"microsoft";
             
         case MPIdentityOther:
-            // As of 7/30/2025, "MPIdentityOther" is used by Rokt customers to identify based off hashed email
-            return @"emailsha256";
+            return @"other";
             
         case MPIdentityTwitter:
             return @"twitter";
@@ -441,6 +447,79 @@ static __weak MPKitRokt *roktKit = nil;
         default:
             return nil;
     }
+}
+
++ (NSNumber *)identityTypeForString:(NSString *)identityString {
+    if ([identityString isEqualToString:@"customerid"]){
+        return @(MPIdentityCustomerId);
+    } else if ([identityString isEqualToString:@"email"]){
+        return @(MPIdentityEmail);
+    } else if ([identityString isEqualToString:@"facebook"]){
+        return @(MPIdentityFacebook);
+    } else if ([identityString isEqualToString:@"facebookcustomaudienceid"]){
+        return @(MPIdentityFacebookCustomAudienceId);
+    } else if ([identityString isEqualToString:@"google"]){
+        return @(MPIdentityGoogle);
+    } else if ([identityString isEqualToString:@"microsoft"]){
+        return @(MPIdentityMicrosoft);
+    } else if ([identityString isEqualToString:@"other"]){
+        return @(MPIdentityOther);
+    } else if ([identityString isEqualToString:@"twitter"]){
+        return @(MPIdentityTwitter);
+    } else if ([identityString isEqualToString:@"yahoo"]){
+        return @(MPIdentityYahoo);
+    } else if ([identityString isEqualToString:@"other2"]){
+        return @(MPIdentityOther2);
+    } else if ([identityString isEqualToString:@"other3"]){
+        return @(MPIdentityOther3);
+    } else if ([identityString isEqualToString:@"other4"]){
+        return @(MPIdentityOther4);
+    } else if ([identityString isEqualToString:@"other5"]){
+        return @(MPIdentityOther5);
+    } else if ([identityString isEqualToString:@"other6"]){
+        return @(MPIdentityOther6);
+    } else if ([identityString isEqualToString:@"other7"]){
+        return @(MPIdentityOther7);
+    } else if ([identityString isEqualToString:@"other8"]){
+        return @(MPIdentityOther8);
+    } else if ([identityString isEqualToString:@"other9"]){
+        return @(MPIdentityOther9);
+    } else if ([identityString isEqualToString:@"other10"]){
+        return @(MPIdentityOther10);
+    } else if ([identityString isEqualToString:@"mobile_number"]){
+        return @(MPIdentityMobileNumber);
+    } else if ([identityString isEqualToString:@"phone_number_2"]){
+        return @(MPIdentityPhoneNumber2);
+    } else if ([identityString isEqualToString:@"phone_number_3"]){
+        return @(MPIdentityPhoneNumber3);
+    } else if ([identityString isEqualToString:@"ios_idfa"]){
+        return @(MPIdentityIOSAdvertiserId);
+    } else if ([identityString isEqualToString:@"ios_idfv"]){
+        return @(MPIdentityIOSVendorId);
+    } else if ([identityString isEqualToString:@"push_token"]){
+        return @(MPIdentityPushToken);
+    } else if ([identityString isEqualToString:@"device_application_stamp"]){
+        return @(MPIdentityDeviceApplicationStamp);
+    } else {
+        return nil;
+    }
+}
+
++ (NSNumber *)getRoktHashedEmailUserIdentityType {
+    // Get the kit configuration
+    NSArray<NSDictionary *> *kitConfigs = [MParticle sharedInstance].kitContainer_PRIVATE.originalConfig.copy;
+    NSDictionary *roktKitConfig;
+    for (NSDictionary *kitConfig in kitConfigs) {
+        if (kitConfig[@"id"] != nil && [kitConfig[@"id"] integerValue] == 181) {
+            roktKitConfig = kitConfig;
+        }
+    }
+    
+    // Get the string representing which identity to use and convert it to the key (NSNumber)
+    NSString *hashedIdentityTypeString = roktKitConfig[kMPHashedEmailUserIdentityType];
+    NSNumber *hashedIdentityTypeNumber = [MPKitRokt identityTypeForString:hashedIdentityTypeString.lowercaseString];
+    
+    return hashedIdentityTypeNumber != nil ? hashedIdentityTypeNumber : @(MPIdentityOther);
 }
 
 - (MPKitExecStatus *)purchaseFinalized:(NSString *)placementId catalogItemId:(NSString *)catalogItemId success:(NSNumber *)success {
