@@ -6,6 +6,9 @@ NSString * const kMPRemoteConfigUserAttributeFilter = @"ua";
 NSString * const MPKitRoktErrorDomain = @"com.mparticle.kits.rokt";
 NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 NSString * const kMPPlacementAttributesMapping = @"placementAttributesMapping";
+NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType";
+NSInteger const kMPRoktKitCode = 181;
+
 static __weak MPKitRokt *roktKit = nil;
 
 @interface MPKitRokt () <MPKitProtocol>
@@ -20,7 +23,7 @@ static __weak MPKitRokt *roktKit = nil;
     mParticle will supply a unique kit code for you. Please contact our team
 */
 + (NSNumber *)kitCode {
-    return @181; // Replace with the actual kit code assigned by mParticle
+    return @(kMPRoktKitCode); // Replace with the actual kit code assigned by mParticle
 }
 
 + (void)load {
@@ -251,7 +254,7 @@ static __weak MPKitRokt *roktKit = nil;
     NSArray<NSDictionary *> *kitConfigs = [MParticle sharedInstance].kitContainer_PRIVATE.originalConfig.copy;
     NSDictionary *roktKitConfig;
     for (NSDictionary *kitConfig in kitConfigs) {
-        if (kitConfig[@"id"] != nil && [kitConfig[@"id"] integerValue] == 181) {
+        if (kitConfig[@"id"] != nil && [kitConfig[@"id"] integerValue] == kMPRoktKitCode) {
             roktKitConfig = kitConfig;
         }
     }
@@ -361,86 +364,86 @@ static __weak MPKitRokt *roktKit = nil;
 }
 
 + (NSString *)stringForIdentityType:(MPIdentity)identityType {
-    switch (identityType) {
-        case MPIdentityCustomerId:
-            return @"customerid";
-            
-        case MPIdentityEmail:
-            return @"email";
-            
-        case MPIdentityFacebook:
-            return @"facebook";
-            
-        case MPIdentityFacebookCustomAudienceId:
-            return @"facebookcustomaudienceid";
-            
-        case MPIdentityGoogle:
-            return @"google";
-            
-        case MPIdentityMicrosoft:
-            return @"microsoft";
-            
-        case MPIdentityOther:
-            // As of 7/30/2025, "MPIdentityOther" is used by Rokt customers to identify based off hashed email
-            return @"emailsha256";
-            
-        case MPIdentityTwitter:
-            return @"twitter";
-            
-        case MPIdentityYahoo:
-            return @"yahoo";
-            
-        case MPIdentityOther2:
-            return @"other2";
-            
-        case MPIdentityOther3:
-            return @"other3";
-            
-        case MPIdentityOther4:
-            return @"other4";
-            
-        case MPIdentityOther5:
-            return @"other5";
-            
-        case MPIdentityOther6:
-            return @"other6";
-            
-        case MPIdentityOther7:
-            return @"other7";
-            
-        case MPIdentityOther8:
-            return @"other8";
-            
-        case MPIdentityOther9:
-            return @"other9";
-            
-        case MPIdentityOther10:
-            return @"other10";
-            
-        case MPIdentityMobileNumber:
-            return @"mobile_number";
-            
-        case MPIdentityPhoneNumber2:
-            return @"phone_number_2";
-            
-        case MPIdentityPhoneNumber3:
-            return @"phone_number_3";
-            
-        case MPIdentityIOSAdvertiserId:
-            return @"ios_idfa";
-            
-        case MPIdentityIOSVendorId:
-            return @"ios_idfv";
-            
-        case MPIdentityPushToken:
-            return @"push_token";
-            
-        case MPIdentityDeviceApplicationStamp:
-            return @"device_application_stamp";
-            
-        default:
-            return nil;
+    NSNumber *hashedEmailIdentity = [MPKitRokt getRoktHashedEmailUserIdentityType];
+    
+    if (hashedEmailIdentity.unsignedIntValue == identityType) {
+        return @"emailsha256";
     }
+    
+    NSDictionary<NSNumber *, NSString *> *identityStrings = @{@(MPIdentityCustomerId): @"customerid",
+                                                             @(MPIdentityEmail): @"email",
+                                                             @(MPIdentityFacebook): @"facebook",
+                                                             @(MPIdentityFacebookCustomAudienceId): @"facebookcustomaudienceid",
+                                                             @(MPIdentityGoogle): @"google",
+                                                             @(MPIdentityMicrosoft): @"microsoft",
+                                                             @(MPIdentityOther): @"other",
+                                                             @(MPIdentityTwitter): @"twitter",
+                                                             @(MPIdentityYahoo): @"yahoo",
+                                                             @(MPIdentityOther2): @"other2",
+                                                             @(MPIdentityOther3): @"other3",
+                                                             @(MPIdentityOther4): @"other4",
+                                                             @(MPIdentityOther5): @"other5",
+                                                             @(MPIdentityOther6): @"other6",
+                                                             @(MPIdentityOther7): @"other7",
+                                                             @(MPIdentityOther8): @"other8",
+                                                             @(MPIdentityOther9): @"other9",
+                                                             @(MPIdentityOther10): @"other10",
+                                                             @(MPIdentityMobileNumber): @"mobile_number",
+                                                             @(MPIdentityPhoneNumber2): @"phone_number_2",
+                                                             @(MPIdentityPhoneNumber3): @"phone_number_3",
+                                                             @(MPIdentityIOSAdvertiserId): @"ios_idfa",
+                                                             @(MPIdentityIOSVendorId): @"ios_idfv",
+                                                             @(MPIdentityPushToken): @"push_token",
+                                                             @(MPIdentityDeviceApplicationStamp): @"device_application_stamp"};
+
+    return identityStrings[@(identityType)];
+}
+
++ (NSNumber *)identityTypeForString:(NSString *)identityString {
+    NSDictionary<NSString *, NSNumber *> *identityNumbers = @{@"customerid": @(MPIdentityCustomerId),
+                                                             @"email": @(MPIdentityEmail),
+                                                             @"facebook": @(MPIdentityFacebook),
+                                                             @"facebookcustomaudienceid": @(MPIdentityFacebookCustomAudienceId),
+                                                             @"google": @(MPIdentityGoogle),
+                                                             @"microsoft": @(MPIdentityMicrosoft),
+                                                             @"other": @(MPIdentityOther),
+                                                             @"twitter": @(MPIdentityTwitter),
+                                                             @"yahoo": @(MPIdentityYahoo),
+                                                             @"other2": @(MPIdentityOther2),
+                                                             @"other3": @(MPIdentityOther3),
+                                                             @"other4": @(MPIdentityOther4),
+                                                             @"other5": @(MPIdentityOther5),
+                                                             @"other6": @(MPIdentityOther6),
+                                                             @"other7": @(MPIdentityOther7),
+                                                             @"other8": @(MPIdentityOther8),
+                                                             @"other9": @(MPIdentityOther9),
+                                                             @"other10": @(MPIdentityOther10),
+                                                             @"mobile_number": @(MPIdentityMobileNumber),
+                                                             @"phone_number_2": @(MPIdentityPhoneNumber2),
+                                                             @"phone_number_3": @(MPIdentityPhoneNumber3),
+                                                             @"ios_idfa": @(MPIdentityIOSAdvertiserId),
+                                                             @"ios_idfv": @(MPIdentityIOSVendorId),
+                                                             @"push_token": @(MPIdentityPushToken),
+                                                             @"device_application_stamp": @(MPIdentityDeviceApplicationStamp)};
+    
+    return identityNumbers[identityString];
+}
+
++ (NSNumber *)getRoktHashedEmailUserIdentityType {
+    // Get the kit configuration
+    NSArray<NSDictionary *> *kitConfigs = [MParticle sharedInstance].kitContainer_PRIVATE.originalConfig.copy;
+    NSDictionary *roktKitConfig;
+    for (NSDictionary *kitConfig in kitConfigs) {
+        if (kitConfig[@"id"] != nil && [kitConfig[@"id"] integerValue] == kMPRoktKitCode) {
+            roktKitConfig = kitConfig;
+        }
+    }
+    
+    // Get the string representing which identity to use and convert it to the key (NSNumber)
+    NSString *hashedIdentityTypeString = roktKitConfig[kMPHashedEmailUserIdentityType];
+    NSNumber *hashedIdentityTypeNumber = [MPKitRokt identityTypeForString:hashedIdentityTypeString.lowercaseString];
+    
+    return hashedIdentityTypeNumber != nil ? hashedIdentityTypeNumber : @(MPIdentityOther);
 }
 
 - (MPKitExecStatus *)purchaseFinalized:(NSString *)placementId catalogItemId:(NSString *)catalogItemId success:(NSNumber *)success {

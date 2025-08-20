@@ -53,9 +53,10 @@ public class MPRoktLayout {
         }
         let email = attributes?["email"]
         let hashedEmail = attributes?["emailsha256"]
+        let hashedEmailIdentity = MPKitRokt.getHashedEmailUserIdentityType()
         
         let userEmailIdentity = user.identities[NSNumber(value: MPIdentity.email.rawValue)]
-        let userHashedEmailIdentity = user.identities[NSNumber(value: MPIdentity.other.rawValue)]
+        let userHashedEmailIdentity = user.identities[hashedEmailIdentity]
         
         let emailMismatch = email != nil && email != userEmailIdentity
         let hashedEmailMismatch = hashedEmail != nil && hashedEmail != userHashedEmailIdentity
@@ -69,7 +70,7 @@ public class MPRoktLayout {
                 print("The existing hashed email on the user (\(userHashedEmailIdentity ?? "nil")) does not match the email passed in to `selectPlacements:` (\(hashedEmail ?? "nil")). Please remember to sync the email identity to mParticle as soon as you receive it. We will now identify the user before creating the layout")
             }
             
-            syncIdentities(user: user, email: email, hashedEmail: hashedEmail, completion: completion)
+            syncIdentities(user: user, email: email, hashedEmail: hashedEmail, hashedEmailKey: hashedEmailIdentity, completion: completion)
         } else {
             completion()
         }
@@ -79,11 +80,12 @@ public class MPRoktLayout {
         user: MParticleUser,
         email: String?,
         hashedEmail: String?,
+        hashedEmailKey: NSNumber,
         completion: @escaping () -> Void
     ) {
         let identityRequest = MPIdentityApiRequest(user: user)
         identityRequest.setIdentity(email, identityType: .email)
-        identityRequest.setIdentity(hashedEmail, identityType: .other)
+        identityRequest.setIdentity(hashedEmail, identityType: MPIdentity(rawValue: hashedEmailKey.uintValue) ?? .other)
         
         mparticle.identity.identify(identityRequest) {apiResult, error in
             if let error = error {
