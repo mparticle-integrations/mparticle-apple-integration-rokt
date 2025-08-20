@@ -50,7 +50,7 @@ static __weak MPKitRokt *roktKit = nil;
     
     NSString *sdkVersion = [MParticle sharedInstance].version;
     // https://go.mparticle.com/work/SQDSDKS-7379
-    NSString *kitVersion = @"8.3.0";
+    NSString *kitVersion = @"8.3.1";
 
     // Initialize Rokt SDK here
     [Rokt initWithRoktTagId:partnerId mParticleSdkVersion:sdkVersion mParticleKitVersion:kitVersion onInitComplete:^(BOOL InitComplete) {
