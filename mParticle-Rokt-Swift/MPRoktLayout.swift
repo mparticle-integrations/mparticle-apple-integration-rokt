@@ -56,10 +56,22 @@ public class MPRoktLayout {
         let hashedEmailIdentity = MPKitRokt.getHashedEmailUserIdentityType()
         
         let userEmailIdentity = user.identities[NSNumber(value: MPIdentity.email.rawValue)]
-        let userHashedEmailIdentity = user.identities[hashedEmailIdentity]
         
-        let emailMismatch = email != nil && email != userEmailIdentity
-        let hashedEmailMismatch = hashedEmail != nil && hashedEmail != userHashedEmailIdentity
+        let emailMismatch: Bool = {
+            guard let email = email,
+                  let userEmail = user.identities[NSNumber(value: MPIdentity.email.rawValue)] else {
+                return false
+            }
+            return email != userEmail
+        }()
+        let hashedEmailMismatch: Bool = {
+            guard let hashedEmail = hashedEmail,
+                  let hashedEmailIdentity = hashedEmailIdentity,
+                  let userHashedEmail = user.identities[hashedEmailIdentity] else {
+                return false
+            }
+            return hashedEmail != userHashedEmail
+        }()
         
         if emailMismatch || hashedEmailMismatch {
             // If there is an existing email or hashed email but it doesn't match what was passed in, warn the customer
@@ -67,7 +79,7 @@ public class MPRoktLayout {
                 print("The existing email on the user (\(userEmailIdentity ?? "nil")) does not match the email passed in to `selectPlacements:` (\(email ?? "nil")). Please remember to sync the email identity to mParticle as soon as you receive it. We will now identify the user before creating the layout")
             }
             if hashedEmailMismatch {
-                print("The existing hashed email on the user (\(userHashedEmailIdentity ?? "nil")) does not match the email passed in to `selectPlacements:` (\(hashedEmail ?? "nil")). Please remember to sync the email identity to mParticle as soon as you receive it. We will now identify the user before creating the layout")
+                print("The existing hashed email on the user (\(user.identities[hashedEmailIdentity ?? NSNumber(value: -1)] ?? "nil")) does not match the email passed in to `selectPlacements:` (\(hashedEmail ?? "nil")). Please remember to sync the hashed email identity to mParticle as soon as you receive it. We will now identify the user before creating the layout")
             }
             
             syncIdentities(user: user, email: email, hashedEmail: hashedEmail, hashedEmailKey: hashedEmailIdentity, completion: completion)
@@ -80,12 +92,14 @@ public class MPRoktLayout {
         user: MParticleUser,
         email: String?,
         hashedEmail: String?,
-        hashedEmailKey: NSNumber,
+        hashedEmailKey: NSNumber?,
         completion: @escaping () -> Void
     ) {
         let identityRequest = MPIdentityApiRequest(user: user)
         identityRequest.setIdentity(email, identityType: .email)
-        identityRequest.setIdentity(hashedEmail, identityType: MPIdentity(rawValue: hashedEmailKey.uintValue) ?? .other)
+        if let hashedEmailKey = hashedEmailKey {
+            identityRequest.setIdentity(hashedEmail, identityType: MPIdentity(rawValue: hashedEmailKey.uintValue) ?? .other)
+        }
         
         mparticle.identity.identify(identityRequest) {apiResult, error in
             if let error = error {
