@@ -3,6 +3,10 @@
 
 import PackageDescription
 
+let mpSDK = "mParticle-Apple-SDK"
+let mpSDKNoLocation = "mParticle-Apple-SDK-NoLocation"
+let roktSDK = "Rokt-Widget"
+
 let package = Package(
     name: "mParticle-Rokt",
     platforms: [ .iOS(.v11), .tvOS(.v11) ], 
@@ -15,10 +19,10 @@ let package = Package(
             targets: ["mParticle-Rokt-Swift-NoLocation"]),
     ],
     dependencies: [
-      .package(name: "mParticle-Apple-SDK",
+      .package(name: mpSDK,
                url: "https://github.com/mParticle/mparticle-apple-sdk",
                .upToNextMajor(from: "8.0.0")),
-      .package(name: "Rokt-Widget",
+      .package(name: roktSDK,
                url: "https://github.com/ROKT/rokt-sdk-ios",
                .upToNextMajor(from: "4.10.0")),
     ],
@@ -26,8 +30,8 @@ let package = Package(
         .target(
             name: "mParticle-Rokt",
             dependencies: [
-              .product(name: "mParticle-Apple-SDK", package: "mParticle-Apple-SDK"),
-              .product(name: "Rokt-Widget", package: "Rokt-Widget"),
+              .product(name: mpSDK, package: mpSDK),
+              .product(name: roktSDK, package: roktSDK),
             ],
             path: "mParticle-Rokt",
             publicHeadersPath: "."
@@ -43,8 +47,8 @@ let package = Package(
         .target(
             name: "mParticle-Rokt-NoLocation",
             dependencies: [
-              .product(name: "mParticle-Apple-SDK-NoLocation", package: "mParticle-Apple-SDK"),
-              .product(name: "Rokt-Widget", package: "Rokt-Widget"),
+              .product(name: mpSDKNoLocation, package: mpSDK),
+              .product(name: roktSDK, package: roktSDK),
             ],
             path: "mParticle-Rokt-NoLocation",
             publicHeadersPath: "."
