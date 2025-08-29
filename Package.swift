@@ -10,6 +10,9 @@ let package = Package(
         .library(
             name: "mParticle-Rokt",
             targets: ["mParticle-Rokt-Swift"]),
+        .library(
+            name: "mParticle-Rokt-NoLocation",
+            targets: ["mParticle-Rokt-Swift-NoLocation"]),
     ],
     dependencies: [
       .package(name: "mParticle-Apple-SDK",
@@ -33,10 +36,25 @@ let package = Package(
             name: "mParticle-Rokt-Swift",
             dependencies: [
                 "mParticle-Rokt",
-                .product(name: "mParticle-Apple-SDK", package: "mParticle-Apple-SDK"),
-                .product(name: "Rokt-Widget", package: "Rokt-Widget"),
             ],
             path: "mParticle-Rokt-Swift"
+        ),
+        
+        .target(
+            name: "mParticle-Rokt-NoLocation",
+            dependencies: [
+              .product(name: "mParticle-Apple-SDK-NoLocation", package: "mParticle-Apple-SDK"),
+              .product(name: "Rokt-Widget", package: "Rokt-Widget"),
+            ],
+            path: "mParticle-Rokt-NoLocation",
+            publicHeadersPath: "."
+        ),
+        .target(
+            name: "mParticle-Rokt-Swift-NoLocation",
+            dependencies: [
+                "mParticle-Rokt-NoLocation",
+            ],
+            path: "mParticle-Rokt-Swift-NoLocation"
         ),
     ]
 ) 
