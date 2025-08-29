@@ -3,20 +3,31 @@
 
 import PackageDescription
 
-let mpSDK = "mParticle-Apple-SDK"
-let mpSDKNoLocation = "mParticle-Apple-SDK-NoLocation"
+let swift = "-Swift"
+let noLocation = "-NoLocation"
+
+// MARK: - External Packages
 let roktSDK = "Rokt-Widget"
+let mpSDK = "mParticle-Apple-SDK"
+let mpSDKNoLocation = mpSDK + noLocation
+
+
+// MARK: - Names & Paths
+let mpRokt = "mParticle-Rokt"
+let mpRoktSwift = mpRokt + swift
+let mpRoktNoLocation = mpRokt + noLocation
+let mpRoktSwiftNoLocation = mpRoktSwift + noLocation
 
 let package = Package(
-    name: "mParticle-Rokt",
-    platforms: [ .iOS(.v11), .tvOS(.v11) ], 
+    name: mpRokt,
+    platforms: [ .iOS(.v11), .tvOS(.v11) ],
     products: [
         .library(
-            name: "mParticle-Rokt",
-            targets: ["mParticle-Rokt-Swift"]),
+            name: mpRokt,
+            targets: [mpRoktSwift]),
         .library(
-            name: "mParticle-Rokt-NoLocation",
-            targets: ["mParticle-Rokt-Swift-NoLocation"]),
+            name: mpRoktNoLocation,
+            targets: [mpRoktSwiftNoLocation]),
     ],
     dependencies: [
       .package(name: mpSDK,
@@ -28,37 +39,37 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "mParticle-Rokt",
+            name: mpRokt,
             dependencies: [
               .product(name: mpSDK, package: mpSDK),
               .product(name: roktSDK, package: roktSDK),
             ],
-            path: "mParticle-Rokt",
+            path: mpRokt,
             publicHeadersPath: "."
         ),
         .target(
-            name: "mParticle-Rokt-Swift",
+            name: mpRoktSwift,
             dependencies: [
-                "mParticle-Rokt",
+                .target(name: mpRokt)
             ],
-            path: "mParticle-Rokt-Swift"
+            path: mpRoktSwift
         ),
         
         .target(
-            name: "mParticle-Rokt-NoLocation",
+            name: mpRoktNoLocation,
             dependencies: [
               .product(name: mpSDKNoLocation, package: mpSDK),
               .product(name: roktSDK, package: roktSDK),
             ],
-            path: "mParticle-Rokt-NoLocation",
+            path: mpRoktNoLocation,
             publicHeadersPath: "."
         ),
         .target(
-            name: "mParticle-Rokt-Swift-NoLocation",
+            name: mpRoktSwiftNoLocation,
             dependencies: [
-                "mParticle-Rokt-NoLocation",
+                .target(name: mpRoktNoLocation)
             ],
-            path: "mParticle-Rokt-Swift-NoLocation"
+            path: mpRoktSwiftNoLocation
         ),
     ]
 ) 
