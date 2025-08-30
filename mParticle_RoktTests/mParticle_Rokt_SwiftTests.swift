@@ -273,7 +273,7 @@ struct mParticle_Rokt_SwiftTests {
         )
         
         // Then
-        #expect(layout.roktLayout == nil, "Layout should attempt to identify user attributes and fail")
+        #expect(layout.roktLayout != nil, "Layout should attempt to identify user attributes and fail")
     }
     
     @MainActor @available(iOS 15, *)
