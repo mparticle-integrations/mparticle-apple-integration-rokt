@@ -236,6 +236,8 @@
     FilteredMParticleUser *filteredUser = [[FilteredMParticleUser alloc] init];
     id mockfilteredUser = OCMPartialMock(filteredUser);
     [[[mockfilteredUser stub] andReturn:testIdentities] userIdentities];
+    id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
+    [[[mockMPKitRoktClass stub] andReturn:@(MPIdentityOther)] getRoktHashedEmailUserIdentityType];
     
     [MPKitRokt addIdentityAttributes:passedAttributes filteredUser:filteredUser];
     
@@ -247,6 +249,69 @@
     XCTAssertEqualObjects(passedAttributes[@"microsoft"], @"testMicrosoft");
     XCTAssertNil(passedAttributes[@"other"]);
     XCTAssertEqualObjects(passedAttributes[@"emailsha256"], @"testOther");
+    XCTAssertEqualObjects(passedAttributes[@"twitter"], @"testTwitter");
+    XCTAssertEqualObjects(passedAttributes[@"yahoo"], @"testYahoo");
+    XCTAssertEqualObjects(passedAttributes[@"other2"], @"testOther2");
+    XCTAssertEqualObjects(passedAttributes[@"other3"], @"testOther3");
+    XCTAssertEqualObjects(passedAttributes[@"other4"], @"testOther4");
+    XCTAssertEqualObjects(passedAttributes[@"other5"], @"testOther5");
+    XCTAssertEqualObjects(passedAttributes[@"other6"], @"testOther6");
+    XCTAssertEqualObjects(passedAttributes[@"other7"], @"testOther7");
+    XCTAssertEqualObjects(passedAttributes[@"other8"], @"testOther8");
+    XCTAssertEqualObjects(passedAttributes[@"other9"], @"testOther9");
+    XCTAssertEqualObjects(passedAttributes[@"other10"], @"testOther10");
+    XCTAssertEqualObjects(passedAttributes[@"mobile_number"], @"1(234)-567-8910");
+    XCTAssertEqualObjects(passedAttributes[@"phone_number_2"], @"1(234)-567-2222");
+    XCTAssertEqualObjects(passedAttributes[@"phone_number_3"], @"1(234)-567-3333");
+    XCTAssertEqualObjects(passedAttributes[@"ios_idfa"], @"testAdvertID");
+    XCTAssertEqualObjects(passedAttributes[@"ios_idfv"], @"testVendorID");
+    XCTAssertEqualObjects(passedAttributes[@"push_token"], @"testPushToken");
+    XCTAssertEqualObjects(passedAttributes[@"device_application_stamp"], @"Test DAS");
+}
+
+- (void)testAddIdentityAttributesUnassigned {
+    NSMutableDictionary<NSString *, NSString *> *passedAttributes = [[NSMutableDictionary alloc] init];
+    NSDictionary<NSNumber *, NSString *> *testIdentities = @{@(MPIdentityCustomerId): @"testCustomerID",
+                                                             @(MPIdentityEmail): @"testEmail@gmail.com",
+                                                             @(MPIdentityFacebook): @"testFacebook",
+                                                             @(MPIdentityFacebookCustomAudienceId): @"testCustomAudienceID",
+                                                             @(MPIdentityGoogle): @"testGoogle",
+                                                             @(MPIdentityMicrosoft): @"testMicrosoft",
+                                                             @(MPIdentityOther): @"testOther",
+                                                             @(MPIdentityTwitter): @"testTwitter",
+                                                             @(MPIdentityYahoo): @"testYahoo",
+                                                             @(MPIdentityOther2): @"testOther2",
+                                                             @(MPIdentityOther3): @"testOther3",
+                                                             @(MPIdentityOther4): @"testOther4",
+                                                             @(MPIdentityOther5): @"testOther5",
+                                                             @(MPIdentityOther6): @"testOther6",
+                                                             @(MPIdentityOther7): @"testOther7",
+                                                             @(MPIdentityOther8): @"testOther8",
+                                                             @(MPIdentityOther9): @"testOther9",
+                                                             @(MPIdentityOther10): @"testOther10",
+                                                             @(MPIdentityMobileNumber): @"1(234)-567-8910",
+                                                             @(MPIdentityPhoneNumber2): @"1(234)-567-2222",
+                                                             @(MPIdentityPhoneNumber3): @"1(234)-567-3333",
+                                                             @(MPIdentityIOSAdvertiserId): @"testAdvertID",
+                                                             @(MPIdentityIOSVendorId): @"testVendorID",
+                                                             @(MPIdentityPushToken): @"testPushToken",
+                                                             @(MPIdentityDeviceApplicationStamp): @"Test DAS"};
+
+    FilteredMParticleUser *filteredUser = [[FilteredMParticleUser alloc] init];
+    id mockfilteredUser = OCMPartialMock(filteredUser);
+    [[[mockfilteredUser stub] andReturn:testIdentities] userIdentities];
+    id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
+    [[[mockMPKitRoktClass stub] andReturn:nil] getRoktHashedEmailUserIdentityType];
+    
+    [MPKitRokt addIdentityAttributes:passedAttributes filteredUser:filteredUser];
+    
+    XCTAssertEqualObjects(passedAttributes[@"customerid"], @"testCustomerID");
+    XCTAssertEqualObjects(passedAttributes[@"email"], @"testEmail@gmail.com");
+    XCTAssertEqualObjects(passedAttributes[@"facebook"], @"testFacebook");
+    XCTAssertEqualObjects(passedAttributes[@"facebookcustomaudienceid"], @"testCustomAudienceID");
+    XCTAssertEqualObjects(passedAttributes[@"google"], @"testGoogle");
+    XCTAssertEqualObjects(passedAttributes[@"microsoft"], @"testMicrosoft");
+    XCTAssertEqualObjects(passedAttributes[@"other"], @"testOther");
     XCTAssertEqualObjects(passedAttributes[@"twitter"], @"testTwitter");
     XCTAssertEqualObjects(passedAttributes[@"yahoo"], @"testYahoo");
     XCTAssertEqualObjects(passedAttributes[@"other2"], @"testOther2");
@@ -299,6 +364,8 @@
     FilteredMParticleUser *filteredUser = [[FilteredMParticleUser alloc] init];
     id mockfilteredUser = OCMPartialMock(filteredUser);
     [[[mockfilteredUser stub] andReturn:testIdentities] userIdentities];
+    id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
+    [[[mockMPKitRoktClass stub] andReturn:@(MPIdentityOther)] getRoktHashedEmailUserIdentityType];
     
     [MPKitRokt addIdentityAttributes:passedAttributes filteredUser:filteredUser];
     

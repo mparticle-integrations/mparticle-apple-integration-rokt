@@ -366,7 +366,7 @@ static __weak MPKitRokt *roktKit = nil;
 + (NSString *)stringForIdentityType:(MPIdentity)identityType {
     NSNumber *hashedEmailIdentity = [MPKitRokt getRoktHashedEmailUserIdentityType];
     
-    if (hashedEmailIdentity.unsignedIntValue == identityType) {
+    if (hashedEmailIdentity && hashedEmailIdentity.unsignedIntValue == identityType) {
         return @"emailsha256";
     }
     
@@ -443,7 +443,7 @@ static __weak MPKitRokt *roktKit = nil;
     NSString *hashedIdentityTypeString = roktKitConfig[kMPHashedEmailUserIdentityType];
     NSNumber *hashedIdentityTypeNumber = [MPKitRokt identityTypeForString:hashedIdentityTypeString.lowercaseString];
     
-    return hashedIdentityTypeNumber != nil ? hashedIdentityTypeNumber : @(MPIdentityOther);
+    return hashedIdentityTypeNumber;
 }
 
 - (MPKitExecStatus *)purchaseFinalized:(NSString *)placementId catalogItemId:(NSString *)catalogItemId success:(NSNumber *)success {
