@@ -29,6 +29,7 @@ public class MPRoktLayout {
         config: RoktConfig? = nil,
         onEvent: ((RoktEvent) -> Void)? = nil
     ) {
+        MPLog.debug("Initializing MPRoktLayout with arguments:", sdkTriggered.wrappedValue, viewName ?? "nil", locationName, attributes)
         confirmUser(attributes: attributes) { identifyCalled in
             let preparedAttributes = MPKitRokt.prepareAttributes(attributes, filteredUser: Optional<FilteredMParticleUser>.none, performMapping: true)
             
