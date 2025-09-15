@@ -29,9 +29,9 @@ public class MPRoktLayout {
         config: RoktConfig? = nil,
         onEvent: ((RoktEvent) -> Void)? = nil
     ) {
-        confirmUser(attributes: attributes) {
+        confirmUser(attributes: attributes) { identifyCalled in
             let preparedAttributes = MPKitRokt.prepareAttributes(attributes, filteredUser: Optional<FilteredMParticleUser>.none, performMapping: true)
-
+            
             self.roktLayout = RoktLayout.init(
                 sdkTriggered: sdkTriggered,
                 viewName: viewName,
@@ -40,15 +40,22 @@ public class MPRoktLayout {
                 config: config,
                 onEvent: onEvent
             )
+            // The Binding variable provided by the client allows us to trigger a re-render of the UI but we only want to do this if the value was true to start
+            if sdkTriggered.wrappedValue {
+                DispatchQueue.main.async {
+                    sdkTriggered.wrappedValue = false
+                    sdkTriggered.wrappedValue = true
+                }
+            }
         }
     }
     
     func confirmUser(
         attributes: [String: String]?,
-        completion: @escaping () -> Void
+        completion: @escaping (Bool) -> Void
     ) {
         guard let user = mparticle.identity.currentUser else {
-            completion()
+            completion(false)
             return
         }
         let email = attributes?["email"]
@@ -82,9 +89,11 @@ public class MPRoktLayout {
                 print("The existing hashed email on the user (\(user.identities[hashedEmailIdentity ?? NSNumber(value: -1)] ?? "nil")) does not match the email passed in to `selectPlacements:` (\(hashedEmail ?? "nil")). Please remember to sync the hashed email identity to mParticle as soon as you receive it. We will now identify the user before creating the layout")
             }
             
-            syncIdentities(user: user, email: email, hashedEmail: hashedEmail, hashedEmailKey: hashedEmailIdentity, completion: completion)
+            syncIdentities(user: user, email: email, hashedEmail: hashedEmail, hashedEmailKey: hashedEmailIdentity) {
+                completion(true)
+            }
         } else {
-            completion()
+            completion(false)
         }
     }
     
