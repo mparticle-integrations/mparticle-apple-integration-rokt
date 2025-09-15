@@ -42,7 +42,7 @@ public class MPRoktLayout {
                 onEvent: onEvent
             )
             // The Binding variable provided by the client allows us to trigger a re-render of the UI but we only want to do this if the value was true to start
-            if sdkTriggered.wrappedValue {
+            if identifyCalled && sdkTriggered.wrappedValue {
                 DispatchQueue.main.async {
                     sdkTriggered.wrappedValue = false
                     sdkTriggered.wrappedValue = true
