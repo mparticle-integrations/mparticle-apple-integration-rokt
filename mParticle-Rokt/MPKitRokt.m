@@ -53,9 +53,11 @@ static __weak MPKitRokt *roktKit = nil;
     NSString *kitVersion = @"8.3.1";
 
     // Initialize Rokt SDK here
+    [MPKitRokt MPLog:[NSString stringWithFormat:@"Attempting to initialize Rokt with Kit Version: %@", kitVersion]];
     [Rokt initWithRoktTagId:partnerId mParticleSdkVersion:sdkVersion mParticleKitVersion:kitVersion onInitComplete:^(BOOL InitComplete) {
         if (InitComplete) {
             [self start];
+            [MPKitRokt MPLog:@"Rokt Init Complete"];
             NSDictionary *userInfo = @{mParticleKitInstanceKey:[[self class] kitCode]};
             [[NSNotificationCenter defaultCenter] postNotificationName:@"mParticle.Rokt.Initialized"
                                                                 object:nil
@@ -98,6 +100,7 @@ static __weak MPKitRokt *roktKit = nil;
                                   config:(MPRoktConfig * _Nullable)mpRoktConfig
                                callbacks:(MPRoktEventCallback * _Nullable)callbacks
                             filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser {
+    [MPKitRokt MPLog:[NSString stringWithFormat:@"Rokt Kit recieved `executeWithIdentifier` method with the following arguments: \n identifier: %@ \n attributes: %@ \n embeddedViews: %@ \n config: %@ \n callbacks: %@ \n filteredUser identities: %@", identifier, attributes, embeddedViews, mpRoktConfig, callbacks, filteredUser.userIdentities]];
     NSDictionary<NSString *, NSString *> *finalAtt = [MPKitRokt prepareAttributes:attributes filteredUser:filteredUser performMapping:NO];
     
     //Convert MPRoktConfig to RoktConfig
@@ -176,6 +179,7 @@ static __weak MPKitRokt *roktKit = nil;
         finalAttributes = [[NSMutableDictionary alloc] initWithDictionary:@{sandboxKey: sandboxValue}];
     }
     
+    [MPKitRokt MPLog:[NSString stringWithFormat:@"Sandbox value: %@", finalAttributes[sandboxKey]]];
     return finalAttributes;
 }
 
@@ -208,6 +212,7 @@ static __weak MPKitRokt *roktKit = nil;
         [finalAtt addEntriesFromDictionary:@{sandboxKey: attributes[sandboxKey]}];
     }
     
+    [MPKitRokt MPLog:[NSString stringWithFormat:@"Attributes updated with mapped user Attributes and Identities: %@", finalAtt]];
     return [self confirmSandboxAttribute:finalAtt];
 }
 
@@ -743,6 +748,14 @@ static __weak MPKitRokt *roktKit = nil;
 
      return [self execStatus:MPKitReturnCodeSuccess];
  }
+
++ (void)MPLog:(NSString *)string {
+    NSString *msg = [NSString stringWithFormat:@"%@%@", @"MPRokt -> ", string];
+    if ([[MParticle sharedInstance] environment] == MPEnvironmentDevelopment) {
+        NSLog(@"%@", msg);
+    }
+}
+
 
 + (MPRoktEvent * _Nullable)mapEvent:(RoktEvent *)event {
     if (!event) {
