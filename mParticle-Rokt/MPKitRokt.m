@@ -405,6 +405,9 @@ static __weak MPKitRokt *roktKit = nil;
 }
 
 + (NSNumber *)identityTypeForString:(NSString *)identityString {
+    if (identityString == nil) {
+        return nil;
+    }
     NSDictionary<NSString *, NSNumber *> *identityNumbers = @{@"customerid": @(MPIdentityCustomerId),
                                                              @"email": @(MPIdentityEmail),
                                                              @"facebook": @(MPIdentityFacebook),
@@ -434,7 +437,7 @@ static __weak MPKitRokt *roktKit = nil;
     return identityNumbers[identityString];
 }
 
-+ (NSNumber *)getRoktHashedEmailUserIdentityType {
++ (NSDictionary *)getKitConfig {
     // Get the kit configuration
     NSArray<NSDictionary *> *kitConfigs = [MParticle sharedInstance].kitContainer_PRIVATE.originalConfig.copy;
     NSDictionary *roktKitConfig;
@@ -443,6 +446,13 @@ static __weak MPKitRokt *roktKit = nil;
             roktKitConfig = kitConfig;
         }
     }
+    
+    return roktKitConfig;
+}
+
++ (NSNumber *)getRoktHashedEmailUserIdentityType {
+    // Get the kit configuration
+    NSDictionary *roktKitConfig = [MPKitRokt getKitConfig];
     
     // Get the string representing which identity to use and convert it to the key (NSNumber)
     NSString *hashedIdentityTypeString = roktKitConfig[kMPHashedEmailUserIdentityType];
