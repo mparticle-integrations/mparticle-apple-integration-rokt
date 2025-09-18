@@ -4,6 +4,9 @@
 #import <mParticle_Rokt/mParticle_Rokt.h>
 #import "MPKitRokt.h"
 
+NSInteger const kMPRoktKitCode = 181;
+NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType";
+
 @interface MPKitRokt ()
 
 - (MPKitExecStatus *)executeWithIdentifier:(NSString * _Nullable)identifier
@@ -23,6 +26,8 @@
 + (void)addIdentityAttributes:(NSMutableDictionary<NSString *, NSString *> * _Nullable)attributes filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser;
 
 + (void)handleHashedEmail:(NSMutableDictionary<NSString *, NSString *> * _Nullable)attributes;
+
++ (NSDictionary *)getKitConfig;
 
 + (NSNumber *)getRoktHashedEmailUserIdentityType;
 
@@ -675,6 +680,51 @@
     XCTAssertEqualObjects(finalAtt[@"other"], @"test@gmail.com");
     XCTAssertEqualObjects(finalAtt[@"emailsha256"], @"test2@gmail.com");
     XCTAssertTrue(finalAtt.allKeys.count == 4);
+}
+
+- (void)testGetRoktHashedEmailUserIdentityTypeOther4 {
+    // Test case 1: When kit configuration exists with hashed email identity type
+    NSDictionary *roktKitConfig = @{
+        @"id": @(kMPRoktKitCode),
+        kMPHashedEmailUserIdentityType: @"other4"
+    };
+    
+    // Mock the MParticle shared instance and kit container
+    id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
+    [[[mockMPKitRoktClass stub] andReturn:roktKitConfig] getKitConfig];
+    
+    // Call the method and verify result
+    NSNumber *result = [MPKitRokt getRoktHashedEmailUserIdentityType];
+    XCTAssertEqualObjects(result, @(MPIdentityOther4), @"Should return MPIdentityOther4 when configured with 'other4'");
+    
+    [mockMPKitRoktClass stopMocking];
+}
+
+- (void)testGetRoktHashedEmailUserIdentityTypeConfigNil {
+    // Test case 2: When kit config nil
+    // Mock the MParticle shared instance and kit container
+    id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
+    [[[mockMPKitRoktClass stub] andReturn:nil] getKitConfig];
+    
+    NSNumber *defaultResult = [MPKitRokt getRoktHashedEmailUserIdentityType];
+    XCTAssertNil(defaultResult, @"Should return nil when when no configuration exists");
+    
+    [mockMPKitRoktClass stopMocking];
+}
+
+- (void)testGetRoktHashedEmailUserIdentityTypeNil {
+    // Mock the MParticle shared instance and kit container
+    id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
+    // Test case 3: When kit config exists but no hashed email identity type specified
+    NSDictionary *roktKitConfigNoHash = @{
+        @"id": @(kMPRoktKitCode)
+    };
+    [[[mockMPKitRoktClass stub] andReturn:roktKitConfigNoHash] getKitConfig];
+    
+    NSNumber *noHashResult = [MPKitRokt getRoktHashedEmailUserIdentityType];
+    XCTAssertNil(noHashResult, @"Should return nil when hashed email identity type not specified");
+    
+    [mockMPKitRoktClass stopMocking];
 }
 
 @end
