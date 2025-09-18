@@ -451,7 +451,6 @@ static __weak MPKitRokt *roktKit = nil;
 }
 
 + (NSNumber *)getRoktHashedEmailUserIdentityType {
-    // Get the kit configuration
     NSDictionary *roktKitConfig = [MPKitRokt getKitConfig];
     
     // Get the string representing which identity to use and convert it to the key (NSNumber)
