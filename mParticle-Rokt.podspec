@@ -16,6 +16,9 @@ Pod::Spec.new do |s|
 
     s.ios.deployment_target = "12.0"
     
+    # Default includes both
+    s.default_subspecs = 'ObjC', 'Swift'
+    
     # Objective-C subspec
     s.subspec 'ObjC' do |objc|
         objc.source_files = 'mParticle-Rokt/*.{h,m}'
@@ -28,10 +31,19 @@ Pod::Spec.new do |s|
     s.subspec 'Swift' do |swift|
         swift.source_files = 'mParticle-Rokt-Swift/*.swift'
         swift.dependency 'mParticle-Rokt/ObjC'
-        swift.dependency 'mParticle-Apple-SDK', '~> 8.0'
-        swift.dependency 'Rokt-Widget', '~> 4.10'
     end
     
-    # Default includes both
-    s.default_subspecs = 'ObjC', 'Swift'
+    # Objective-C-NoLocation subspec
+    s.subspec 'ObjCNoLocation' do |objc|
+        objc.source_files = 'mParticle-Rokt/*.{h,m}'
+        objc.public_header_files = 'mParticle-Rokt/*.h'
+        objc.dependency 'mParticle-Apple-SDK/mParticleNoLocation', '~> 8.0'
+        objc.dependency 'Rokt-Widget', '~> 4.10'
+    end
+    
+    # SwiftNoLocation subspec
+    s.subspec 'SwiftNoLocation' do |swift|
+        swift.source_files = 'mParticle-Rokt-Swift/*.swift'
+        swift.dependency 'mParticle-Rokt/ObjCNoLocation'
+    end
 end
