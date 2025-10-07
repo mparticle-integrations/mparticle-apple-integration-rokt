@@ -17,7 +17,7 @@ let package = Package(
                .upToNextMajor(from: "8.0.0")),
       .package(name: "Rokt-Widget",
                url: "https://github.com/ROKT/rokt-sdk-ios",
-               .revision("485507587a376291c5f0e46fea55a3503b10dbe0")),
+               .branch("test-static-lib")),
     ],
     targets: [
         .target(
