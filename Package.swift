@@ -14,7 +14,7 @@ let package = Package(
     dependencies: [
       .package(name: "mParticle-Apple-SDK",
                url: "https://github.com/mParticle/mparticle-apple-sdk",
-               .upToNextMajor(from: "8.0.0")),
+               .branch("test/spm-static-linking")),
       .package(name: "Rokt-Widget",
                url: "https://github.com/ROKT/rokt-sdk-ios",
                .branch("test-static-lib")),
