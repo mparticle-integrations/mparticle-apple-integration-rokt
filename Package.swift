@@ -12,31 +12,32 @@ let package = Package(
             targets: ["mParticle-Rokt-Swift"]),
     ],
     dependencies: [
-      .package(name: "mParticle-Apple-SDK",
-               url: "https://github.com/mParticle/mparticle-apple-sdk",
-               .branch("test/spm-static-linking")),
-      .package(name: "Rokt-Widget",
-               url: "https://github.com/ROKT/rokt-sdk-ios",
-               .branch("test-static-lib")),
+        .package(name: "Rokt-Widget",
+                 url: "https://github.com/ROKT/rokt-sdk-ios",
+                 .branch("test-static-lib")),
     ],
     targets: [
         .target(
             name: "mParticle-Rokt",
             dependencies: [
-              .product(name: "mParticle-Apple-SDK", package: "mParticle-Apple-SDK"),
-              .product(name: "Rokt-Widget", package: "Rokt-Widget"),
+                .product(name: "Rokt-Widget", package: "Rokt-Widget"),
             ],
             path: "mParticle-Rokt",
-            publicHeadersPath: "."
+            publicHeadersPath: ".",
+            linkerSettings: [
+                .unsafeFlags(["-undefined", "dynamic_lookup"], .when(platforms: [.iOS, .tvOS]))
+            ]
         ),
         .target(
             name: "mParticle-Rokt-Swift",
             dependencies: [
                 "mParticle-Rokt",
-                .product(name: "mParticle-Apple-SDK", package: "mParticle-Apple-SDK"),
                 .product(name: "Rokt-Widget", package: "Rokt-Widget"),
             ],
-            path: "mParticle-Rokt-Swift"
+            path: "mParticle-Rokt-Swift",
+            linkerSettings: [
+                .unsafeFlags(["-undefined", "dynamic_lookup"], .when(platforms: [.iOS, .tvOS]))
+            ]
         ),
     ]
-) 
+)
