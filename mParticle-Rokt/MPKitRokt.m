@@ -44,7 +44,8 @@ static __weak MPKitRokt *roktKit = nil;
 }
 
 - (id)getKitFilters {
-    return nil;
+    // Return empty dictionary instead of nil to avoid crashes in registerSideloadedKits
+    return @{};
 }
 
 - (NSNumber *)sideloadedKitCode {
