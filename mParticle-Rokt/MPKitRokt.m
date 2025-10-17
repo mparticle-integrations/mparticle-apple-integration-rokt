@@ -43,6 +43,10 @@ static __weak MPKitRokt *roktKit = nil;
     return self;
 }
 
+- (id)getKitFilters {
+    return nil;
+}
+
 #pragma mark - MPKitInstanceProtocol methods
 
 #pragma mark Kit instance and lifecycle
