@@ -15,6 +15,9 @@ let package = Package(
         .package(name: "Rokt-Widget",
                  url: "https://github.com/ROKT/rokt-sdk-ios",
                  .branch("test-static-lib")),
+        .package(name: "mParticle-Apple-SDK",
+                 url: "https://github.com/mParticle/mparticle-apple-sdk",
+                 .branch("test/spm-static-linking")),
     ],
     targets: [
         .target(
@@ -33,6 +36,7 @@ let package = Package(
             dependencies: [
                 "mParticle-Rokt",
                 .product(name: "Rokt-Widget", package: "Rokt-Widget"),
+                .product(name: "mParticle-Apple-SDK", package: "mParticle-Apple-SDK"),
             ],
             path: "mParticle-Rokt-Swift",
             linkerSettings: [
