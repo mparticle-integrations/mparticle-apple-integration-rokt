@@ -16,6 +16,7 @@
 @property (nonatomic, strong, nullable) NSDictionary *launchOptions;
 @property (nonatomic, unsafe_unretained, readonly) BOOL started;
 @property (nonatomic, strong, nullable, readonly) id providerKitInstance;
+@property (nonatomic, strong, nonnull, readonly) id kitInstance;
 
 + (NSDictionary<NSString *, NSString *> * _Nonnull)prepareAttributes:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes filteredUser:(FilteredMParticleUser * _Nullable)filteredUser performMapping:(BOOL)performMapping;
 + (NSNumber * _Nullable)getRoktHashedEmailUserIdentityType;

@@ -39,6 +39,10 @@ static __weak MPKitRokt *roktKit = nil;
     return self;
 }
 
+- (id)kitInstance {
+    return self;
+}
+
 #pragma mark - MPKitInstanceProtocol methods
 
 #pragma mark Kit instance and lifecycle
