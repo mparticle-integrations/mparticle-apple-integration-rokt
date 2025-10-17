@@ -47,6 +47,10 @@ static __weak MPKitRokt *roktKit = nil;
     return nil;
 }
 
+- (NSNumber *)sideloadedKitCode {
+    return @(kMPRoktKitCode);
+}
+
 #pragma mark - MPKitInstanceProtocol methods
 
 #pragma mark Kit instance and lifecycle
