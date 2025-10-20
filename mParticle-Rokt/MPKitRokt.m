@@ -35,28 +35,6 @@ static __weak MPKitRokt *roktKit = nil;
     return [[MPKitExecStatus alloc] initWithSDKCode:self.class.kitCode returnCode:returnCode];
 }
 
-- (id)providerKitInstance {
-    return self;
-}
-
-- (id)kitInstance {
-    return self;
-}
-
-- (id)getKitFilters {
-    // Return empty dictionary instead of nil to avoid crashes in registerSideloadedKits
-    return @{};
-}
-
-- (NSNumber *)sideloadedKitCode {
-    return @(kMPRoktKitCode);
-}
-
-- (void)setSideloadedKitCode:(NSNumber *)sideloadedKitCode {
-    // Ignore the setter - always use kMPRoktKitCode from the getter
-    // mParticle sets this but we want to ensure consistency with kitCode
-}
-
 #pragma mark - MPKitInstanceProtocol methods
 
 #pragma mark Kit instance and lifecycle

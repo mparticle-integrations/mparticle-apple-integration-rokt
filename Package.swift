@@ -12,12 +12,12 @@ let package = Package(
             targets: ["mParticle-Rokt", "mParticle-Rokt-Swift"]),
     ],
     dependencies: [
-        .package(name: "Rokt-Widget",
-                 url: "https://github.com/ROKT/rokt-sdk-ios",
-                 .branch("test-static-lib")),
         .package(name: "mParticle-Apple-SDK",
                  url: "https://github.com/mParticle/mparticle-apple-sdk",
                  .branch("test/spm-static-linking")),
+        .package(name: "Rokt-Widget",
+                 url: "https://github.com/ROKT/rokt-sdk-ios",
+                 .branch("test-static-lib")),
     ],
     targets: [
         .target(
