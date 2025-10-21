@@ -27,9 +27,6 @@ let package = Package(
             ],
             path: "mParticle-Rokt",
             publicHeadersPath: ".",
-            linkerSettings: [
-                .unsafeFlags(["-undefined", "dynamic_lookup"], .when(platforms: [.iOS, .tvOS]))
-            ]
         ),
         .target(
             name: "mParticle-Rokt-Swift",
@@ -39,9 +36,6 @@ let package = Package(
                 .product(name: "mParticle-Apple-SDK", package: "mParticle-Apple-SDK"),
             ],
             path: "mParticle-Rokt-Swift",
-            linkerSettings: [
-                .unsafeFlags(["-undefined", "dynamic_lookup"], .when(platforms: [.iOS, .tvOS]))
-            ]
         ),
     ]
 )
