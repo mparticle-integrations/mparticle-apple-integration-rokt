@@ -7,6 +7,7 @@ NSString * const MPKitRoktErrorDomain = @"com.mparticle.kits.rokt";
 NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 NSString * const kMPPlacementAttributesMapping = @"placementAttributesMapping";
 NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType";
+NSString * const kMPRoktEmbeddedViewClassName = @"MPRoktEmbeddedView";
 NSInteger const kMPRoktKitCode = 181;
 
 static __weak MPKitRokt *roktKit = nil;
@@ -105,10 +106,11 @@ static __weak MPKitRokt *roktKit = nil;
     
     //Convert MPRoktConfig to RoktConfig
     RoktConfig *roktConfig = [MPKitRokt convertMPRoktConfig:mpRoktConfig];
+    NSDictionary<NSString *, RoktEmbeddedView *> *confirmedViews = [self confirmEmbeddedViews:embeddedViews];
     
     [Rokt executeWithViewName:identifier
                    attributes:finalAtt
-                   placements:[self confirmEmbeddedViews:embeddedViews]
+                   placements:confirmedViews
                        config:roktConfig
                        onLoad:callbacks.onLoad
                      onUnLoad:callbacks.onUnLoad
@@ -145,18 +147,36 @@ static __weak MPKitRokt *roktKit = nil;
 }
 
 - (NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmEmbeddedViews:(NSDictionary<NSString *, MPRoktEmbeddedView *> * _Nullable)embeddedViews {
+    if (!embeddedViews || embeddedViews.count == 0) {
+        return [NSMutableDictionary dictionary];
+    }
+    
     NSMutableDictionary <NSString *, RoktEmbeddedView *> *safePlacements = [NSMutableDictionary dictionary];
 
     for (NSString* key in embeddedViews) {
         MPRoktEmbeddedView *mpView = [embeddedViews objectForKey:key];
 
-        if ([mpView isKindOfClass:MPRoktEmbeddedView.class]) {
+        BOOL isUIView = [mpView isKindOfClass:[UIView class]];
+        
+        if (!isUIView) {
+            continue;
+        }
+
+        Class runtimeClass = NSClassFromString(kMPRoktEmbeddedViewClassName);
+        
+        // Use runtime class for type checking instead of compile-time reference
+        // This handles cases where the class is defined in multiple frameworks
+        BOOL isProperType = runtimeClass && [mpView isKindOfClass:runtimeClass];
+        
+        if (isProperType) {
             // Create a new RoktEmbeddedView instance
             RoktEmbeddedView *roktView = [[RoktEmbeddedView alloc] initWithFrame:mpView.bounds];
             // Add the RoktEmbeddedView as a child view of MPRoktEmbeddedView
             [mpView addSubview:roktView];
             // Add the RoktEmbeddedView to our safe placements dictionary
             [safePlacements setObject:roktView forKey:key];
+        } else {
+            [MPKitRokt MPLog:[NSString stringWithFormat:@"Rokt embedded view is incorrect type. Found: %@ but required: %@", NSStringFromClass([mpView class]), kMPRoktEmbeddedViewClassName]];
         }
     }
 
