@@ -159,6 +159,7 @@ static __weak MPKitRokt *roktKit = nil;
         BOOL isUIView = [mpView isKindOfClass:[UIView class]];
         
         if (!isUIView) {
+            [MPKitRokt MPLog:[NSString stringWithFormat:@"Rokt embedded view is incorrect type. Found: %@ but required: UIView", NSStringFromClass([mpView class])]];
             continue;
         }
 
