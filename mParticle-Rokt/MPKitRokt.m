@@ -276,17 +276,10 @@ static __weak MPKitRokt *roktKit = nil;
 + (NSDictionary<NSString *, NSString *> *)mapAttributes:(NSDictionary<NSString *, NSString *> * _Nullable)attributes filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser {
     NSArray<NSDictionary<NSString *, NSString *> *> *attributeMap = nil;
     
-    // Get the kit configuration
-    NSArray<NSDictionary *> *kitConfigs = [MParticle sharedInstance].kitContainer_PRIVATE.originalConfig.copy;
-    NSDictionary *roktKitConfig;
-    for (NSDictionary *kitConfig in kitConfigs) {
-        if (kitConfig[@"id"] != nil && [kitConfig[@"id"] integerValue] == kMPRoktKitCode) {
-            roktKitConfig = kitConfig;
-        }
-    }
-    
-    // Return nil if no Rokt Kit configuration found
-    if (!roktKitConfig) {
+    // Use the kit configuration received during the initialization
+    NSDictionary *roktKitSettings = roktKit.configuration;
+
+    if (![roktKitSettings isKindOfClass:[NSDictionary class]]) {
         return attributes;
     }
     
@@ -295,8 +288,9 @@ static __weak MPKitRokt *roktKit = nil;
     NSData *dataAttributeMap;
     // Rokt Kit is available though there may not be an attribute map
     attributeMap = @[];
-    if (roktKitConfig[kMPPlacementAttributesMapping] != [NSNull null]) {
-        strAttributeMap = [roktKitConfig[kMPPlacementAttributesMapping] stringByRemovingPercentEncoding];
+    id rawAttributeMap = roktKitSettings[kMPPlacementAttributesMapping];
+    if (rawAttributeMap != [NSNull null] && rawAttributeMap != nil) {
+        strAttributeMap = [rawAttributeMap stringByRemovingPercentEncoding];
         dataAttributeMap = [strAttributeMap dataUsingEncoding:NSUTF8StringEncoding];
     }
     
@@ -458,24 +452,16 @@ static __weak MPKitRokt *roktKit = nil;
     return identityNumbers[identityString];
 }
 
-+ (NSDictionary *)getKitConfig {
-    // Get the kit configuration
-    NSArray<NSDictionary *> *kitConfigs = [MParticle sharedInstance].kitContainer_PRIVATE.originalConfig.copy;
-    NSDictionary *roktKitConfig;
-    for (NSDictionary *kitConfig in kitConfigs) {
-        if (kitConfig[@"id"] != nil && [kitConfig[@"id"] integerValue] == kMPRoktKitCode) {
-            roktKitConfig = kitConfig;
-        }
++ (NSNumber *)getRoktHashedEmailUserIdentityType {
+    // Use the kit configuration provided at initialization
+    NSDictionary *roktKitSettings = roktKit.configuration;
+
+    if (![roktKitSettings isKindOfClass:[NSDictionary class]]) {
+        return nil;
     }
     
-    return roktKitConfig;
-}
-
-+ (NSNumber *)getRoktHashedEmailUserIdentityType {
-    NSDictionary *roktKitConfig = [MPKitRokt getKitConfig];
-    
     // Get the string representing which identity to use and convert it to the key (NSNumber)
-    NSString *hashedIdentityTypeString = roktKitConfig[kMPHashedEmailUserIdentityType];
+    NSString *hashedIdentityTypeString = roktKitSettings[kMPHashedEmailUserIdentityType];
     NSNumber *hashedIdentityTypeNumber = [MPKitRokt identityTypeForString:hashedIdentityTypeString.lowercaseString];
     
     return hashedIdentityTypeNumber;

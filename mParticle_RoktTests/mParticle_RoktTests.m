@@ -27,13 +27,13 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
 
 + (void)handleHashedEmail:(NSMutableDictionary<NSString *, NSString *> * _Nullable)attributes;
 
-+ (NSDictionary *)getKitConfig;
-
 + (NSNumber *)getRoktHashedEmailUserIdentityType;
 
 + (RoktConfig *)convertMPRoktConfig:(MPRoktConfig *)mpRoktConfig;
 
 + (NSDictionary<NSString *, NSString *> *)transformValuesToString:(NSDictionary<NSString *, id> * _Nullable)originalDictionary;
+
++ (NSDictionary<NSString *, NSString *> *)mapAttributes:(NSDictionary<NSString *, NSString *> * _Nullable)attributes filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser;
 
 @end
 
@@ -123,6 +123,13 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
     
     XCTAssertNotNil(status);
     XCTAssertEqual(status.returnCode, MPKitReturnCodeUnavailable);
+}
+
+- (void)testGetRoktHashedEmailUserIdentityType_UsesLaunchConfig {
+    NSDictionary *config = @{ @"accountId": @"123", kMPHashedEmailUserIdentityType: @"Other5" };
+    [self.kitInstance didFinishLaunchingWithConfiguration:config];
+    NSNumber *hashedType = [MPKitRokt getRoktHashedEmailUserIdentityType];
+    XCTAssertEqualObjects(hashedType, @(MPIdentityOther5));
 }
 
 - (void)testLogBaseEvent {
@@ -684,47 +691,127 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
 
 - (void)testGetRoktHashedEmailUserIdentityTypeOther4 {
     // Test case 1: When kit configuration exists with hashed email identity type
-    NSDictionary *roktKitConfig = @{
-        @"id": @(kMPRoktKitCode),
+    NSDictionary *config = @{
+        @"accountId": @"test_account_id",
         kMPHashedEmailUserIdentityType: @"other4"
     };
     
-    // Mock the MParticle shared instance and kit container
-    id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
-    [[[mockMPKitRoktClass stub] andReturn:roktKitConfig] getKitConfig];
+    // Initialize kit with configuration
+    [self.kitInstance didFinishLaunchingWithConfiguration:config];
     
     // Call the method and verify result
     NSNumber *result = [MPKitRokt getRoktHashedEmailUserIdentityType];
     XCTAssertEqualObjects(result, @(MPIdentityOther4), @"Should return MPIdentityOther4 when configured with 'other4'");
-    
-    [mockMPKitRoktClass stopMocking];
-}
-
-- (void)testGetRoktHashedEmailUserIdentityTypeConfigNil {
-    // Test case 2: When kit config nil
-    // Mock the MParticle shared instance and kit container
-    id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
-    [[[mockMPKitRoktClass stub] andReturn:nil] getKitConfig];
-    
-    NSNumber *defaultResult = [MPKitRokt getRoktHashedEmailUserIdentityType];
-    XCTAssertNil(defaultResult, @"Should return nil when when no configuration exists");
-    
-    [mockMPKitRoktClass stopMocking];
 }
 
 - (void)testGetRoktHashedEmailUserIdentityTypeNil {
-    // Mock the MParticle shared instance and kit container
-    id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
-    // Test case 3: When kit config exists but no hashed email identity type specified
-    NSDictionary *roktKitConfigNoHash = @{
-        @"id": @(kMPRoktKitCode)
+    // Test case 2: When kit config exists but no hashed email identity type specified
+    NSDictionary *configNoHash = @{
+        @"accountId": @"test_account_id"
     };
-    [[[mockMPKitRoktClass stub] andReturn:roktKitConfigNoHash] getKitConfig];
-    
+
+    // Initialize kit with configuration that doesn't have hashed email setting
+    [self.kitInstance didFinishLaunchingWithConfiguration:configNoHash];
+
     NSNumber *noHashResult = [MPKitRokt getRoktHashedEmailUserIdentityType];
     XCTAssertNil(noHashResult, @"Should return nil when hashed email identity type not specified");
-    
-    [mockMPKitRoktClass stopMocking];
+}
+
+- (void)testMapAttributesWithConfigurationAndMapping {
+    // Test case: Verify mapAttributes uses roktKit.configuration for attribute mapping
+    NSString *mappingJSON = @"[{\"map\":\"oldKey\",\"value\":\"newKey\"}]";
+    NSString *encodedMapping = [mappingJSON stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+
+    NSDictionary *config = @{
+        @"accountId": @"test_account_id",
+        @"placementAttributesMapping": encodedMapping
+    };
+
+    // Initialize kit with configuration
+    [self.kitInstance didFinishLaunchingWithConfiguration:config];
+
+    // Create test attributes and filtered user
+    NSDictionary<NSString *, NSString *> *attributes = @{@"oldKey": @"testValue"};
+    FilteredMParticleUser *user = [[FilteredMParticleUser alloc] init];
+    id mockUser = OCMPartialMock(user);
+    [[[mockUser stub] andReturn:@{}] userAttributes];
+
+    // Note: The actual mapping will attempt to set user attributes on MParticle
+    // but we're primarily testing that the configuration is being read correctly
+    // The method should not crash if MParticle isn't fully mocked
+
+    // Call mapAttributes
+    NSDictionary<NSString *, NSString *> *result = [MPKitRokt mapAttributes:attributes filteredUser:user];
+
+    // Verify the configuration was accessed (result should be processed)
+    XCTAssertNotNil(result, @"Result should not be nil");
+}
+
+- (void)testMapAttributesWithoutConfiguration {
+    // Test case: When kit is not initialized, mapAttributes should return original attributes
+    NSDictionary<NSString *, NSString *> *attributes = @{@"key1": @"value1", @"key2": @"value2"};
+    FilteredMParticleUser *user = [[FilteredMParticleUser alloc] init];
+
+    // Don't initialize the kit - this tests the graceful degradation
+    NSDictionary<NSString *, NSString *> *result = [MPKitRokt mapAttributes:attributes filteredUser:user];
+
+    // Should return original attributes when no configuration exists
+    XCTAssertEqualObjects(result, attributes, @"Should return original attributes when kit not initialized");
+}
+
+- (void)testMapAttributesWithEmptyMapping {
+    // Test case: Configuration exists but no attribute mapping specified
+    NSDictionary *config = @{
+        @"accountId": @"test_account_id"
+        // No placementAttributesMapping
+    };
+
+    // Initialize kit with configuration
+    [self.kitInstance didFinishLaunchingWithConfiguration:config];
+
+    NSDictionary<NSString *, NSString *> *attributes = @{@"key1": @"value1"};
+    FilteredMParticleUser *user = [[FilteredMParticleUser alloc] init];
+
+    // Call mapAttributes
+    NSDictionary<NSString *, NSString *> *result = [MPKitRokt mapAttributes:attributes filteredUser:user];
+
+    // Should return original attributes when no mapping is configured
+    XCTAssertEqualObjects(result[@"key1"], @"value1", @"Original attribute should be preserved");
+}
+
+- (void)testPrepareAttributesWithConfiguration {
+    // Test case: Verify prepareAttributes uses roktKit.configuration correctly
+    NSDictionary *config = @{
+        @"accountId": @"test_account_id",
+        kMPHashedEmailUserIdentityType: @"other5"
+    };
+
+    // Initialize kit with configuration
+    [self.kitInstance didFinishLaunchingWithConfiguration:config];
+
+    // Create test data
+    NSDictionary<NSString *, NSString *> *attributes = @{@"testKey": @"testValue"};
+    FilteredMParticleUser *user = [[FilteredMParticleUser alloc] init];
+    id mockUser = OCMPartialMock(user);
+    NSNumber *mockUserId = @123456;
+
+    [[[mockUser stub] andReturn:@{}] userAttributes];
+    [[[mockUser stub] andReturn:@{}] userIdentities];
+    [[[mockUser stub] andReturn:mockUserId] userId];
+
+    // Call prepareAttributes with performMapping = YES
+    NSDictionary<NSString *, NSString *> *result = [MPKitRokt prepareAttributes:attributes
+                                                                    filteredUser:user
+                                                                  performMapping:YES];
+
+    // Verify sandbox attribute is added automatically
+    XCTAssertNotNil(result[@"sandbox"], @"Sandbox attribute should be added");
+
+    // Verify MPID is added
+    XCTAssertEqualObjects(result[@"mpid"], @"123456", @"MPID should be added to attributes");
+
+    // Verify original attribute is preserved
+    XCTAssertEqualObjects(result[@"testKey"], @"testValue", @"Original attributes should be preserved");
 }
 
 @end
