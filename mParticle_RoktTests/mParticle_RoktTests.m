@@ -35,6 +35,10 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
 
 + (NSDictionary<NSString *, NSString *> *)transformValuesToString:(NSDictionary<NSString *, id> * _Nullable)originalDictionary;
 
++ (NSDictionary<NSString *, NSString *> *)mapAttributes:(NSDictionary<NSString *, NSString *> * _Nullable)attributes filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser;
+
++ (NSDictionary<NSString *, NSString *> *)confirmSandboxAttribute:(NSDictionary<NSString *, NSString *> * _Nullable)attributes;
+
 @end
 
 @interface mParticle_RoktTests : XCTestCase
@@ -686,7 +690,9 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
     // Test case 1: When kit configuration exists with hashed email identity type
     NSDictionary *roktKitConfig = @{
         @"id": @(kMPRoktKitCode),
-        kMPHashedEmailUserIdentityType: @"other4"
+        @"as": @{
+            kMPHashedEmailUserIdentityType: @"other4"
+        }
     };
     
     // Mock the MParticle shared instance and kit container
@@ -717,12 +723,251 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
     id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
     // Test case 3: When kit config exists but no hashed email identity type specified
     NSDictionary *roktKitConfigNoHash = @{
-        @"id": @(kMPRoktKitCode)
+        @"id": @(kMPRoktKitCode),
+        @"as": @{
+            // No kMPHashedEmailUserIdentityType specified
+        }
     };
     [[[mockMPKitRoktClass stub] andReturn:roktKitConfigNoHash] getKitConfig];
     
     NSNumber *noHashResult = [MPKitRokt getRoktHashedEmailUserIdentityType];
     XCTAssertNil(noHashResult, @"Should return nil when hashed email identity type not specified");
+    
+    [mockMPKitRoktClass stopMocking];
+}
+
+- (void)testMapAttributesWithNewConfigurationStructure {
+    // Test the mapAttributes method with the new nested configuration structure
+    NSDictionary *roktKitConfig = @{
+        @"id": @(kMPRoktKitCode),
+        @"as": @{
+            @"placementAttributesMapping": @"[{\"jsmap\":null,\"map\":\"f.name\",\"maptype\":\"UserAttributeClass.Name\",\"value\":\"firstname\"},{\"jsmap\":null,\"map\":\"zip\",\"maptype\":\"UserAttributeClass.Name\",\"value\":\"billingzipcode\"},{\"jsmap\":null,\"map\":\"l.name\",\"maptype\":\"UserAttributeClass.Name\",\"value\":\"lastname\"}]"
+        }
+    };
+    
+    // Mock the kit configuration
+    id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
+    [[[mockMPKitRoktClass stub] andReturn:roktKitConfig] getKitConfig];
+    
+    // Create test input attributes
+    NSDictionary<NSString *, NSString *> *inputAttributes = @{
+        @"f.name": @"John",
+        @"zip": @"12345",
+        @"l.name": @"Doe",
+        @"email": @"john.doe@example.com"
+    };
+    
+    // Create mock filtered user
+    FilteredMParticleUser *filteredUser = [[FilteredMParticleUser alloc] init];
+    id mockFilteredUser = OCMPartialMock(filteredUser);
+    [[[mockFilteredUser stub] andReturn:@{}] userAttributes];
+    
+    // Call mapAttributes method
+    NSDictionary<NSString *, NSString *> *result = [MPKitRokt mapAttributes:inputAttributes filteredUser:mockFilteredUser];
+    
+    // Verify the mapping worked correctly
+    XCTAssertEqualObjects(result[@"firstname"], @"John", @"f.name should be mapped to firstname");
+    XCTAssertEqualObjects(result[@"billingzipcode"], @"12345", @"zip should be mapped to billingzipcode");
+    XCTAssertEqualObjects(result[@"lastname"], @"Doe", @"l.name should be mapped to lastname");
+    XCTAssertEqualObjects(result[@"email"], @"john.doe@example.com", @"email should remain unchanged");
+    
+    // Verify original keys are removed
+    XCTAssertNil(result[@"f.name"], @"Original f.name key should be removed");
+    XCTAssertNil(result[@"zip"], @"Original zip key should be removed");
+    XCTAssertNil(result[@"l.name"], @"Original l.name key should be removed");
+    
+    [mockMPKitRoktClass stopMocking];
+}
+
+- (void)testMapAttributesWithNoConfiguration {
+    // Test mapAttributes when no kit configuration exists
+    id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
+    [[[mockMPKitRoktClass stub] andReturn:nil] getKitConfig];
+    
+    NSDictionary<NSString *, NSString *> *inputAttributes = @{
+        @"email": @"test@example.com",
+        @"name": @"Test User"
+    };
+    
+    FilteredMParticleUser *filteredUser = [[FilteredMParticleUser alloc] init];
+    
+    // Call mapAttributes method
+    NSDictionary<NSString *, NSString *> *result = [MPKitRokt mapAttributes:inputAttributes filteredUser:filteredUser];
+    
+    // Should return original attributes unchanged
+    XCTAssertEqualObjects(result, inputAttributes, @"Should return original attributes when no configuration exists");
+    
+    [mockMPKitRoktClass stopMocking];
+}
+
+#pragma mark - Device Identifier Tests (IDFA/IDFV)
+
+- (void)testAddIdentityAttributesWithDeviceIdentifiers {
+    // Test that IDFA and IDFV device identifiers are added from filteredUser
+    NSMutableDictionary<NSString *, NSString *> *passedAttributes = [[NSMutableDictionary alloc] init];
+    NSDictionary<NSNumber *, NSString *> *testIdentities = @{
+        @(MPIdentityEmail): @"test@example.com"
+    };
+
+    FilteredMParticleUser *filteredUser = [[FilteredMParticleUser alloc] init];
+    id mockFilteredUser = OCMPartialMock(filteredUser);
+    [[[mockFilteredUser stub] andReturn:testIdentities] userIdentities];
+    [[[mockFilteredUser stub] andReturn:@"test-idfa-value"] idfa];
+    [[[mockFilteredUser stub] andReturn:@"test-idfv-value"] idfv];
+    [[[mockFilteredUser stub] andReturn:@(12345)] userId];
+    
+    id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
+    [[[mockMPKitRoktClass stub] andReturn:nil] getRoktHashedEmailUserIdentityType];
+    
+    [MPKitRokt addIdentityAttributes:passedAttributes filteredUser:filteredUser];
+    
+    // Verify device identifiers are added
+    XCTAssertEqualObjects(passedAttributes[@"idfa"], @"test-idfa-value", @"IDFA should be added from filteredUser.idfa");
+    XCTAssertEqualObjects(passedAttributes[@"idfv"], @"test-idfv-value", @"IDFV should be added from filteredUser.idfv");
+    XCTAssertEqualObjects(passedAttributes[@"mpid"], @"12345", @"MPID should be added from filteredUser.userId");
+    XCTAssertEqualObjects(passedAttributes[@"email"], @"test@example.com", @"Email should still be added");
+    
+    [mockMPKitRoktClass stopMocking];
+}
+
+- (void)testAddIdentityAttributesWithNilIdfa {
+    // Test behavior when IDFA is nil (e.g., ATT permission not granted)
+    NSMutableDictionary<NSString *, NSString *> *passedAttributes = [[NSMutableDictionary alloc] init];
+    NSDictionary<NSNumber *, NSString *> *testIdentities = @{
+        @(MPIdentityEmail): @"test@example.com"
+    };
+
+    FilteredMParticleUser *filteredUser = [[FilteredMParticleUser alloc] init];
+    id mockFilteredUser = OCMPartialMock(filteredUser);
+    [[[mockFilteredUser stub] andReturn:testIdentities] userIdentities];
+    [[[mockFilteredUser stub] andReturn:nil] idfa];  // IDFA nil when ATT not authorized
+    [[[mockFilteredUser stub] andReturn:@"test-idfv-value"] idfv];
+    [[[mockFilteredUser stub] andReturn:@(12345)] userId];
+    
+    id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
+    [[[mockMPKitRoktClass stub] andReturn:nil] getRoktHashedEmailUserIdentityType];
+    
+    [MPKitRokt addIdentityAttributes:passedAttributes filteredUser:filteredUser];
+    
+    // Verify IDFA is nil but IDFV is still added
+    XCTAssertNil(passedAttributes[@"idfa"], @"IDFA should be nil when not authorized");
+    XCTAssertEqualObjects(passedAttributes[@"idfv"], @"test-idfv-value", @"IDFV should still be added");
+    XCTAssertEqualObjects(passedAttributes[@"mpid"], @"12345", @"MPID should still be added");
+    
+    [mockMPKitRoktClass stopMocking];
+}
+
+- (void)testAddIdentityAttributesWithNilIdfv {
+    // Test behavior when IDFV is nil
+    NSMutableDictionary<NSString *, NSString *> *passedAttributes = [[NSMutableDictionary alloc] init];
+    NSDictionary<NSNumber *, NSString *> *testIdentities = @{
+        @(MPIdentityEmail): @"test@example.com"
+    };
+
+    FilteredMParticleUser *filteredUser = [[FilteredMParticleUser alloc] init];
+    id mockFilteredUser = OCMPartialMock(filteredUser);
+    [[[mockFilteredUser stub] andReturn:testIdentities] userIdentities];
+    [[[mockFilteredUser stub] andReturn:@"test-idfa-value"] idfa];
+    [[[mockFilteredUser stub] andReturn:nil] idfv];  // IDFV nil
+    [[[mockFilteredUser stub] andReturn:@(12345)] userId];
+    
+    id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
+    [[[mockMPKitRoktClass stub] andReturn:nil] getRoktHashedEmailUserIdentityType];
+    
+    [MPKitRokt addIdentityAttributes:passedAttributes filteredUser:filteredUser];
+    
+    // Verify IDFV is nil but IDFA is still added
+    XCTAssertEqualObjects(passedAttributes[@"idfa"], @"test-idfa-value", @"IDFA should still be added");
+    XCTAssertNil(passedAttributes[@"idfv"], @"IDFV should be nil");
+    XCTAssertEqualObjects(passedAttributes[@"mpid"], @"12345", @"MPID should still be added");
+    
+    [mockMPKitRoktClass stopMocking];
+}
+
+- (void)testAddIdentityAttributesWithBothDeviceIdentifiersNil {
+    // Test behavior when both IDFA and IDFV are nil
+    NSMutableDictionary<NSString *, NSString *> *passedAttributes = [[NSMutableDictionary alloc] init];
+    NSDictionary<NSNumber *, NSString *> *testIdentities = @{
+        @(MPIdentityEmail): @"test@example.com"
+    };
+
+    FilteredMParticleUser *filteredUser = [[FilteredMParticleUser alloc] init];
+    id mockFilteredUser = OCMPartialMock(filteredUser);
+    [[[mockFilteredUser stub] andReturn:testIdentities] userIdentities];
+    [[[mockFilteredUser stub] andReturn:nil] idfa];
+    [[[mockFilteredUser stub] andReturn:nil] idfv];
+    [[[mockFilteredUser stub] andReturn:@(12345)] userId];
+    
+    id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
+    [[[mockMPKitRoktClass stub] andReturn:nil] getRoktHashedEmailUserIdentityType];
+    
+    [MPKitRokt addIdentityAttributes:passedAttributes filteredUser:filteredUser];
+    
+    // Verify both device identifiers are nil
+    XCTAssertNil(passedAttributes[@"idfa"], @"IDFA should be nil");
+    XCTAssertNil(passedAttributes[@"idfv"], @"IDFV should be nil");
+    // Other identities should still be added
+    XCTAssertEqualObjects(passedAttributes[@"email"], @"test@example.com", @"Email should still be added");
+    XCTAssertEqualObjects(passedAttributes[@"mpid"], @"12345", @"MPID should still be added");
+    
+    [mockMPKitRoktClass stopMocking];
+}
+
+- (void)testAddIdentityAttributesDeviceIdentifiersDoNotOverrideUserIdentities {
+    // Test that device IDFA/IDFV (idfa/idfv keys) coexist with user identity IDFA/IDFV (ios_idfa/ios_idfv keys)
+    NSMutableDictionary<NSString *, NSString *> *passedAttributes = [[NSMutableDictionary alloc] init];
+    NSDictionary<NSNumber *, NSString *> *testIdentities = @{
+        @(MPIdentityEmail): @"test@example.com",
+        @(MPIdentityIOSAdvertiserId): @"user-identity-idfa",
+        @(MPIdentityIOSVendorId): @"user-identity-idfv"
+    };
+
+    FilteredMParticleUser *filteredUser = [[FilteredMParticleUser alloc] init];
+    id mockFilteredUser = OCMPartialMock(filteredUser);
+    [[[mockFilteredUser stub] andReturn:testIdentities] userIdentities];
+    [[[mockFilteredUser stub] andReturn:@"device-idfa"] idfa];
+    [[[mockFilteredUser stub] andReturn:@"device-idfv"] idfv];
+    [[[mockFilteredUser stub] andReturn:@(12345)] userId];
+    
+    id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
+    [[[mockMPKitRoktClass stub] andReturn:nil] getRoktHashedEmailUserIdentityType];
+    
+    [MPKitRokt addIdentityAttributes:passedAttributes filteredUser:filteredUser];
+    
+    // Verify both device identifiers and user identity identifiers are present with different keys
+    XCTAssertEqualObjects(passedAttributes[@"idfa"], @"device-idfa", @"Device IDFA should be added with 'idfa' key");
+    XCTAssertEqualObjects(passedAttributes[@"idfv"], @"device-idfv", @"Device IDFV should be added with 'idfv' key");
+    XCTAssertEqualObjects(passedAttributes[@"ios_idfa"], @"user-identity-idfa", @"User identity IDFA should be added with 'ios_idfa' key");
+    XCTAssertEqualObjects(passedAttributes[@"ios_idfv"], @"user-identity-idfv", @"User identity IDFV should be added with 'ios_idfv' key");
+    XCTAssertEqualObjects(passedAttributes[@"mpid"], @"12345", @"MPID should be added");
+    
+    [mockMPKitRoktClass stopMocking];
+}
+
+- (void)testAddIdentityAttributesMpidWithNilUserId {
+    // Test behavior when userId is nil
+    NSMutableDictionary<NSString *, NSString *> *passedAttributes = [[NSMutableDictionary alloc] init];
+    NSDictionary<NSNumber *, NSString *> *testIdentities = @{
+        @(MPIdentityEmail): @"test@example.com"
+    };
+
+    FilteredMParticleUser *filteredUser = [[FilteredMParticleUser alloc] init];
+    id mockFilteredUser = OCMPartialMock(filteredUser);
+    [[[mockFilteredUser stub] andReturn:testIdentities] userIdentities];
+    [[[mockFilteredUser stub] andReturn:@"test-idfa"] idfa];
+    [[[mockFilteredUser stub] andReturn:@"test-idfv"] idfv];
+    [[[mockFilteredUser stub] andReturn:nil] userId];  // nil userId
+    
+    id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
+    [[[mockMPKitRoktClass stub] andReturn:nil] getRoktHashedEmailUserIdentityType];
+    
+    [MPKitRokt addIdentityAttributes:passedAttributes filteredUser:filteredUser];
+    
+    // Verify MPID is nil when userId is nil
+    XCTAssertNil(passedAttributes[@"mpid"], @"MPID should be nil when userId is nil");
+    // Other identifiers should still be added
+    XCTAssertEqualObjects(passedAttributes[@"idfa"], @"test-idfa", @"IDFA should still be added");
+    XCTAssertEqualObjects(passedAttributes[@"idfv"], @"test-idfv", @"IDFV should still be added");
     
     [mockMPKitRoktClass stopMocking];
 }
