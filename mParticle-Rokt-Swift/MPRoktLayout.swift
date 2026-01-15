@@ -33,6 +33,9 @@ public class MPRoktLayout {
         confirmUser(attributes: attributes) { identifyCalled in
             let preparedAttributes = MPKitRokt.prepareAttributes(attributes, filteredUser: Optional<FilteredMParticleUser>.none, performMapping: true)
             
+            // Log custom event for selectPlacements call
+            MPKitRokt.logSelectPlacementEvent(preparedAttributes)
+            
             MPRoktLayout.mpLog("Initializing RoktLayout with arguments  sdkTriggered:\(sdkTriggered.wrappedValue), viewName: \(viewName ?? "nil"), locationName:\(locationName), attributes:\(preparedAttributes)")
             self.roktLayout = RoktLayout.init(
                 sdkTriggered: sdkTriggered,
