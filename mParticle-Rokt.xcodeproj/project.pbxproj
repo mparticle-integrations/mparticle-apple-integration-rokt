@@ -787,7 +787,7 @@
 			repositoryURL = "https://github.com/mParticle/mparticle-apple-sdk.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 8.4.0;
+				minimumVersion = 8.41.0;
 			};
 		};
 		7EE7F13C2DA95BEE006C5440 /* XCRemoteSwiftPackageReference "ocmock" */ = {

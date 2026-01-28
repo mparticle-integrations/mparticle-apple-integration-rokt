@@ -14,7 +14,7 @@ let package = Package(
     dependencies: [
       .package(name: "mParticle-Apple-SDK",
                url: "https://github.com/mParticle/mparticle-apple-sdk",
-               .upToNextMajor(from: "8.0.0")),
+               .upToNextMajor(from: "8.41.0")),
       .package(name: "Rokt-Widget",
                url: "https://github.com/ROKT/rokt-sdk-ios",
                .upToNextMajor(from: "4.10.0")),

@@ -147,7 +147,7 @@ struct mParticle_Rokt_SwiftTests {
         
         // Then
         #expect(preparedAttributes["sandbox"] == "true", "Sandbox attribute should be preserved")
-        #expect(preparedAttributes["custom_attr"] == nil, "Custom attributes should be preserved")
+        #expect(preparedAttributes["custom_attr"] != nil, "Custom attributes should be preserved")
     }
     
     @available(iOS 15, *)
