@@ -377,7 +377,7 @@ static __weak MPKitRokt *roktKit = nil;
     // Add MPID to the attributes being passed to the Rokt SDK
     attributes[kMPRoktIdentityTypeMpid] = filteredUser.userId.stringValue;
     
-    // IDFA and IDFV are seperate but related to identities, IDFA is only provided if ATTStatus has been set to authorized
+    // IDFA and IDFV are separate but related to identities, IDFA is only provided if ATTStatus has been set to authorized
     attributes[kMPRoktIdentityTypeIdfa] = filteredUser.idfa;
     attributes[kMPRoktIdentityTypeIdfv] = filteredUser.idfv;
 }
