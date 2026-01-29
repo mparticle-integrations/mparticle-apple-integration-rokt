@@ -51,7 +51,7 @@ jobs:
           shutdown_after_job: true
 
       - name: Run unit tests
-        run: xcodebuild -project mParticle-Rokt.xcodeproj -scheme mParticle_RoktTests -destination 'id=${{ steps.simulator.outputs.UDID }}' test
+        run: xcodebuild -project mParticle-Rokt.xcodeproj -scheme mParticle_RoktTests -destination 'id=${{ steps.simulator.outputs.udid }}' test
 
   pr-notify:
     if: >
