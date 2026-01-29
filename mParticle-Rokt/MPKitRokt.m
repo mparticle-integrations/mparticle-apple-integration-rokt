@@ -8,6 +8,7 @@ NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
 NSString * const kMPPlacementAttributesMapping = @"placementAttributesMapping";
 NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType";
 NSString * const kMPRoktEmbeddedViewClassName = @"MPRoktEmbeddedView";
+NSString * const kMPEventNameSelectPlacements = @"selectPlacements";
 NSInteger const kMPRoktKitCode = 181;
 
 static __weak MPKitRokt *roktKit = nil;
@@ -103,6 +104,9 @@ static __weak MPKitRokt *roktKit = nil;
                             filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser {
     [MPKitRokt MPLog:[NSString stringWithFormat:@"Rokt Kit recieved `executeWithIdentifier` method with the following arguments: \n identifier: %@ \n attributes: %@ \n embeddedViews: %@ \n config: %@ \n callbacks: %@ \n filteredUser identities: %@", identifier, attributes, embeddedViews, mpRoktConfig, callbacks, filteredUser.userIdentities]];
     NSDictionary<NSString *, NSString *> *finalAtt = [MPKitRokt prepareAttributes:attributes filteredUser:filteredUser performMapping:NO];
+    
+    // Log custom event for selectPlacements call
+    [MPKitRokt logSelectPlacementEvent:finalAtt];
     
     //Convert MPRoktConfig to RoktConfig
     RoktConfig *roktConfig = [MPKitRokt convertMPRoktConfig:mpRoktConfig];
@@ -784,6 +788,13 @@ static __weak MPKitRokt *roktKit = nil;
     if ([[MParticle sharedInstance] environment] == MPEnvironmentDevelopment) {
         NSLog(@"%@", msg);
     }
+}
+
++ (void)logSelectPlacementEvent:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes {
+    MPEvent *event = [[MPEvent alloc] initWithName:kMPEventNameSelectPlacements type:MPEventTypeOther];
+    event.customAttributes = attributes;
+    [[MParticle sharedInstance] logEvent:event];
+    [MPKitRokt MPLog:[NSString stringWithFormat:@"Logged selectplacements custom event with attributes: %@", attributes]];
 }
 
 

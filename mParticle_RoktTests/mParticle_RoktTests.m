@@ -35,6 +35,8 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
 
 + (NSDictionary<NSString *, NSString *> *)transformValuesToString:(NSDictionary<NSString *, id> * _Nullable)originalDictionary;
 
++ (void)logSelectPlacementEvent:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes;
+
 @end
 
 @interface mParticle_RoktTests : XCTestCase
@@ -725,6 +727,73 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
     XCTAssertNil(noHashResult, @"Should return nil when hashed email identity type not specified");
     
     [mockMPKitRoktClass stopMocking];
+}
+
+#pragma mark - logSelectPlacementEvent tests
+
+- (void)testExecuteWithIdentifierLogsSelectPlacementEventWithPreparedAttributes {
+    id mockRoktSDK = OCMClassMock([Rokt class]);
+    id mockMParticleInstance = OCMClassMock([MParticle class]);
+    
+    // Stub the class method sharedInstance to return our mock
+    id mockMParticleClass = OCMClassMock([MParticle class]);
+    OCMStub([mockMParticleClass sharedInstance]).andReturn(mockMParticleInstance);
+    OCMStub([(MParticle *)mockMParticleInstance environment]).andReturn(MPEnvironmentDevelopment);
+    
+    NSString *identifier = @"TestView";
+    NSDictionary *attributes = @{@"email": @"test@example.com"};
+    
+    // Create a mock user with MPID and identities
+    FilteredMParticleUser *user = [[FilteredMParticleUser alloc] init];
+    id mockUser = OCMPartialMock(user);
+    OCMStub([mockUser userId]).andReturn(@(123456));
+    OCMStub([mockUser userIdentities]).andReturn(@{@(MPIdentityEmail): @"test@example.com"});
+    OCMStub([mockUser userAttributes]).andReturn(@{});
+    
+    // Expect logEvent and verify MPEvent object contains prepared attributes (email, mpid, sandbox)
+    OCMExpect([(MParticle *)mockMParticleInstance logEvent:[OCMArg checkWithBlock:^BOOL(MPEvent *event) {
+        // Verify the MPEvent object was created correctly
+        XCTAssertNotNil(event, @"Event object should not be nil");
+        XCTAssertEqualObjects(event.name, @"selectPlacements", @"Event name should be 'selectPlacements'");
+        XCTAssertEqual(event.type, MPEventTypeOther, @"Event type should be MPEventTypeOther");
+        
+        // Verify custom attributes contain prepared user data
+        XCTAssertEqualObjects(event.customAttributes[@"email"], @"test@example.com", @"Email should be in attributes");
+        XCTAssertEqualObjects(event.customAttributes[@"mpid"], @"123456", @"MPID should be in attributes");
+        XCTAssertNotNil(event.customAttributes[@"sandbox"], @"Sandbox should be in attributes");
+        
+        return YES;
+    }]]);
+    
+    // Stub Rokt execute call
+    OCMStub([mockRoktSDK executeWithViewName:OCMOCK_ANY
+                                  attributes:OCMOCK_ANY
+                                  placements:OCMOCK_ANY
+                                      config:OCMOCK_ANY
+                                      onLoad:OCMOCK_ANY
+                                    onUnLoad:OCMOCK_ANY
+                onShouldShowLoadingIndicator:OCMOCK_ANY
+                onShouldHideLoadingIndicator:OCMOCK_ANY
+                        onEmbeddedSizeChange:OCMOCK_ANY]);
+    
+    // Call executeWithIdentifier which triggers logSelectPlacementEvent with prepareAttributes
+    MPKitExecStatus *status = [self.kitInstance executeWithIdentifier:identifier
+                                                         attributes:attributes
+                                                      embeddedViews:nil
+                                                             config:nil
+                                                          callbacks:nil
+                                                       filteredUser:user];
+
+    // Verify that logEvent was called with the correct MPEvent object
+    OCMVerifyAll(mockMParticleInstance);
+    
+    // Verify execution status
+    XCTAssertNotNil(status);
+    XCTAssertEqual(status.returnCode, MPKitReturnCodeSuccess);
+    
+    [mockRoktSDK stopMocking];
+    [mockMParticleClass stopMocking];
+    [mockMParticleInstance stopMocking];
 }
 
 @end

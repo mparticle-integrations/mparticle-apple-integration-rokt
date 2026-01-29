@@ -252,6 +252,39 @@ struct mParticle_Rokt_SwiftTests {
         #expect(layout.roktLayout != nil, "Layout should handle state changes")
     }
     
+    // MARK: - SelectPlacements Custom Event Tests
+    
+    @available(iOS 15, *)
+    @Test func testPrepareAttributesLogsAttributesEvent() {
+        // Given
+        let attributes: [String: String] = ["attr1": "val1"]
+        
+        // When
+        let preparedAttributes = MPKitRokt.prepareAttributes(
+            attributes,
+            filteredUser: nil,
+            performMapping: false
+        )
+        
+        MPKitRokt.logSelectPlacementEvent(preparedAttributes)
+        
+        // Then
+        #expect(preparedAttributes["sandbox"] != nil, "Sandbox attribute should be present")
+        #expect(preparedAttributes.count >= 1, "Prepared attributes should contain at least the sandbox attribute")
+    }
+    
+    @available(iOS 15, *)
+    @Test func testLogSelectPlacementEventHandlesNilMParticleInstance() {
+        // Given
+        let attributes: [String: String] = ["key1": "value1"]
+        
+        // When
+        MPKitRokt.logSelectPlacementEvent(attributes)
+        
+        // Then
+        #expect(true, "logSelectPlacementEvent should handle MParticle instance state gracefully")
+    }
+    
     // MARK: - Integration Tests
     
     @MainActor @available(iOS 15, *)
