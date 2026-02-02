@@ -21,6 +21,9 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
                          catalogItemId:(NSString *)catalogItemId
                                success:(NSNumber *)success;
 
+- (MPKitExecStatus *)setSessionId:(NSString *)sessionId;
+- (NSString *)getSessionId;
+
 - (NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmEmbeddedViews:(NSDictionary<NSString *, MPRoktEmbeddedView *> * _Nullable)embeddedViews;
 
 + (void)addIdentityAttributes:(NSMutableDictionary<NSString *, NSString *> * _Nullable)attributes filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser;
@@ -794,6 +797,81 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
     [mockRoktSDK stopMocking];
     [mockMParticleClass stopMocking];
     [mockMParticleInstance stopMocking];
+}
+
+#pragma mark - setSessionId tests
+
+- (void)testSetSessionIdCallsRoktSDK {
+    id mockRoktSDK = OCMClassMock([Rokt class]);
+
+    NSString *sessionId = @"test-session-id-12345";
+
+    // Expect Rokt setSessionIdWithSessionId call with correct parameter
+    OCMExpect([mockRoktSDK setSessionIdWithSessionId:sessionId]);
+
+    // Execute the method
+    MPKitExecStatus *status = [self.kitInstance setSessionId:sessionId];
+
+    // Verify
+    XCTAssertNotNil(status);
+    XCTAssertEqual(status.returnCode, MPKitReturnCodeSuccess);
+    XCTAssertEqualObjects(status.integrationId, @181);
+    OCMVerifyAll(mockRoktSDK);
+
+    [mockRoktSDK stopMocking];
+}
+
+- (void)testSetSessionIdWithEmptyString {
+    id mockRoktSDK = OCMClassMock([Rokt class]);
+
+    NSString *sessionId = @"";
+
+    // Expect Rokt setSessionIdWithSessionId call - the kit passes it through, Rokt SDK handles validation
+    OCMExpect([mockRoktSDK setSessionIdWithSessionId:sessionId]);
+
+    // Execute the method
+    MPKitExecStatus *status = [self.kitInstance setSessionId:sessionId];
+
+    // Verify
+    XCTAssertNotNil(status);
+    XCTAssertEqual(status.returnCode, MPKitReturnCodeSuccess);
+    OCMVerifyAll(mockRoktSDK);
+
+    [mockRoktSDK stopMocking];
+}
+
+#pragma mark - getSessionId tests
+
+- (void)testGetSessionIdReturnsSessionIdFromRoktSDK {
+    id mockRoktSDK = OCMClassMock([Rokt class]);
+
+    NSString *expectedSessionId = @"mock-session-id-67890";
+
+    // Stub Rokt getSessionId to return the expected session ID
+    OCMStub([mockRoktSDK getSessionId]).andReturn(expectedSessionId);
+
+    // Execute the method
+    NSString *result = [self.kitInstance getSessionId];
+
+    // Verify
+    XCTAssertEqualObjects(result, expectedSessionId, @"Should return the session id from the Rokt SDK");
+
+    [mockRoktSDK stopMocking];
+}
+
+- (void)testGetSessionIdReturnsNilWhenRoktSDKReturnsNil {
+    id mockRoktSDK = OCMClassMock([Rokt class]);
+
+    // Stub Rokt getSessionId to return nil
+    OCMStub([mockRoktSDK getSessionId]).andReturn(nil);
+
+    // Execute the method
+    NSString *result = [self.kitInstance getSessionId];
+
+    // Verify
+    XCTAssertNil(result, @"Should return nil when Rokt SDK returns nil");
+
+    [mockRoktSDK stopMocking];
 }
 
 @end
