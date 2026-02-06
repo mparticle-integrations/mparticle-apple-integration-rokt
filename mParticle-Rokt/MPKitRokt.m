@@ -1,5 +1,10 @@
 #import "MPKitRokt.h"
+
+#if SWIFT_PACKAGE
+@import Rokt_Widget;
+#else
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
+#endif
 
 // Constants for kit configuration keys
 static NSString * const kMPKitConfigurationIdKey = @"id";
@@ -70,6 +75,10 @@ static __weak MPKitRokt *roktKit = nil;
 
     // Initialize Rokt SDK here
     [MPKitRokt MPLog:[NSString stringWithFormat:@"Attempting to initialize Rokt with Kit Version: %@", kitVersion]];
+    
+    // Apply mParticle log level to Rokt SDK before initialization
+    [MPKitRokt applyMParticleLogLevel];
+    
     [Rokt initWithRoktTagId:partnerId mParticleSdkVersion:sdkVersion mParticleKitVersion:kitVersion onInitComplete:^(BOOL InitComplete) {
         if (InitComplete) {
             [self start];
@@ -832,6 +841,34 @@ static __weak MPKitRokt *roktKit = nil;
     if ([[MParticle sharedInstance] environment] == MPEnvironmentDevelopment) {
         NSLog(@"%@", msg);
     }
+}
+
+#pragma mark - Log Level Mapping
+
+/// Maps mParticle log level to Rokt SDK log level
++ (RoktLogLevel)roktLogLevelFromMParticleLogLevel:(MPILogLevel)mpLogLevel {
+    switch (mpLogLevel) {
+        case MPILogLevelVerbose:
+            return RoktLogLevelVerbose;
+        case MPILogLevelDebug:
+            return RoktLogLevelDebug;
+        case MPILogLevelWarning:
+            return RoktLogLevelWarning;
+        case MPILogLevelError:
+            return RoktLogLevelError;
+        case MPILogLevelNone:
+        default:
+            return RoktLogLevelNone;
+    }
+}
+
+/// Applies mParticle's current log level to the Rokt SDK
++ (void)applyMParticleLogLevel {
+    MPILogLevel mpLogLevel = [MParticle sharedInstance].logLevel;
+    RoktLogLevel roktLogLevel = [MPKitRokt roktLogLevelFromMParticleLogLevel:mpLogLevel];
+    [Rokt setLogLevel:roktLogLevel];
+    [MPKitRokt MPLog:[NSString stringWithFormat:@"Applied log level mapping: mParticle %lu -> Rokt %ld",
+                      (unsigned long)mpLogLevel, (long)roktLogLevel]];
 }
 
 + (void)logSelectPlacementEvent:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes {
