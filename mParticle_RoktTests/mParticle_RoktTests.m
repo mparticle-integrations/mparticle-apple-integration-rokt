@@ -40,6 +40,10 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
 
 + (void)logSelectPlacementEvent:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes;
 
++ (RoktLogLevel)roktLogLevelFromMParticleLogLevel:(MPILogLevel)mpLogLevel;
+
++ (void)applyMParticleLogLevel;
+
 @end
 
 @interface mParticle_RoktTests : XCTestCase
@@ -872,6 +876,53 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
     XCTAssertNil(result, @"Should return nil when Rokt SDK returns nil");
 
     [mockRoktSDK stopMocking];
+}
+
+#pragma mark - Log Level Mapping tests
+
+- (void)testRoktLogLevelFromMParticleLogLevel_Verbose {
+    RoktLogLevel result = [MPKitRokt roktLogLevelFromMParticleLogLevel:MPILogLevelVerbose];
+    XCTAssertEqual(result, RoktLogLevelVerbose, @"MPILogLevelVerbose should map to RoktLogLevelVerbose");
+}
+
+- (void)testRoktLogLevelFromMParticleLogLevel_Debug {
+    RoktLogLevel result = [MPKitRokt roktLogLevelFromMParticleLogLevel:MPILogLevelDebug];
+    XCTAssertEqual(result, RoktLogLevelDebug, @"MPILogLevelDebug should map to RoktLogLevelDebug");
+}
+
+- (void)testRoktLogLevelFromMParticleLogLevel_Warning {
+    RoktLogLevel result = [MPKitRokt roktLogLevelFromMParticleLogLevel:MPILogLevelWarning];
+    XCTAssertEqual(result, RoktLogLevelWarning, @"MPILogLevelWarning should map to RoktLogLevelWarning");
+}
+
+- (void)testRoktLogLevelFromMParticleLogLevel_Error {
+    RoktLogLevel result = [MPKitRokt roktLogLevelFromMParticleLogLevel:MPILogLevelError];
+    XCTAssertEqual(result, RoktLogLevelError, @"MPILogLevelError should map to RoktLogLevelError");
+}
+
+- (void)testRoktLogLevelFromMParticleLogLevel_None {
+    RoktLogLevel result = [MPKitRokt roktLogLevelFromMParticleLogLevel:MPILogLevelNone];
+    XCTAssertEqual(result, RoktLogLevelNone, @"MPILogLevelNone should map to RoktLogLevelNone");
+}
+
+- (void)testApplyMParticleLogLevel {
+    id mockRoktSDK = OCMClassMock([Rokt class]);
+    id mockMParticleInstance = OCMClassMock([MParticle class]);
+    id mockMParticleClass = OCMClassMock([MParticle class]);
+    
+    OCMStub([mockMParticleClass sharedInstance]).andReturn(mockMParticleInstance);
+    OCMStub([(MParticle *)mockMParticleInstance logLevel]).andReturn(MPILogLevelDebug);
+    OCMStub([(MParticle *)mockMParticleInstance environment]).andReturn(MPEnvironmentDevelopment);
+    
+    OCMExpect([mockRoktSDK setLogLevel:RoktLogLevelDebug]);
+    
+    [MPKitRokt applyMParticleLogLevel];
+    
+    OCMVerifyAll(mockRoktSDK);
+    
+    [mockRoktSDK stopMocking];
+    [mockMParticleClass stopMocking];
+    [mockMParticleInstance stopMocking];
 }
 
 @end
