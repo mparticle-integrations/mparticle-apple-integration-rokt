@@ -2,6 +2,9 @@
 
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
 
+// Kit version
+static NSString * const kMPRoktKitVersion = @"8.3.3";
+
 // Constants for kit configuration keys
 static NSString * const kMPKitConfigurationIdKey = @"id";
 static NSString * const kMPRemoteConfigKitConfigurationKey = @"as";
@@ -66,16 +69,14 @@ static __weak MPKitRokt *roktKit = nil;
     roktKit = self;
     
     NSString *sdkVersion = [MParticle sharedInstance].version;
-    // https://go.mparticle.com/work/SQDSDKS-7379
-    NSString *kitVersion = @"8.3.2";
 
     // Initialize Rokt SDK here
-    [MPKitRokt MPLog:[NSString stringWithFormat:@"Attempting to initialize Rokt with Kit Version: %@", kitVersion]];
+    [MPKitRokt MPLog:[NSString stringWithFormat:@"Attempting to initialize Rokt with Kit Version: %@", kMPRoktKitVersion]];
     
     // Apply mParticle log level to Rokt SDK before initialization
     [MPKitRokt applyMParticleLogLevel];
     
-    [Rokt initWithRoktTagId:partnerId mParticleSdkVersion:sdkVersion mParticleKitVersion:kitVersion onInitComplete:^(BOOL InitComplete) {
+    [Rokt initWithRoktTagId:partnerId mParticleSdkVersion:sdkVersion mParticleKitVersion:kMPRoktKitVersion onInitComplete:^(BOOL InitComplete) {
         if (InitComplete) {
             [self start];
             [MPKitRokt MPLog:@"Rokt Init Complete"];
