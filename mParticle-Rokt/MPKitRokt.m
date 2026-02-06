@@ -1,10 +1,6 @@
 #import "MPKitRokt.h"
 
-#if SWIFT_PACKAGE
-@import Rokt_Widget;
-#else
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
-#endif
 
 // Constants for kit configuration keys
 static NSString * const kMPKitConfigurationIdKey = @"id";
