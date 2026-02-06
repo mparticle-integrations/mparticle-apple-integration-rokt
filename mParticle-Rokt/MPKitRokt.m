@@ -489,6 +489,7 @@ static __weak MPKitRokt *roktKit = nil;
             return kitConfig;
         }
     }
+   [MPKitRokt MPLog:@"Rokt Kit is not configured in kit container"];
     return nil;
 }
 
