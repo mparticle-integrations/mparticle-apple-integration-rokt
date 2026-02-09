@@ -1,12 +1,12 @@
 #import "MPKitRokt.h"
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
 
-NSString * const kMPRemoteConfigKitHashesKey = @"hs";
+NSString * const kMPRoktRemoteConfigKitHashesKey = @"hs";
 NSString * const kMPRemoteConfigUserAttributeFilter = @"ua";
 NSString * const MPKitRoktErrorDomain = @"com.mparticle.kits.rokt";
 NSString * const MPKitRoktErrorMessageKey = @"mParticle-Rokt Error";
-NSString * const kMPPlacementAttributesMapping = @"placementAttributesMapping";
-NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType";
+NSString * const kMPRoktPlacementAttributesMapping = @"placementAttributesMapping";
+NSString * const kMPRoktHashedEmailUserIdentityType = @"hashedEmailUserIdentityType";
 NSString * const kMPRoktEmbeddedViewClassName = @"MPRoktEmbeddedView";
 NSInteger const kMPRoktKitCode = 181;
 
@@ -304,8 +304,8 @@ static __weak MPKitRokt *roktKit = nil;
     NSData *dataAttributeMap;
     // Rokt Kit is available though there may not be an attribute map
     attributeMap = @[];
-    if (roktKitConfig[kMPPlacementAttributesMapping] != [NSNull null]) {
-        strAttributeMap = [roktKitConfig[kMPPlacementAttributesMapping] stringByRemovingPercentEncoding];
+    if (roktKitConfig[kMPRoktPlacementAttributesMapping] != [NSNull null]) {
+        strAttributeMap = [roktKitConfig[kMPRoktPlacementAttributesMapping] stringByRemovingPercentEncoding];
         dataAttributeMap = [strAttributeMap dataUsingEncoding:NSUTF8StringEncoding];
     }
     
@@ -484,7 +484,7 @@ static __weak MPKitRokt *roktKit = nil;
     NSDictionary *roktKitConfig = [MPKitRokt getKitConfig];
     
     // Get the string representing which identity to use and convert it to the key (NSNumber)
-    NSString *hashedIdentityTypeString = roktKitConfig[kMPHashedEmailUserIdentityType];
+    NSString *hashedIdentityTypeString = roktKitConfig[kMPRoktHashedEmailUserIdentityType];
     NSNumber *hashedIdentityTypeNumber = [MPKitRokt identityTypeForString:hashedIdentityTypeString.lowercaseString];
     
     return hashedIdentityTypeNumber;
@@ -883,7 +883,7 @@ static __weak MPKitRokt *roktKit = nil;
     if ([event isKindOfClass:[EmbeddedSizeChanged class]]) {
         EmbeddedSizeChanged *embeddedSizeChanged = (EmbeddedSizeChanged *)event;
         return [[MPRoktEmbeddedSizeChanged alloc] initWithPlacementId:embeddedSizeChanged.placementId
-                                                        updatedHeight:embeddedSizeChanged.selectedHeight];
+                                                        updatedHeight:embeddedSizeChanged.updatedHeight];
     }
     
     // Check for RoktEvent.CartItemInstantPurchase

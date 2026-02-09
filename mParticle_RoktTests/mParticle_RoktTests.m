@@ -5,7 +5,7 @@
 #import "MPKitRokt.h"
 
 NSInteger const kMPRoktKitCode = 181;
-NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType";
+NSString * const kMPRoktHashedEmailUserIdentityType = @"hashedEmailUserIdentityType";
 
 @interface MPKitRokt ()
 
@@ -676,7 +676,7 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
     // Test case 1: When kit configuration exists with hashed email identity type
     NSDictionary *roktKitConfig = @{
         @"id": @(kMPRoktKitCode),
-        kMPHashedEmailUserIdentityType: @"other4"
+        kMPRoktHashedEmailUserIdentityType: @"other4"
     };
     
     // Mock the MParticle shared instance and kit container
