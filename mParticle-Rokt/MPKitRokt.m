@@ -263,7 +263,7 @@ static __weak MPKitRokt *roktKit = nil;
                 transformedDictionary[key] = [numberAttribute stringValue];
             }
         } else if ([obj isKindOfClass:[NSDate class]]) {
-            transformedDictionary[key] = [MPDateFormatter stringFromDateRFC3339:obj];
+            transformedDictionary[key] = [MPKitAPI stringFromDateRFC3339:obj];
         } else if ([obj isKindOfClass:[NSData class]] && [(NSData *)obj length] > 0) {
             transformedDictionary[key] = [[NSString alloc] initWithData:obj encoding:NSUTF8StringEncoding];
         } else if ([obj isKindOfClass:[NSDictionary class]]) {
