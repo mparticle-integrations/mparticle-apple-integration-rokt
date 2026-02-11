@@ -17,7 +17,7 @@ let package = Package(
                .upToNextMajor(from: "8.0.0")),
       .package(name: "Rokt-Widget",
                url: "https://github.com/ROKT/rokt-sdk-ios",
-               .upToNextMajor(from: "4.16.0")),
+               .upToNextMajor(from: "4.16.1")),
     ],
     targets: [
         .target(

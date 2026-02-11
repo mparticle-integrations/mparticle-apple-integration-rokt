@@ -14,7 +14,8 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
                            embeddedViews:(NSDictionary<NSString *, MPRoktEmbeddedView *> * _Nullable)embeddedViews
                                   config:(MPRoktConfig * _Nullable)mpRoktConfig
                                callbacks:(MPRoktEventCallback * _Nullable)callbacks
-                            filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser;
+                            filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser
+                                 options:(MPRoktPlacementOptions * _Nullable)options;
 - (MPKitExecStatus *)setWrapperSdk:(MPWrapperSdk)wrapperSdk version:(nonnull NSString *)wrapperSdkVersion;
 
 - (MPKitExecStatus *)purchaseFinalized:(NSString *)placementId
@@ -164,6 +165,7 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
                                     }]
                                     placements:OCMOCK_ANY
                                         config:nil
+                              placementOptions:OCMOCK_ANY
                                         onLoad:nil
                                       onUnLoad:nil
                   onShouldShowLoadingIndicator:nil
@@ -175,7 +177,8 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
                                                       embeddedViews:embeddedViews
                                                              config:nil
                                                           callbacks:nil
-                                                       filteredUser:user];
+                                                       filteredUser:user
+                                                            options:nil];
 
     // Verify
     XCTAssertNotNil(status);
@@ -201,6 +204,7 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
                                     }]
                                     placements:OCMOCK_ANY
                                         config:nil
+                              placementOptions:OCMOCK_ANY
                                         onLoad:nil
                                       onUnLoad:nil
                   onShouldShowLoadingIndicator:nil
@@ -212,7 +216,83 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
                                                       embeddedViews:embeddedViews
                                                              config:nil
                                                           callbacks:nil
-                                                       filteredUser:user];
+                                                       filteredUser:user
+                                                            options:nil];
+
+    // Verify
+    XCTAssertNotNil(status);
+    XCTAssertEqual(status.returnCode, MPKitReturnCodeSuccess);
+    OCMVerifyAll(mockRoktSDK);
+}
+
+- (void)testExecuteWithIdentifierWithOptions {
+    id mockRoktSDK = OCMClassMock([Rokt class]);
+
+    MPRoktEmbeddedView *view = [[MPRoktEmbeddedView alloc] init];
+    NSString *identifier = @"TestView";
+    NSDictionary *embeddedViews = @{@"placement1": view};
+    NSDictionary *attributes = @{@"attr1": @"value1", @"sandbox": @"false"};
+    FilteredMParticleUser *user = [[FilteredMParticleUser alloc] init];
+
+    // Create placement options with a custom timestamp value
+    MPRoktPlacementOptions *options = [[MPRoktPlacementOptions alloc] initWithTimestamp:42];
+
+    // Expect Rokt execute call and verify placementOptions carries the jointSdkSelectPlacements value
+    OCMExpect([mockRoktSDK executeWithViewName:identifier
+                                    attributes:OCMOCK_ANY
+                                    placements:OCMOCK_ANY
+                                        config:nil
+                              placementOptions:[OCMArg checkWithBlock:^BOOL(PlacementOptions *opts) {
+                                        return opts != nil;
+                                    }]
+                                        onLoad:nil
+                                      onUnLoad:nil
+                  onShouldShowLoadingIndicator:nil
+                  onShouldHideLoadingIndicator:nil
+                          onEmbeddedSizeChange:nil]);
+
+    MPKitExecStatus *status = [self.kitInstance executeWithIdentifier:identifier
+                                                         attributes:attributes
+                                                      embeddedViews:embeddedViews
+                                                             config:nil
+                                                          callbacks:nil
+                                                       filteredUser:user
+                                                            options:options];
+
+    // Verify
+    XCTAssertNotNil(status);
+    XCTAssertEqual(status.returnCode, MPKitReturnCodeSuccess);
+    OCMVerifyAll(mockRoktSDK);
+}
+
+- (void)testExecuteWithIdentifierNilOptionsCreatesDefaultPlacementOptions {
+    id mockRoktSDK = OCMClassMock([Rokt class]);
+
+    NSString *identifier = @"TestView";
+    NSDictionary *attributes = @{@"attr1": @"value1", @"sandbox": @"false"};
+    FilteredMParticleUser *user = [[FilteredMParticleUser alloc] init];
+
+    // When options is nil, a default PlacementOptions with jointSdkSelectPlacements=0 should be created
+    OCMExpect([mockRoktSDK executeWithViewName:identifier
+                                    attributes:OCMOCK_ANY
+                                    placements:OCMOCK_ANY
+                                        config:nil
+                              placementOptions:[OCMArg checkWithBlock:^BOOL(PlacementOptions *opts) {
+                                        return opts != nil;
+                                    }]
+                                        onLoad:nil
+                                      onUnLoad:nil
+                  onShouldShowLoadingIndicator:nil
+                  onShouldHideLoadingIndicator:nil
+                          onEmbeddedSizeChange:nil]);
+
+    MPKitExecStatus *status = [self.kitInstance executeWithIdentifier:identifier
+                                                         attributes:attributes
+                                                      embeddedViews:nil
+                                                             config:nil
+                                                          callbacks:nil
+                                                       filteredUser:user
+                                                            options:nil];
 
     // Verify
     XCTAssertNotNil(status);
@@ -783,6 +863,7 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
                                   attributes:OCMOCK_ANY
                                   placements:OCMOCK_ANY
                                       config:OCMOCK_ANY
+                            placementOptions:OCMOCK_ANY
                                       onLoad:OCMOCK_ANY
                                     onUnLoad:OCMOCK_ANY
                 onShouldShowLoadingIndicator:OCMOCK_ANY
@@ -795,7 +876,8 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
                                                       embeddedViews:nil
                                                              config:nil
                                                           callbacks:nil
-                                                       filteredUser:user];
+                                                       filteredUser:user
+                                                            options:nil];
 
     // Verify that logEvent was called with the correct MPEvent object
     OCMVerifyAll(mockMParticleInstance);
