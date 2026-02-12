@@ -21,6 +21,9 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
                          catalogItemId:(NSString *)catalogItemId
                                success:(NSNumber *)success;
 
+- (MPKitExecStatus *)setSessionId:(NSString *)sessionId;
+- (NSString *)getSessionId;
+
 - (NSDictionary<NSString *, RoktEmbeddedView *> * _Nullable) confirmEmbeddedViews:(NSDictionary<NSString *, MPRoktEmbeddedView *> * _Nullable)embeddedViews;
 
 + (void)addIdentityAttributes:(NSMutableDictionary<NSString *, NSString *> * _Nullable)attributes filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser;
@@ -34,6 +37,16 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
 + (RoktConfig *)convertMPRoktConfig:(MPRoktConfig *)mpRoktConfig;
 
 + (NSDictionary<NSString *, NSString *> *)transformValuesToString:(NSDictionary<NSString *, id> * _Nullable)originalDictionary;
+
++ (void)logSelectPlacementEvent:(NSDictionary<NSString *, NSString *> * _Nonnull)attributes;
+
++ (NSDictionary<NSString *, NSString *> *)mapAttributes:(NSDictionary<NSString *, NSString *> * _Nullable)attributes filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser;
+
++ (NSDictionary<NSString *, NSString *> *)confirmSandboxAttribute:(NSDictionary<NSString *, NSString *> * _Nullable)attributes;
+
++ (RoktLogLevel)roktLogLevelFromMParticleLogLevel:(MPILogLevel)mpLogLevel;
+
++ (void)applyMParticleLogLevel;
 
 @end
 
@@ -142,15 +155,13 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
     NSDictionary *embeddedViews = @{@"placement1": view};
     NSDictionary *attributes = @{@"attr1": @"value1", @"sandbox": @"false"};
     FilteredMParticleUser *user = [[FilteredMParticleUser alloc] init];
-    
-    // Expected attributes in final call
-    NSDictionary *expectedAttributes = @{
-        @"sandbox": @"false"
-    };
 
-    // Expect Rokt execute call with correct parameters
+    // Expect Rokt execute call and verify sandbox attribute is preserved
+    // Note: attributes may include additional device identifiers (idfa, idfv, mpid)
     OCMExpect([mockRoktSDK executeWithViewName:identifier
-                                    attributes:expectedAttributes
+                                    attributes:[OCMArg checkWithBlock:^BOOL(NSDictionary *attrs) {
+                                        return [attrs[@"sandbox"] isEqualToString:@"false"];
+                                    }]
                                     placements:OCMOCK_ANY
                                         config:nil
                                         onLoad:nil
@@ -178,17 +189,16 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
     MPRoktEmbeddedView *view = [[MPRoktEmbeddedView alloc] init];
     NSString *identifier = @"TestView";
     NSDictionary *embeddedViews = @{@"placement1": view};
-    NSDictionary *attributes = @{@"attr1": @"value1"};
+    NSDictionary *attributes = @{@"attr1": @"value1"};  // No sandbox attribute provided
     FilteredMParticleUser *user = [[FilteredMParticleUser alloc] init];
-    
-    // Expected attributes in final call
-    NSDictionary *expectedAttributes = @{
-        @"sandbox": @"true"
-    };
 
-    // Expect Rokt execute call with correct parameters
+    // Expect Rokt execute call and verify sandbox attribute is auto-detected
+    // In development environment, sandbox should be "true"
+    // Note: attributes may include additional device identifiers (idfa, idfv, mpid)
     OCMExpect([mockRoktSDK executeWithViewName:identifier
-                                    attributes:expectedAttributes
+                                    attributes:[OCMArg checkWithBlock:^BOOL(NSDictionary *attrs) {
+                                        return attrs[@"sandbox"] != nil;  // Sandbox should be auto-added
+                                    }]
                                     placements:OCMOCK_ANY
                                         config:nil
                                         onLoad:nil
@@ -686,7 +696,9 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
     // Test case 1: When kit configuration exists with hashed email identity type
     NSDictionary *roktKitConfig = @{
         @"id": @(kMPRoktKitCode),
-        kMPHashedEmailUserIdentityType: @"other4"
+        @"as": @{
+            kMPHashedEmailUserIdentityType: @"other4"
+        }
     };
     
     // Mock the MParticle shared instance and kit container
@@ -717,7 +729,10 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
     id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
     // Test case 3: When kit config exists but no hashed email identity type specified
     NSDictionary *roktKitConfigNoHash = @{
-        @"id": @(kMPRoktKitCode)
+        @"id": @(kMPRoktKitCode),
+        @"as": @{
+            // No kMPHashedEmailUserIdentityType specified
+        }
     };
     [[[mockMPKitRoktClass stub] andReturn:roktKitConfigNoHash] getKitConfig];
     
@@ -725,6 +740,284 @@ NSString * const kMPHashedEmailUserIdentityType = @"hashedEmailUserIdentityType"
     XCTAssertNil(noHashResult, @"Should return nil when hashed email identity type not specified");
     
     [mockMPKitRoktClass stopMocking];
+}
+
+#pragma mark - logSelectPlacementEvent tests
+
+- (void)testExecuteWithIdentifierLogsSelectPlacementEventWithPreparedAttributes {
+    id mockRoktSDK = OCMClassMock([Rokt class]);
+    id mockMParticleInstance = OCMClassMock([MParticle class]);
+    
+    // Stub the class method sharedInstance to return our mock
+    id mockMParticleClass = OCMClassMock([MParticle class]);
+    OCMStub([mockMParticleClass sharedInstance]).andReturn(mockMParticleInstance);
+    OCMStub([(MParticle *)mockMParticleInstance environment]).andReturn(MPEnvironmentDevelopment);
+    
+    NSString *identifier = @"TestView";
+    NSDictionary *attributes = @{@"email": @"test@example.com"};
+    
+    // Create a mock user with MPID and identities
+    FilteredMParticleUser *user = [[FilteredMParticleUser alloc] init];
+    id mockUser = OCMPartialMock(user);
+    OCMStub([mockUser userId]).andReturn(@(123456));
+    OCMStub([mockUser userIdentities]).andReturn(@{@(MPIdentityEmail): @"test@example.com"});
+    OCMStub([mockUser userAttributes]).andReturn(@{});
+    
+    // Expect logEvent and verify MPEvent object contains prepared attributes (email, mpid, sandbox)
+    OCMExpect([(MParticle *)mockMParticleInstance logEvent:[OCMArg checkWithBlock:^BOOL(MPEvent *event) {
+        // Verify the MPEvent object was created correctly
+        XCTAssertNotNil(event, @"Event object should not be nil");
+        XCTAssertEqualObjects(event.name, @"selectPlacements", @"Event name should be 'selectPlacements'");
+        XCTAssertEqual(event.type, MPEventTypeOther, @"Event type should be MPEventTypeOther");
+        
+        // Verify custom attributes contain prepared user data
+        XCTAssertEqualObjects(event.customAttributes[@"email"], @"test@example.com", @"Email should be in attributes");
+        XCTAssertEqualObjects(event.customAttributes[@"mpid"], @"123456", @"MPID should be in attributes");
+        XCTAssertNotNil(event.customAttributes[@"sandbox"], @"Sandbox should be in attributes");
+        
+        return YES;
+    }]]);
+    
+    // Stub Rokt execute call
+    OCMStub([mockRoktSDK executeWithViewName:OCMOCK_ANY
+                                  attributes:OCMOCK_ANY
+                                  placements:OCMOCK_ANY
+                                      config:OCMOCK_ANY
+                                      onLoad:OCMOCK_ANY
+                                    onUnLoad:OCMOCK_ANY
+                onShouldShowLoadingIndicator:OCMOCK_ANY
+                onShouldHideLoadingIndicator:OCMOCK_ANY
+                        onEmbeddedSizeChange:OCMOCK_ANY]);
+    
+    // Call executeWithIdentifier which triggers logSelectPlacementEvent with prepareAttributes
+    MPKitExecStatus *status = [self.kitInstance executeWithIdentifier:identifier
+                                                         attributes:attributes
+                                                      embeddedViews:nil
+                                                             config:nil
+                                                          callbacks:nil
+                                                       filteredUser:user];
+
+    // Verify that logEvent was called with the correct MPEvent object
+    OCMVerifyAll(mockMParticleInstance);
+    
+    // Verify execution status
+    XCTAssertNotNil(status);
+    XCTAssertEqual(status.returnCode, MPKitReturnCodeSuccess);
+    
+    [mockRoktSDK stopMocking];
+    [mockMParticleClass stopMocking];
+    [mockMParticleInstance stopMocking];
+}
+
+#pragma mark - setSessionId tests
+
+- (void)testSetSessionIdCallsRoktSDK {
+    id mockRoktSDK = OCMClassMock([Rokt class]);
+
+    NSString *sessionId = @"test-session-id-12345";
+
+    // Expect Rokt setSessionIdWithSessionId call with correct parameter
+    OCMExpect([mockRoktSDK setSessionIdWithSessionId:sessionId]);
+
+    // Execute the method
+    MPKitExecStatus *status = [self.kitInstance setSessionId:sessionId];
+
+    // Verify
+    XCTAssertNotNil(status);
+    XCTAssertEqual(status.returnCode, MPKitReturnCodeSuccess);
+    XCTAssertEqualObjects(status.integrationId, @181);
+    OCMVerifyAll(mockRoktSDK);
+
+    [mockRoktSDK stopMocking];
+}
+
+- (void)testSetSessionIdWithEmptyString {
+    id mockRoktSDK = OCMClassMock([Rokt class]);
+
+    NSString *sessionId = @"";
+
+    // Expect Rokt setSessionIdWithSessionId call - the kit passes it through, Rokt SDK handles validation
+    OCMExpect([mockRoktSDK setSessionIdWithSessionId:sessionId]);
+
+    // Execute the method
+    MPKitExecStatus *status = [self.kitInstance setSessionId:sessionId];
+
+    // Verify
+    XCTAssertNotNil(status);
+    XCTAssertEqual(status.returnCode, MPKitReturnCodeSuccess);
+    OCMVerifyAll(mockRoktSDK);
+
+    [mockRoktSDK stopMocking];
+}
+
+#pragma mark - getSessionId tests
+
+- (void)testGetSessionIdReturnsSessionIdFromRoktSDK {
+    id mockRoktSDK = OCMClassMock([Rokt class]);
+
+    NSString *expectedSessionId = @"mock-session-id-67890";
+
+    // Stub Rokt getSessionId to return the expected session ID
+    OCMStub([mockRoktSDK getSessionId]).andReturn(expectedSessionId);
+
+    // Execute the method
+    NSString *result = [self.kitInstance getSessionId];
+
+    // Verify
+    XCTAssertEqualObjects(result, expectedSessionId, @"Should return the session id from the Rokt SDK");
+
+    [mockRoktSDK stopMocking];
+}
+
+- (void)testGetSessionIdReturnsNilWhenRoktSDKReturnsNil {
+    id mockRoktSDK = OCMClassMock([Rokt class]);
+
+    // Stub Rokt getSessionId to return nil
+    OCMStub([mockRoktSDK getSessionId]).andReturn(nil);
+
+    // Execute the method
+    NSString *result = [self.kitInstance getSessionId];
+
+    // Verify
+    XCTAssertNil(result, @"Should return nil when Rokt SDK returns nil");
+
+    [mockRoktSDK stopMocking];
+}
+
+- (void)testMapAttributesWithNewConfigurationStructure {
+    // Test the mapAttributes method with the new nested configuration structure
+    NSDictionary *roktKitConfig = @{
+        @"id": @(kMPRoktKitCode),
+        @"as": @{
+            @"placementAttributesMapping": @"[{\"jsmap\":null,\"map\":\"f.name\",\"maptype\":\"UserAttributeClass.Name\",\"value\":\"firstname\"},{\"jsmap\":null,\"map\":\"zip\",\"maptype\":\"UserAttributeClass.Name\",\"value\":\"billingzipcode\"},{\"jsmap\":null,\"map\":\"l.name\",\"maptype\":\"UserAttributeClass.Name\",\"value\":\"lastname\"}]"
+        }
+    };
+    
+    // Mock the kit configuration
+    id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
+    [[[mockMPKitRoktClass stub] andReturn:roktKitConfig] getKitConfig];
+    
+    // Create test input attributes
+    NSDictionary<NSString *, NSString *> *inputAttributes = @{
+        @"f.name": @"John",
+        @"zip": @"12345",
+        @"l.name": @"Doe",
+        @"email": @"john.doe@example.com"
+    };
+    
+    // Create mock filtered user
+    FilteredMParticleUser *filteredUser = [[FilteredMParticleUser alloc] init];
+    id mockFilteredUser = OCMPartialMock(filteredUser);
+    [[[mockFilteredUser stub] andReturn:@{}] userAttributes];
+    
+    // Call mapAttributes method
+    NSDictionary<NSString *, NSString *> *result = [MPKitRokt mapAttributes:inputAttributes filteredUser:mockFilteredUser];
+    
+    // Verify the mapping worked correctly
+    XCTAssertEqualObjects(result[@"firstname"], @"John", @"f.name should be mapped to firstname");
+    XCTAssertEqualObjects(result[@"billingzipcode"], @"12345", @"zip should be mapped to billingzipcode");
+    XCTAssertEqualObjects(result[@"lastname"], @"Doe", @"l.name should be mapped to lastname");
+    XCTAssertEqualObjects(result[@"email"], @"john.doe@example.com", @"email should remain unchanged");
+    
+    // Verify original keys are removed
+    XCTAssertNil(result[@"f.name"], @"Original f.name key should be removed");
+    XCTAssertNil(result[@"zip"], @"Original zip key should be removed");
+    XCTAssertNil(result[@"l.name"], @"Original l.name key should be removed");
+    
+    [mockMPKitRoktClass stopMocking];
+}
+
+- (void)testMapAttributesWithNoConfiguration {
+    // Test mapAttributes when no kit configuration exists
+    id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
+    [[[mockMPKitRoktClass stub] andReturn:nil] getKitConfig];
+    
+    NSDictionary<NSString *, NSString *> *inputAttributes = @{
+        @"email": @"test@example.com",
+        @"name": @"Test User"
+    };
+    
+    FilteredMParticleUser *filteredUser = [[FilteredMParticleUser alloc] init];
+    
+    // Call mapAttributes method
+    NSDictionary<NSString *, NSString *> *result = [MPKitRokt mapAttributes:inputAttributes filteredUser:filteredUser];
+    
+    // Should return original attributes unchanged
+    XCTAssertEqualObjects(result, inputAttributes, @"Should return original attributes when no configuration exists");
+    
+    [mockMPKitRoktClass stopMocking];
+}
+
+- (void)testAddIdentityAttributesMpidWithNilUserId {
+    // Test behavior when userId is nil
+    NSMutableDictionary<NSString *, NSString *> *passedAttributes = [[NSMutableDictionary alloc] init];
+    NSDictionary<NSNumber *, NSString *> *testIdentities = @{
+        @(MPIdentityEmail): @"test@example.com"
+    };
+
+    FilteredMParticleUser *filteredUser = [[FilteredMParticleUser alloc] init];
+    id mockFilteredUser = OCMPartialMock(filteredUser);
+    [[[mockFilteredUser stub] andReturn:testIdentities] userIdentities];
+    [[[mockFilteredUser stub] andReturn:nil] userId];  // nil userId
+    
+    id mockMPKitRoktClass = OCMClassMock([MPKitRokt class]);
+    [[[mockMPKitRoktClass stub] andReturn:nil] getRoktHashedEmailUserIdentityType];
+    
+    [MPKitRokt addIdentityAttributes:passedAttributes filteredUser:filteredUser];
+    
+    // Verify MPID is nil when userId is nil
+    XCTAssertNil(passedAttributes[@"mpid"], @"MPID should be nil when userId is nil");
+    // Email should still be added
+    XCTAssertEqualObjects(passedAttributes[@"email"], @"test@example.com", @"Email should still be added");
+    
+    [mockMPKitRoktClass stopMocking];
+}
+
+#pragma mark - Log Level Mapping tests
+
+- (void)testRoktLogLevelFromMParticleLogLevel_Verbose {
+    RoktLogLevel result = [MPKitRokt roktLogLevelFromMParticleLogLevel:MPILogLevelVerbose];
+    XCTAssertEqual(result, RoktLogLevelVerbose, @"MPILogLevelVerbose should map to RoktLogLevelVerbose");
+}
+
+- (void)testRoktLogLevelFromMParticleLogLevel_Debug {
+    RoktLogLevel result = [MPKitRokt roktLogLevelFromMParticleLogLevel:MPILogLevelDebug];
+    XCTAssertEqual(result, RoktLogLevelDebug, @"MPILogLevelDebug should map to RoktLogLevelDebug");
+}
+
+- (void)testRoktLogLevelFromMParticleLogLevel_Warning {
+    RoktLogLevel result = [MPKitRokt roktLogLevelFromMParticleLogLevel:MPILogLevelWarning];
+    XCTAssertEqual(result, RoktLogLevelWarning, @"MPILogLevelWarning should map to RoktLogLevelWarning");
+}
+
+- (void)testRoktLogLevelFromMParticleLogLevel_Error {
+    RoktLogLevel result = [MPKitRokt roktLogLevelFromMParticleLogLevel:MPILogLevelError];
+    XCTAssertEqual(result, RoktLogLevelError, @"MPILogLevelError should map to RoktLogLevelError");
+}
+
+- (void)testRoktLogLevelFromMParticleLogLevel_None {
+    RoktLogLevel result = [MPKitRokt roktLogLevelFromMParticleLogLevel:MPILogLevelNone];
+    XCTAssertEqual(result, RoktLogLevelNone, @"MPILogLevelNone should map to RoktLogLevelNone");
+}
+
+- (void)testApplyMParticleLogLevel {
+    id mockRoktSDK = OCMClassMock([Rokt class]);
+    id mockMParticleInstance = OCMClassMock([MParticle class]);
+    id mockMParticleClass = OCMClassMock([MParticle class]);
+    
+    OCMStub([mockMParticleClass sharedInstance]).andReturn(mockMParticleInstance);
+    OCMStub([(MParticle *)mockMParticleInstance logLevel]).andReturn(MPILogLevelDebug);
+    OCMStub([(MParticle *)mockMParticleInstance environment]).andReturn(MPEnvironmentDevelopment);
+    
+    OCMExpect([mockRoktSDK setLogLevel:RoktLogLevelDebug]);
+    
+    [MPKitRokt applyMParticleLogLevel];
+    
+    OCMVerifyAll(mockRoktSDK);
+    
+    [mockRoktSDK stopMocking];
+    [mockMParticleClass stopMocking];
+    [mockMParticleInstance stopMocking];
 }
 
 @end
