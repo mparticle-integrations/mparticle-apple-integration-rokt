@@ -21,7 +21,7 @@ Pod::Spec.new do |s|
         objc.source_files = 'mParticle-Rokt/*.{h,m}'
         objc.public_header_files = 'mParticle-Rokt/*.h'
         objc.dependency 'mParticle-Apple-SDK', '~> 8.0'
-        objc.dependency 'Rokt-Widget', '~> 4.15'
+        objc.dependency 'Rokt-Widget', '~> 4.16'
     end
     
      # Swift subspec
@@ -29,7 +29,7 @@ Pod::Spec.new do |s|
         swift.source_files = 'mParticle-Rokt-Swift/*.swift'
         swift.dependency 'mParticle-Rokt/ObjC'
         swift.dependency 'mParticle-Apple-SDK', '~> 8.0'
-        swift.dependency 'Rokt-Widget', '~> 4.15'
+        swift.dependency 'Rokt-Widget', '~> 4.16'
     end
     
     # Default includes both

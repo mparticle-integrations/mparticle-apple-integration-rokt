@@ -10,6 +10,8 @@
     #import "mParticle_Apple_SDK-Swift.h"
 #endif
 
+@class MPRoktPlacementOptions;
+
 @interface MPKitRokt : NSObject <MPKitProtocol>
 
 @property (nonatomic, strong, nonnull) NSDictionary *configuration;

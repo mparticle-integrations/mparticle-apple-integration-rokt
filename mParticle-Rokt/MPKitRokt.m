@@ -120,8 +120,9 @@ static __weak MPKitRokt *roktKit = nil;
                            embeddedViews:(NSDictionary<NSString *, MPRoktEmbeddedView *> * _Nullable)embeddedViews
                                   config:(MPRoktConfig * _Nullable)mpRoktConfig
                                callbacks:(MPRoktEventCallback * _Nullable)callbacks
-                            filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser {
-    [MPKitRokt MPLog:[NSString stringWithFormat:@"Rokt Kit recieved `executeWithIdentifier` method with the following arguments: \n identifier: %@ \n attributes: %@ \n embeddedViews: %@ \n config: %@ \n callbacks: %@ \n filteredUser identities: %@", identifier, attributes, embeddedViews, mpRoktConfig, callbacks, filteredUser.userIdentities]];
+                            filteredUser:(FilteredMParticleUser * _Nonnull)filteredUser
+                                 options:(MPRoktPlacementOptions * _Nullable)options {
+    [MPKitRokt MPLog:[NSString stringWithFormat:@"Rokt Kit recieved `executeWithIdentifier` method with the following arguments: \n identifier: %@ \n attributes: %@ \n embeddedViews: %@ \n config: %@ \n callbacks: %@ \n filteredUser identities: %@ \n options: %@", identifier, attributes, embeddedViews, mpRoktConfig, callbacks, filteredUser.userIdentities, options]];
     NSDictionary<NSString *, NSString *> *finalAtt = [MPKitRokt prepareAttributes:attributes filteredUser:filteredUser performMapping:NO];
     
     // Log custom event for selectPlacements call
@@ -130,11 +131,17 @@ static __weak MPKitRokt *roktKit = nil;
     //Convert MPRoktConfig to RoktConfig
     RoktConfig *roktConfig = [MPKitRokt convertMPRoktConfig:mpRoktConfig];
     NSDictionary<NSString *, RoktEmbeddedView *> *confirmedViews = [self confirmEmbeddedViews:embeddedViews];
+
+    PlacementOptions *placementOptions = [[PlacementOptions alloc] initWithJointSdkSelectPlacements:0 dynamicPerformanceMarkers:@{}];
+    if (options) {
+        placementOptions = [[PlacementOptions alloc] initWithJointSdkSelectPlacements:options.jointSdkSelectPlacements dynamicPerformanceMarkers:@{}];
+    }
     
     [Rokt executeWithViewName:identifier
                    attributes:finalAtt
                    placements:confirmedViews
                        config:roktConfig
+             placementOptions:placementOptions
                        onLoad:callbacks.onLoad
                      onUnLoad:callbacks.onUnLoad
  onShouldShowLoadingIndicator:callbacks.onShouldShowLoadingIndicator

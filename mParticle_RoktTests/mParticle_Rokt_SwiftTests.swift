@@ -284,7 +284,7 @@ struct mParticle_Rokt_SwiftTests {
         // Then
         #expect(true, "logSelectPlacementEvent should handle MParticle instance state gracefully")
     }
-    
+
     // MARK: - Integration Tests
     
     @MainActor @available(iOS 15, *)
