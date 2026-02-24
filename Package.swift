@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "mParticle-Rokt",
-    platforms: [ .iOS(.v11), .tvOS(.v11) ], 
+    platforms: [ .iOS(.v12) ],
     products: [
         .library(
             name: "mParticle-Rokt",
