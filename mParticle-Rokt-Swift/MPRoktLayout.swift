@@ -21,8 +21,9 @@ public class MPRoktLayout {
     public var roktLayout: RoktLayout? = nil
     let mparticle = MParticle.sharedInstance()
 
+    /// - Parameter sdkTriggered: Pass the current trigger value (e.g. from `@State var sdkTriggered`). When the host sets `sdkTriggered = true`, SwiftUI re-renders and passes the new value to MPRoktLayout and RoktLayout.
     public init(
-        sdkTriggered: Binding<Bool>,
+        sdkTriggered: Bool,
         viewName: String? = nil,
         locationName: String = "",
         attributes: [String: String],
@@ -35,14 +36,14 @@ public class MPRoktLayout {
             dynamicPerformanceMarkers: [:]
         )
 
-        MPRoktLayout.mpLog("Initializing MPRoktLayout with arguments sdkTriggered:\(sdkTriggered.wrappedValue), viewName:\(viewName ?? "nil"), locationName:\(locationName), attributes:\(attributes)")
-        confirmUser(attributes: attributes) { identifyCalled in
+        MPRoktLayout.mpLog("Initializing MPRoktLayout with arguments sdkTriggered:\(sdkTriggered), viewName:\(viewName ?? "nil"), locationName:\(locationName), attributes:\(attributes)")
+        confirmUser(attributes: attributes) { _ in
             let preparedAttributes = MPKitRokt.prepareAttributes(attributes, filteredUser: Optional<FilteredMParticleUser>.none, performMapping: true)
             
             // Log custom event for selectPlacements call
             MPKitRokt.logSelectPlacementEvent(preparedAttributes)
             
-            MPRoktLayout.mpLog("Initializing RoktLayout with arguments  sdkTriggered:\(sdkTriggered.wrappedValue), viewName: \(viewName ?? "nil"), locationName:\(locationName), attributes:\(preparedAttributes)")
+            MPRoktLayout.mpLog("Initializing RoktLayout with arguments  sdkTriggered:\(sdkTriggered), viewName: \(viewName ?? "nil"), locationName:\(locationName), attributes:\(preparedAttributes)")
             self.roktLayout = RoktLayout.init(
                 sdkTriggered: sdkTriggered,
                 viewName: viewName,
@@ -52,14 +53,6 @@ public class MPRoktLayout {
                 placementOptions: options,
                 onEvent: onEvent
             )
-            // The Binding variable provided by the client allows us to trigger a re-render of the UI but we only want to do this if the value was true to start
-            if identifyCalled && sdkTriggered.wrappedValue {
-                MPRoktLayout.mpLog("Triggering Rokt Swift UI re-render")
-                DispatchQueue.main.async {
-                    sdkTriggered.wrappedValue = false
-                    sdkTriggered.wrappedValue = true
-                }
-            }
         }
     }
     

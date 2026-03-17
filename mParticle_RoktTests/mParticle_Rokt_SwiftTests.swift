@@ -19,13 +19,12 @@ struct mParticle_Rokt_SwiftTests {
     @MainActor @available(iOS 15, *)
     @Test func testMPRoktLayoutBasicInitialization() {
         // Given
-        let sdkTriggered = Binding.constant(false)
         let locationName = "test_location"
         let attributes: [String: String] = ["key1": "value1", "key2": "value2"]
         
         // When
         let layout = MPRoktLayout(
-            sdkTriggered: sdkTriggered,
+            sdkTriggered: false,
             locationName: locationName,
             attributes: attributes
         )
@@ -37,7 +36,6 @@ struct mParticle_Rokt_SwiftTests {
     @MainActor @available(iOS 15, *)
     @Test func testMPRoktLayoutInitializationWithAllParameters() {
         // Given
-        let sdkTriggered = Binding.constant(true)
         let viewName = "test_view"
         let locationName = "test_location"
         let attributes: [String: String] = ["user_id": "12345", "sandbox": "true"]
@@ -49,7 +47,7 @@ struct mParticle_Rokt_SwiftTests {
         
         // When
         let layout = MPRoktLayout(
-            sdkTriggered: sdkTriggered,
+            sdkTriggered: true,
             viewName: viewName,
             locationName: locationName,
             attributes: attributes,
@@ -64,13 +62,12 @@ struct mParticle_Rokt_SwiftTests {
     @MainActor @available(iOS 15, *)
     @Test func testMPRoktLayoutInitializationWithEmptyAttributes() {
         // Given
-        let sdkTriggered = Binding.constant(false)
         let locationName = "empty_attributes_test"
         let attributes: [String: String] = [:]
         
         // When
         let layout = MPRoktLayout(
-            sdkTriggered: sdkTriggered,
+            sdkTriggered: false,
             locationName: locationName,
             attributes: attributes
         )
@@ -82,13 +79,12 @@ struct mParticle_Rokt_SwiftTests {
     @MainActor @available(iOS 15, *)
     @Test func testMPRoktLayoutInitializationWithSandboxAttribute() {
         // Given
-        let sdkTriggered = Binding.constant(false)
         let locationName = "sandbox_test"
         let attributes: [String: String] = ["sandbox": "true", "user_id": "test_user"]
         
         // When
         let layout = MPRoktLayout(
-            sdkTriggered: sdkTriggered,
+            sdkTriggered: false,
             locationName: locationName,
             attributes: attributes
         )
@@ -172,12 +168,11 @@ struct mParticle_Rokt_SwiftTests {
     @MainActor @available(iOS 15, *)
     @Test func testMPRoktLayoutIsSwiftUIView() {
         // Given
-        let sdkTriggered = Binding.constant(false)
         let attributes: [String: String] = ["test": "value"]
         
         // When
         let layout = MPRoktLayout(
-            sdkTriggered: sdkTriggered,
+            sdkTriggered: false,
             locationName: "test",
             attributes: attributes
         )
@@ -191,13 +186,12 @@ struct mParticle_Rokt_SwiftTests {
     @MainActor @available(iOS 15, *)
     @Test func testMPRoktLayoutWithLongLocationName() {
         // Given
-        let sdkTriggered = Binding.constant(false)
         let longLocationName = String(repeating: "a", count: 1000)
         let attributes: [String: String] = ["test": "value"]
 
         // When
         let layout = MPRoktLayout(
-            sdkTriggered: sdkTriggered,
+            sdkTriggered: false,
             locationName: longLocationName,
             attributes: attributes
         )
@@ -209,7 +203,6 @@ struct mParticle_Rokt_SwiftTests {
     @MainActor @available(iOS 15, *)
     @Test func testMPRoktLayoutWithSpecialCharacters() {
         // Given
-        let sdkTriggered = Binding.constant(false)
         let locationName = "test_location_with_特殊字符_🎉"
         let attributes: [String: String] = [
             "unicode_key_🌟": "unicode_value_🎯",
@@ -218,7 +211,7 @@ struct mParticle_Rokt_SwiftTests {
         
         // When
         let layout = MPRoktLayout(
-            sdkTriggered: sdkTriggered,
+            sdkTriggered: false,
             locationName: locationName,
             attributes: attributes
         )
@@ -231,25 +224,26 @@ struct mParticle_Rokt_SwiftTests {
     
     @MainActor @available(iOS 15, *)
     @Test func testMPRoktLayoutSDKTriggeredStateChange() {
-        // Given
-        let sdkTriggered = Binding.constant(false)
+        // Given: sdkTriggered is now a value; host passes true/false and SwiftUI re-renders when state changes
         let attributes: [String: String] = ["test": "value"]
         
-        // When
-        let layout = MPRoktLayout(
-            sdkTriggered: sdkTriggered,
+        // When: create with false
+        let layoutFalse = MPRoktLayout(
+            sdkTriggered: false,
+            locationName: "state_test",
+            attributes: attributes
+        )
+        
+        // When: create with true (simulates host re-rendering after setting sdkTriggered = true)
+        let layoutTrue = MPRoktLayout(
+            sdkTriggered: true,
             locationName: "state_test",
             attributes: attributes
         )
         
         // Then
-        #expect(layout.roktLayout != nil, "Layout should be created with initial state")
-        
-        // When state changes
-        sdkTriggered.wrappedValue = true
-        
-        // Then
-        #expect(layout.roktLayout != nil, "Layout should handle state changes")
+        #expect(layoutFalse.roktLayout != nil, "Layout should be created with sdkTriggered false")
+        #expect(layoutTrue.roktLayout != nil, "Layout should be created with sdkTriggered true")
     }
     
     // MARK: - SelectPlacements Custom Event Tests
@@ -290,7 +284,6 @@ struct mParticle_Rokt_SwiftTests {
     @MainActor @available(iOS 15, *)
     @Test func testMPRoktLayoutAttributeProcessingIntegration() {
         // Given
-        let sdkTriggered = Binding.constant(false)
         let attributes: [String: String] = [
             "user_id": "12345",
             "email": "test@example.com",
@@ -299,7 +292,7 @@ struct mParticle_Rokt_SwiftTests {
         
         // When
         let layout = MPRoktLayout(
-            sdkTriggered: sdkTriggered,
+            sdkTriggered: false,
             viewName: "integration_test",
             locationName: "test_location",
             attributes: attributes
@@ -312,7 +305,6 @@ struct mParticle_Rokt_SwiftTests {
     @MainActor @available(iOS 15, *)
     @Test func testMPRoktLayoutWithComplexConfiguration() {
         // Given
-        let sdkTriggered = Binding.constant(true)
         let viewName = "complex_config_test"
         let locationName = "complex_location"
         let attributes: [String: String] = [
@@ -331,7 +323,7 @@ struct mParticle_Rokt_SwiftTests {
         
         // When
         let layout = MPRoktLayout(
-            sdkTriggered: sdkTriggered,
+            sdkTriggered: true,
             viewName: viewName,
             locationName: locationName,
             attributes: attributes,
