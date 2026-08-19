@@ -37,6 +37,12 @@ static __weak MPKitRokt *roktKit = nil;
 
 @end
 
+// Last MPID this kit acted on. Persisted rather than held in memory so a kiosk app that is
+// relaunched mid-queue still recognises the next customer as a different person; an in-memory
+// value would reset to nil on launch, be treated as a first observation, and let that customer
+// inherit the previous one's Rokt session.
+static NSString * const kMPRoktLastSeenMpidKey = @"mParticle::rokt::lastSeenMpid";
+
 @implementation MPKitRokt
 
 /*
@@ -568,6 +574,22 @@ static __weak MPKitRokt *roktKit = nil;
     return [Rokt getSessionId];
 }
 
+/// End the current Rokt session so the next placement starts a new one.
+///
+/// Reached either from MPRokt.clearSession (partner-driven) or from the session/identity
+/// triggers below.
+- (MPKitExecStatus *)clearSession {
+    [MPKitRokt clearRoktSession];
+    return [self execStatus:MPKitReturnCodeSuccess];
+}
+
+/// Single funnel for every reset trigger, so the ordering guarantees inside the Rokt SDK
+/// (flush buffered events, then drop the session) are exercised identically by all of them.
++ (void)clearRoktSession {
+    [MPKitRokt MPLog:@"Rokt Kit clearing the Rokt session"];
+    [Rokt clearSession];
+}
+
 #pragma mark - User attributes and identities
 
 - (MPKitExecStatus *)setUserIdentity:(NSString *)identityString identityType:(MPUserIdentity)identityType {
@@ -711,52 +733,105 @@ static __weak MPKitRokt *roktKit = nil;
 }
 
 #pragma mark Identity
+
 /*
-    Implement this method if your SDK should be notified any time the mParticle ID (MPID) changes. This will occur on initial install of the app, and potentially after a login or logout.
+    A change of MPID means a different person is using the device. On a self-service terminal
+    that is the transaction boundary: the Rokt session must end so the next customer is not
+    folded into the previous customer's session.
+
+    The kit is never told "the MPID changed" directly — MPIdentityApi fires that branch
+    internally and then forwards the identity completion unconditionally — so the comparison
+    is made here against the last MPID this kit acted on.
+
+    onModifyComplete is deliberately NOT wired: modify() resolves through
+    onModifyRequestComplete with a response carrying no mpid and forwards the current user, so
+    it cannot change the MPID and would never pass the check below.
 */
 - (MPKitExecStatus *)onIdentifyComplete:(FilteredMParticleUser *)user request:(FilteredMPIdentityApiRequest *)request {
-     /*  Your code goes here.
-         If the execution is not successful, please use a code other than MPKitReturnCodeSuccess for the execution status.
-         Please see MPKitExecStatus.h for all exec status codes
-      */
-
-     return [self execStatus:MPKitReturnCodeSuccess];
+    [self clearRoktSessionIfMpidChanged:user];
+    return [self execStatus:MPKitReturnCodeSuccess];
 }
 
-/*
-    Implement this method if your SDK should be notified when the user logs in
-*/
 - (MPKitExecStatus *)onLoginComplete:(FilteredMParticleUser *)user request:(FilteredMPIdentityApiRequest *)request {
-     /*  Your code goes here.
-         If the execution is not successful, please use a code other than MPKitReturnCodeSuccess for the execution status.
-         Please see MPKitExecStatus.h for all exec status codes
-      */
-
-     return [self execStatus:MPKitReturnCodeSuccess];
+    [self clearRoktSessionIfMpidChanged:user];
+    return [self execStatus:MPKitReturnCodeSuccess];
 }
 
-/*
-    Implement this method if your SDK should be notified when the user logs out
-*/
 - (MPKitExecStatus *)onLogoutComplete:(FilteredMParticleUser *)user request:(FilteredMPIdentityApiRequest *)request {
-     /*  Your code goes here.
-         If the execution is not successful, please use a code other than MPKitReturnCodeSuccess for the execution status.
-         Please see MPKitExecStatus.h for all exec status codes
-      */
-
-     return [self execStatus:MPKitReturnCodeSuccess];
+    [self clearRoktSessionIfMpidChanged:user];
+    return [self execStatus:MPKitReturnCodeSuccess];
 }
 
-/*
-    Implement this method if your SDK should be notified when user identities change
-*/
-- (MPKitExecStatus *)onModifyComplete:(FilteredMParticleUser *)user request:(FilteredMPIdentityApiRequest *)request {
-     /*  Your code goes here.
-         If the execution is not successful, please use a code other than MPKitReturnCodeSuccess for the execution status.
-         Please see MPKitExecStatus.h for all exec status codes
-      */
+/// Resets the Rokt session when this identity call produced a different MPID than the last one
+/// seen. The first MPID ever observed is recorded without resetting: there is no previous
+/// customer to separate from, and resetting there would discard a session the host app may
+/// have only just established.
+- (void)clearRoktSessionIfMpidChanged:(FilteredMParticleUser *)user {
+    NSNumber *mpid = user.userId;
+    if (mpid == nil || [mpid isKindOfClass:[NSNull class]]) {
+        return;
+    }
 
-     return [self execStatus:MPKitReturnCodeSuccess];
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSNumber *lastSeenMpid = [defaults objectForKey:kMPRoktLastSeenMpidKey];
+    // Recorded unconditionally, and deliberately before any readiness check. Identity callbacks
+    // routinely land before Rokt's init round trip finishes; skipping the write there would leave
+    // the *next* customer looking like the first observation, so their arrival would not reset and
+    // they would inherit the previous customer's session.
+    [defaults setObject:mpid forKey:kMPRoktLastSeenMpidKey];
+
+    if (lastSeenMpid == nil) {
+        [MPKitRokt MPLog:@"Rokt Kit recording first observed MPID; no session reset"];
+        return;
+    }
+
+    if ([lastSeenMpid isEqualToNumber:mpid]) {
+        return;
+    }
+
+    [MPKitRokt MPLog:@"Rokt Kit detected an MPID change; resetting the Rokt session"];
+    // No `started` check: clearing is safe before Rokt finishes initialising (it only touches
+    // stored session state) and is exactly what a terminal relaunched mid-queue needs, so a
+    // session persisted for the previous customer is dropped rather than restored.
+    [MPKitRokt clearRoktSession];
+}
+
+#pragma mark Session
+
+/*
+    Session boundaries are only honoured when the host app drives sessions itself
+    (automaticSessionTracking == NO). Under automatic tracking a session ends after the app has
+    been in the *background* past a 60s timeout — a statement about app lifecycle, not about who
+    is using the device — and a terminal pinned in the foreground never triggers it at all. So
+    acting on automatic sessions would fragment sessions for every existing mParticle partner
+    while doing nothing for the case this exists to solve.
+
+    Both begin and end are wired. A partner rotating sessions per transaction must call
+    endSession then beginSession (beginSession is a no-op while a session exists), and honouring
+    begin as well guarantees a clean slate when a previous transaction ended abnormally. The
+    redundant reset that follows an end/begin pair is harmless: Rokt.clearSession is idempotent.
+*/
+- (MPKitExecStatus *)beginSession {
+    [self clearRoktSessionOnManualSessionBoundary];
+    return [self execStatus:MPKitReturnCodeSuccess];
+}
+
+- (MPKitExecStatus *)endSession {
+    [self clearRoktSessionOnManualSessionBoundary];
+    return [self execStatus:MPKitReturnCodeSuccess];
+}
+
+- (void)clearRoktSessionOnManualSessionBoundary {
+    if (!self.started) {
+        return;
+    }
+
+    if ([MParticle sharedInstance].automaticSessionTracking) {
+        return;
+    }
+
+    [MPKitRokt MPLog:@"Rokt Kit reached a manual session boundary; resetting the Rokt session"];
+    [MPKitRokt clearRoktSession];
 }
 
 #pragma mark Events
